@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "Axie Scholar Utilities"
+version = "0.1.0"
+description = "TBD"
+authors = ["Ferran Marin <ferran.marin.llobet@gmail.com>"]
+license = "TBD"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+docopt = "^0.6.2"
+web3 = "^5.23.0"
+jsonschema = "^3.2.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
