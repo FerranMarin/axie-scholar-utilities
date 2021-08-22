@@ -25,7 +25,10 @@ log.addHandler(ch)
 
 def generate_secrets_file(payments_file_path, secrets_file_path=None):
     if not secrets_file_path:
-        secrets_file_path = "./secrets.json"
+        fn = "secrets.json"
+        with open(fn, "w") as f:
+            f.write("{}")
+        secrets_file_path = "secrets.json"
     payments = AxiePaymentsManager.load_json(payments_file_path)
     secrets = AxiePaymentsManager.load_json(secrets_file_path)
     changed = False
@@ -36,7 +39,7 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
             while new_secret == '':
                 new_secret = input(f"Please provide secret key for account {acc['Name']}."
                                    f"({acc['AccountAddress']}): ")
-            secrets[acc["AccounttAddress"]] = new_secret
+            secrets[acc["AccountAddress"]] = new_secret
     
     if changed:
         logging.info(f"Saving secrets file at {secrets_file_path}")
