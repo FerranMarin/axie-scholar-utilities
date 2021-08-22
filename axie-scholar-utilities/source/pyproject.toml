@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "Axie Scholar Utilities"
 version = "0.1.0"
-description = "TBD"
+description = "Package to automaet activites related to manage Axie Infinity Scholars. Specially aimed at managers with large scholar roasters."
 authors = ["Ferran Marin <ferran.marin.llobet@gmail.com>"]
-license = "TBD"
+license = "GPL-3.0"
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -12,6 +12,8 @@ web3 = "^5.23.0"
 jsonschema = "^3.2.0"
 
 [tool.poetry.dev-dependencies]
+mock = "^4.0.3"
+pytest-mock = "^3.6.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
