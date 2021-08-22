@@ -28,17 +28,20 @@ payments_schema = {
                         "type": "string"
                     },
                     "AccountAddress": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^ronin:"
                     },
                     "ScholarPayoutAddress": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^ronin:"
                     },
                     "ScholarPayout": {
                         "type": "number",
                         "minimum": 1
                     },
                     "TrainerPayoutAddress": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^ronin:"
                     },
                     "TrainerPayout": {
                         "type": "number",
@@ -65,7 +68,8 @@ payments_schema = {
                         "type": "string"
                     },
                     "AccountAddress": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^ronin:"
                     },
                     "Percent": {
                         "type": "number",
