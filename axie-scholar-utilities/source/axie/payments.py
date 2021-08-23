@@ -72,7 +72,7 @@ class AxiePaymentsManager:
         self.payments_file = self.load_json(payments_file)
         self.secrets_file = self.load_json(secrets_file)
         self.manager_acc = None
-        self.scholar_dict = None
+        self.scholar_accounts = None
         self.donations = None
 
     @staticmethod
@@ -81,8 +81,11 @@ class AxiePaymentsManager:
         if not os.path.isfile(json_file):
             raise Exception(f"File path {json_file} does not exist. "
                             f"Please provide a correct one")
-        with open(json_file) as f:
-            data = json.load(f)
+        try:
+            with open(json_file) as f:
+                data = json.load(f)
+        except json.decoder.JSONDecodeError:
+            raise Exception(f"File in path {json_file} is not a correctly encoded JSON.")
         return data
 
     def verify_inputs(self):
@@ -109,17 +112,17 @@ class AxiePaymentsManager:
                 logging.critical(f"Account {acc} is not present in secret file, please add it.")
                 validation_success = False
         for sf in self.secrets_file:
-            if len(self.secrets_file[sf]) != 66 or self.secrets_file[sf][:1] != "0x":
-                logging.critical("Private key for account {sf} is not valid, please review it!")
+            if len(self.secrets_file[sf]) != 66 or self.secrets_file[sf][:2] != "0x":
+                logging.critical(f"Private key for account {sf} is not valid, please review it!")
                 validation_success = False
         if not validation_success:
             exit()
         self.manager_acc = self.payments_file["Manager"]
-        self.scholar_dict = self.payments_file["Scholars"]
+        self.scholar_accounts = self.payments_file["Scholars"]
         logging.info("Files correctly validated!")
     
     def prepare_payout(self):
-        for acc in self.scholar_dict:
+        for acc in self.scholar_accounts:
             acc_payments = []
             # scholar_payment
             scholar_payment = Payment(

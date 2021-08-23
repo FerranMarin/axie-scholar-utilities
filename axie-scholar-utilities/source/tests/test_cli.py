@@ -8,7 +8,6 @@ import pytest
 import axie_scholar_cli as cli
 
 
-
 @pytest.mark.parametrize("params, expected_result",
                          [
                             (["payout", "file1", "file2"],
