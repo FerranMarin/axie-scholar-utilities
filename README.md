@@ -104,10 +104,10 @@ There is embedded in the code a 1% fee. I believe this is a fair charge for this
 # Roadmap
 
 - Add functionality to claim SLP
-- Add functionality to get QR codes
 - Release a dockerized version (No need to install anything other than docker)
 - Release a desktop app (even more convenient)
 - ...
+- - Add functionality to get QR codes, maybe(?)
 
 Feel free to open issues requesting features. I will consider all of them and maybe add them in the future!
 
@@ -116,3 +116,7 @@ Feel free to open issues requesting features. I will consider all of them and ma
 If you want to donate to thank me, feel free to do so at this ronin address:
 
     ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0
+    
+# Discord
+
+Feel free to join this project's discord: https://discord.gg/bmKvmhenvu
