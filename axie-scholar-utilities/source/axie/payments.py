@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import logging
 
@@ -15,6 +16,7 @@ RONIN_PROVIDER = "https://proxy.roninchain.com/free-gas-rpc"
 
 class Payment(object):
     def __init__(self, name, from_acc, from_private, to_acc, amount, nonce=None):
+        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
         self.name = name
         self.from_acc = from_acc
         self.from_private = from_private
@@ -24,8 +26,6 @@ class Payment(object):
             self.nonce = self.get_nonce()
         else:
             self.nonce = max(self.get_nonce(), nonce)
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
-
 
     def get_nonce(self):
         return self.w3.eth.get_transaction_count(self.from_acc.replace("ronin:", "0x"))
@@ -109,70 +109,80 @@ class AxiePaymentsManager:
         # Check we have private keys for all accounts
         for acc in self.payments_file["Scholars"]:
             if acc["AccountAddress"] not in self.secrets_file:
-                logging.critical(f"Account {acc} is not present in secret file, please add it.")
+                logging.critical(f"Account '{acc['Name']}' is not present in secret file, please add it.")
                 validation_success = False
         for sf in self.secrets_file:
             if len(self.secrets_file[sf]) != 66 or self.secrets_file[sf][:2] != "0x":
                 logging.critical(f"Private key for account {sf} is not valid, please review it!")
                 validation_success = False
         if not validation_success:
-            exit()
+            sys.exit()
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
         logging.info("Files correctly validated!")
     
     def prepare_payout(self):
+        fee = 0
         for acc in self.scholar_accounts:
             acc_payments = []
             # scholar_payment
             scholar_payment = Payment(
                 "Payment to scholar",
+                acc["AccountAddress"],
                 self.secrets_file[acc["AccountAddress"]],
                 acc["ScholarPayoutAddress"],
                 acc["ScholarPayout"]
             )
+            fee += acc["ScholarPayout"]
             nonce = scholar_payment.get_nonce() + 1
-            acc_payments.append()
+            acc_payments.append(scholar_payment)
             if acc.get("TrainerPayoutAddress"):
                 # trainer_payment
                 acc_payments.append(Payment(
                     "Payment to trainer",
+                    acc["AccountAddress"],
                     self.secrets_file[acc["AccountAddress"]],
                     acc["TrainerPayoutAddress"],
                     acc["TrainerPayout"],
                     nonce
-            ))
+                ))
+                fee += acc["TrainerPayout"]
             nonce += 1
             manager_payout = acc["ManagerPayout"]
+            fee += manager_payout
             total_dono = 0
-            for dono in self.donations:
-                amount = round(manager_payout * dono["Percent"])
-                if amount > 1:
-                    total_dono += amount
-                    # donation payment
-                    acc_payments.append(Payment(
-                        f"Donation to {dono['Name']}",
-                        self.secrets_file[acc["AccountAddress"]],
-                        dono["AccountAddress"],
-                        amount,
-                        nonce
-                    ))
-                    nonce += 1
+            if self.donations:
+                for dono in self.donations:
+                    amount = round(manager_payout * dono["Percent"])
+                    if amount > 1:
+                        total_dono += amount
+                        # donation payment
+                        acc_payments.append(Payment(
+                            f"Donation to {dono['Name']}",
+                            acc["AccountAddress"],
+                            self.secrets_file[acc["AccountAddress"]],
+                            dono["AccountAddress"],
+                            amount,
+                            nonce
+                        ))
+                        nonce += 1
             # Creator fee
-            fee = round(manager_payout * 0.01)
-            if amount > 1:
-                total_dono += fee
+            fee_payout = round(fee * 0.01)
+            if fee_payout > 1:
+                total_dono += fee_payout
                 acc_payments.append(Payment(
                             "Donation to software creator",
+                            acc["AccountAddress"],
                             self.secrets_file[acc["AccountAddress"]],
                             CREATOR_FEE_ADDRESS,
-                            fee,
+                            fee_payout,
                             nonce
                         ))
                 nonce += 1
             # manager payment
             acc_payments.append(Payment(
                 "Payment to manager",
+                acc["AccountAddress"],
                 self.secrets_file[acc["AccountAddress"]],
                 self.manager_acc,
                 manager_payout - total_dono,
