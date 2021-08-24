@@ -18,7 +18,7 @@ class Payment(object):
     def __init__(self, name, from_acc, from_private, to_acc, amount, nonce=None):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
         self.name = name
-        self.from_acc = from_acc
+        self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
         self.to_acc = self.validate_account(to_acc)
         self.amount = amount
@@ -28,12 +28,13 @@ class Payment(object):
             self.nonce = max(self.get_nonce(), nonce)
 
     def get_nonce(self):
-        return self.w3.eth.get_transaction_count(self.from_acc.replace("ronin:", "0x"))
+        return self.w3.eth.get_transaction_count(self.from_acc)
 
     def validate_account(self, acc):
         clean_acc = acc.replace("ronin:", "0x")
         if not self.w3.isAddress(clean_acc):
-            raise Exception(f"This address {acc} is invalid!")
+            raise Exception(f"This address '{acc}' is invalid!")
+        return clean_acc
 
     def execute(self):
         # Prepare transaction
@@ -45,7 +46,7 @@ class Payment(object):
         )
         # Build transaction
         transaction = slp_contract.functions.transfer(
-            self.to_acc.replace("ronin:", "0x"),
+            self.to_acc,
             self.amount
         ).buildTransaction({
             "chainId": 2020,
@@ -54,7 +55,7 @@ class Payment(object):
             "nonce": self.nonce
         })
         # Sign Transaction
-        signed = self.w3.eth.account.sign_ransaction(
+        signed = self.w3.eth.account.sign_transaction(
             transaction, 
             private_key=self.from_private
         )
