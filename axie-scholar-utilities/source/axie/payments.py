@@ -190,17 +190,18 @@ class AxiePaymentsManager:
             ))
             self.payout_account(acc["Name"], acc_payments)
 
+    @staticmethod
     def payout_account(acc_name, payment_list):
         logging.info(f"Payments for {acc_name}:")
-        logging.info(",\n".join(p for p in payment_list))
+        logging.info(",\n".join(str(p) for p in payment_list))
         accept = None
         while accept not in ["y", "n", "Y", "N"]:
-            accept = input("Do you want to proceed with these payments?(y/n): ")
+            accept = input("Do you want to proceed with these transactions?(y/n): ")
         if accept.lower() == "y":
             for payment in payment_list:
                 hash = payment.execute()
                 logging.info(f"{payment} Transaction Sent!")
                 logging.info(f"Transaction hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
-            logging.info(f"Payments completed for {acc_name}")
+            logging.info(f"Transactions completed for account: '{acc_name}'")
         else:
-            logging.info(f"Payments canceled for {acc_name}")
+            logging.info(f"Transactions canceled for account: '{acc_name}'")
