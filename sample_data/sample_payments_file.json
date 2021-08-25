@@ -1,0 +1,35 @@
+{
+    "Manager": "ronin:<Manager address here>",
+    "Scholars":[
+        {
+            "Name": "Scholar 1",
+            "AccountAddress": "ronin:<account_s1_address>",
+            "ScholarPayoutAddress": "ronin:<scholar_address>",
+            "ScholarPayout": 100,
+            "TrainerPayoutAddress": "ronin:<trainer_address>",
+            "TrainerPayout": 10,
+            "ManagerPayout": 90
+        },
+        {
+            "Name": "Scholar 2",
+            "AccountAddress": "ronin:<account_s2_address>",
+            "ScholarPayoutAddress": "ronin:<scholar2_address>",
+            "ScholarPayout": 200,
+            "TrainerPayoutAddress": "ronin:<trainer_address>",
+            "TrainerPayout": 14,
+            "ManagerPayout": 190
+        }
+    ],
+    "Donations": [
+        {
+            "Name": "Entity 1",
+            "AccountAddress": "ronin:<donation_entity_1_address>",
+            "Percent": 0.01
+        },
+        {
+            "Name": "Entity 2",
+            "AccountAddress": "ronin:<donation_entity_2_address>",
+            "Percent": 0.01
+        }
+    ]
+}
