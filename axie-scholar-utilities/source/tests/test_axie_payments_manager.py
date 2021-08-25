@@ -10,8 +10,8 @@ from axie.payments import Payment, SLP_CONTRACT
 
 @patch("axie.AxiePaymentsManager.load_json")
 def test_payments_manager_init(mocked_load_json):
-    payments_file = os.path.abspath("./test_data/sample_payments_file.json")
-    secrets_file = os.path.abspath("./test_data/sample_secrets_file.json")
+    payments_file = "sample_payments_file.json"
+    secrets_file = "sample_secrets_file.json"
     AxiePaymentsManager(payments_file, secrets_file)
     mocked_load_json.assert_has_calls(
         calls=[call(payments_file), call(secrets_file)]
