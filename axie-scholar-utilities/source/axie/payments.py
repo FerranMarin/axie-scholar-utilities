@@ -2,10 +2,11 @@ import os
 import sys
 import json
 import logging
+from time import sleep
 
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
-from web3 import Web3
+from web3 import Web3, exceptions
 
 from axie.schemas import payments_schema
 
@@ -20,7 +21,7 @@ class Payment(object):
         self.name = name
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
-        self.to_acc = self.validate_account(to_acc)
+        self.to_acc = to_acc.replace("ronin:", "0x")
         self.amount = amount
         if not nonce:
             self.nonce = self.get_nonce()
@@ -28,17 +29,11 @@ class Payment(object):
             self.nonce = max(self.get_nonce(), nonce)
 
     def get_nonce(self):
-        return self.w3.eth.get_transaction_count(self.from_acc)
-
-    def validate_account(self, acc):
-        clean_acc = acc.replace("ronin:", "0x")
-        if not self.w3.isAddress(clean_acc):
-            raise Exception(f"This address '{acc}' is invalid!")
-        return clean_acc
+        return self.w3.eth.get_transaction_count(Web3.toChecksumAddress(self.from_acc))
 
     def execute(self):
         # Prepare transaction
-        with open("slp_abi.json") as f:
+        with open("axie/slp_abi.json") as f:
             slb_abi = json.load(f)
         slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
@@ -46,7 +41,7 @@ class Payment(object):
         )
         # Build transaction
         transaction = slp_contract.functions.transfer(
-            self.to_acc,
+            Web3.toChecksumAddress(self.to_acc),
             self.amount
         ).buildTransaction({
             "chainId": 2020,
@@ -61,11 +56,26 @@ class Payment(object):
         )
         # send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
-        # Returns transaction hash
-        return self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        # get transaction hash
+        hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        # wait for transaction to finish
+        while True:
+            try:
+                recepit = self.w3.eth.get_transaction_receipt(hash)
+                if recepit["status"] == 1:
+                    success = True
+                else:
+                    success = False
+                break
+            except exceptions.TransactionNotFound:
+                logging.info("Waiting for transaction to finish...")
+                # Sleep 5 seconds not to constantly send requests!
+                sleep(5)
+
+        return hash, success
 
     def __str__(self):
-        return f"{self.name}({self.to_acc}) for the ammount of {self.amount} SLP."
+        return f"{self.name}({self.to_acc.replace('0x', 'ronin:')}) for the ammount of {self.amount} SLP"
 
 
 class AxiePaymentsManager:
@@ -200,9 +210,12 @@ class AxiePaymentsManager:
             accept = input("Do you want to proceed with these transactions?(y/n): ")
         if accept.lower() == "y":
             for payment in payment_list:
-                hash = payment.execute()
-                logging.info(f"{payment} Transaction Sent!")
-                logging.info(f"Transaction hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+                hash, success = payment.execute()
+                if success:
+                    logging.info(f"{payment} Transaction Sent!")
+                    logging.info(f"Transaction hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+                else:
+                    logging.info(f"Transaction reverted by EVM (Ethereum Virtual machine)")
             logging.info(f"Transactions completed for account: '{acc_name}'")
         else:
             logging.info(f"Transactions canceled for account: '{acc_name}'")

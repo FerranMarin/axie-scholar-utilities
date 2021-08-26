@@ -73,6 +73,8 @@ Command looks like:
 
 This means you need to provide the path to a payments_file and to secrets_file. After that, just follow instructions in the terminal to complete payouts. It will ask for confirmation for each account.
 
+**CAUTION!** In order to be able to do transactions, the sending ronin account (in this case the Scholars Account ronin Addresses) will need to be registered on the Axie marketplace. (If you want to use this tool they should already be, but just in case!)
+
 ## Generate Secrets Utility
 
 This utility helps you generate and make sure your secrets file will hold all the needed private keys to execute the payments. That is why it will ask for a payments file and optionally an already created secrets file. Even if you have a generated secrets file, I recommend running this utility for the sake of making sure you have all the needed secrets. Do not worry if you do not, but that will prevent your payouts to be executed and you will need to edit the secrets file anyway.
