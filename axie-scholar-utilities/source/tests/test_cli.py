@@ -104,10 +104,19 @@ def test_generate_secrets_no_secrets_file(tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
              '{"Name": "Acc2", "AccountAddress": "ronin:<account_s2_address>"}]}')
-    f2 = tmpdir.join("file2.json")
-    f2.write("{}")
+    f2 = tmpdir.join("secrets.json")
     with patch.object(builtins, 'input', lambda _: 'some_input'):
-        cli.generate_secrets_file(f1.strpath, f2.strpath)
+        cli.generate_secrets_file(f1.strpath)
+    assert f2.read() == ('{\n    "ronin:<account_s1_address>": "some_input",\n'
+                         '    "ronin:<account_s2_address>": "some_input"\n}')
+
+def test_generate_secrets_no_secrets_file_other_folder(tmpdir):
+    f1 = tmpdir.mkdir("other_folder").join("file1.json")
+    f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
+             '{"Name": "Acc2", "AccountAddress": "ronin:<account_s2_address>"}]}')
+    f2 = tmpdir.join("other_folder/secrets.json")
+    with patch.object(builtins, 'input', lambda _: 'some_input'):
+        cli.generate_secrets_file(f1.strpath)
     assert f2.read() == ('{\n    "ronin:<account_s1_address>": "some_input",\n'
                          '    "ronin:<account_s2_address>": "some_input"\n}')
 

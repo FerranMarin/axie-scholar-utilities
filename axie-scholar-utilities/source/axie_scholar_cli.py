@@ -25,10 +25,11 @@ log.addHandler(ch)
 
 def generate_secrets_file(payments_file_path, secrets_file_path=None):
     if not secrets_file_path:
-        fn = "secrets.json"
-        with open(fn, "w") as f:
+        # Put secrets file in same folder where payments_file is
+        folder =  os.path.dirname(payments_file_path)
+        secrets_file_path = os.path.join(folder, "secrets.json")
+        with open(secrets_file_path, "w") as f:
             f.write("{}")
-        secrets_file_path = "secrets.json"
     payments = AxiePaymentsManager.load_json(payments_file_path)
     secrets = AxiePaymentsManager.load_json(secrets_file_path)
     changed = False
