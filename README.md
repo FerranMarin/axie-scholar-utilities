@@ -198,11 +198,20 @@ For the last step, modify the <payments_file> and <secrets_file> with the locati
 ------
 ### Linux Installation
 
+TBD
+
 ------
 ------
 ## Docker
 
-TBD
+How to install docker?
+
+[Docker on Windows](https://docs.docker.com/desktop/windows/install/)
+[Docker on Mac](https://docs.docker.com/desktop/mac/install/)
+[Docker on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+[Docker on Debian](https://docs.docker.com/engine/install/debian/)
+Check the website for more Linux distros.
+
 
 ## Desktop App
 

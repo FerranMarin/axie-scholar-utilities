@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  scholar-utilities:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile 
+      target: production
+  tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile 
+      target: tests
