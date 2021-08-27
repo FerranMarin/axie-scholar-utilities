@@ -20,4 +20,4 @@ FROM python-base as tests
 # Install depenencies
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
-ENTRYPOINT ["poetry" "run" "pytest"]
+ENTRYPOINT ["poetry", "run", "pytest"]
