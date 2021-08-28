@@ -2,7 +2,7 @@ import sys
 import builtins
 
 from docopt import docopt, DocoptExit
-from mock import patch
+from mock import mock_open, patch
 import pytest
 
 import axie_scholar_cli as cli
@@ -11,35 +11,70 @@ import axie_scholar_cli as cli
 @pytest.mark.parametrize("params, expected_result",
                          [
                             (["payout", "file1", "file2"],
-                             {"<payments_file>": "file1",
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "<payments_file>": "file1",
+                              "<secrets_file>": "file2",
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              "payout": True}),
+                            (["payout", "file1", "file2", "-y"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": True,
+                              "<payments_file>": "file1",
+                              "<secrets_file>": "file2",
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              "payout": True}),
+                            (["payout", "file1", "file2", "--yes"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": True,
+                              "<payments_file>": "file1",
                               "<secrets_file>": "file2",
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
                               "payout": True}),
                             (["claim", "file1"],
-                             {"<payments_file>": None,
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "<payments_file>": None,
                               "<secrets_file>": "file1",
                               "claim": True,
                               "generate_QR": False,
                               "generate_secrets": False,
                               "payout": False}),
                             (["generate_QR", "file1"],
-                             {"<payments_file>": None,
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "<payments_file>": None,
                               "<secrets_file>": "file1",
                               "claim": False,
                               "generate_QR": True,
                               "generate_secrets": False,
                               "payout": False}),
                             (["generate_secrets", "file1"],
-                             {"<payments_file>": "file1",
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "<payments_file>": "file1",
                               "<secrets_file>": None,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": True,
                               "payout": False}),
                             (["generate_secrets", "file1", "file2"],
-                             {"<payments_file>": "file1",
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "<payments_file>": "file1",
                               "<secrets_file>": "file2",
                               "claim": False,
                               "generate_QR": False,
@@ -141,3 +176,31 @@ def test_generate_secrets_partially_there(tmpdir):
         cli.generate_secrets_file(f1.strpath, f2.strpath)
     assert f2.read() == ('{\n    "ronin:<account_s1_address>": "hello",\n'
                          '    "ronin:<account_s2_address>": "some_input"\n}')
+
+@patch("axie.AxiePaymentsManager.__init__", return_value=None)
+@patch("axie.AxiePaymentsManager.verify_inputs")
+@patch("axie.AxiePaymentsManager.prepare_payout")
+def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, mocked_paymentsmanager, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"}]}')
+    f2 = tmpdir.join("file2.json")
+    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "payout", str(f1), str(f2)]):
+        cli.run_cli()
+    mock_prepare_payout.assert_called_with()
+    mock_verify_input.assert_called_with()
+    mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=False)
+
+@patch("axie.AxiePaymentsManager.__init__", return_value=None)
+@patch("axie.AxiePaymentsManager.verify_inputs")
+@patch("axie.AxiePaymentsManager.prepare_payout")
+def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, mocked_paymentsmanager, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"}]}')
+    f2 = tmpdir.join("file2.json")
+    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "payout", str(f1), str(f2), "-y"]):
+        cli.run_cli()
+    mock_prepare_payout.assert_called_with()
+    mock_verify_input.assert_called_with()
+    mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=True)

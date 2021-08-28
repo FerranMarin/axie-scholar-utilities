@@ -79,12 +79,13 @@ class Payment(object):
 
 
 class AxiePaymentsManager:
-    def __init__(self, payments_file, secrets_file):
+    def __init__(self, payments_file, secrets_file, auto=False):
         self.payments_file = self.load_json(payments_file)
         self.secrets_file = self.load_json(secrets_file)
         self.manager_acc = None
         self.scholar_accounts = None
         self.donations = None
+        self.auto = auto
 
     @staticmethod
     def load_json(json_file):
@@ -201,11 +202,10 @@ class AxiePaymentsManager:
             ))
             self.payout_account(acc["Name"], acc_payments)
 
-    @staticmethod
-    def payout_account(acc_name, payment_list):
+    def payout_account(self, acc_name, payment_list):
         logging.info(f"Payments for {acc_name}:")
         logging.info(",\n".join(str(p) for p in payment_list))
-        accept = None
+        accept = "y" if self.auto else None
         while accept not in ["y", "n", "Y", "N"]:
             accept = input("Do you want to proceed with these transactions?(y/n): ")
         if accept.lower() == "y":

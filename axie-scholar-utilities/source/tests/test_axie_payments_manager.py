@@ -12,10 +12,13 @@ from axie.payments import Payment, SLP_CONTRACT
 def test_payments_manager_init(mocked_load_json):
     payments_file = "sample_payments_file.json"
     secrets_file = "sample_secrets_file.json"
-    AxiePaymentsManager(payments_file, secrets_file)
+    axp = AxiePaymentsManager(payments_file, secrets_file)
     mocked_load_json.assert_has_calls(
         calls=[call(payments_file), call(secrets_file)]
     )
+    axp.auto = False
+    axp2 = AxiePaymentsManager(payments_file, secrets_file, auto=True)
+    axp2.auto = True
 
 def test_payments_manager_load_json_safeguard():
     with pytest.raises(Exception) as e:
@@ -287,7 +290,33 @@ def test_payments_manager_payout_account_accept(_, mocked_execute, tmpdir, caplo
         assert "Payment to manager(ronin:<Manager address here>) for the ammount of 386 SLP Transaction Sent!" in caplog.text
         assert "Transaction hash: abc123 - Explorer: https://explorer.roninchain.com/tx/abc123" in caplog.text
         assert "Transactions completed for account: 'Scholar 1'" in caplog.text
-    
+
+@patch("axie.payments.Payment.execute", return_value=("abc123", True))
+@patch("axie.payments.Payment.get_nonce", return_value=1)
+def test_payments_manager_payout_auto_yes(_, mocked_execute, tmpdir, caplog):
+    p_file = tmpdir.join("p.json")
+    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
+                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
+                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
+                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPayout":100,'
+                  '"ManagerPayout":400}], "Donations":[{"Name":"Entity 1",'
+                  '"AccountAddress": "ronin:<donation_entity_1_address>","Percent":0.01}]}'))
+    s_file = tmpdir.join("s.json")
+    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    axp = AxiePaymentsManager(p_file, s_file, auto=True)
+    axp.verify_inputs()
+    axp.prepare_payout()
+    assert mocked_execute.call_count == 5
+    assert "Payment to scholar(ronin:<scholar_address>) for the ammount of 500 SLP Transaction Sent!" in caplog.text
+    assert "Payment to trainer(ronin:<trainer_address>) for the ammount of 100 SLP Transaction Sent!" in caplog.text
+    assert "Donation to Entity 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP Transaction Sent!" in caplog.text
+    assert "Donation to software creator(ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0) for the ammount of 10 SLP Transaction Sent!" in caplog.text
+    assert "Payment to manager(ronin:<Manager address here>) for the ammount of 386 SLP Transaction Sent!" in caplog.text
+    assert "Transaction hash: abc123 - Explorer: https://explorer.roninchain.com/tx/abc123" in caplog.text
+    assert "Transactions completed for account: 'Scholar 1'" in caplog.text
+
 @patch("axie.payments.Payment.execute")
 @patch("axie.payments.Payment.get_nonce", return_value=1)
 def test_payments_manager_payout_account_deny(_, mocked_execute, tmpdir, caplog):

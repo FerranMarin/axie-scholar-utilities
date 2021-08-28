@@ -1,10 +1,19 @@
 """ Axie Scholar Utilities CLI.
+This tool will help you perform various actions.
+They are: payout, claim, generate_secrets, generate_QR
 
 Usage:
-    axie_scholar_payments_cli.py payout <payments_file> <secrets_file>
+    axie_scholar_payments_cli.py payout <payments_file> <secrets_file> [-y]
     axie_scholar_payments_cli.py claim <secrets_file>
-    axie_scholar_payments_cli.py generate_QR <secrets_file>
     axie_scholar_payments_cli.py generate_secrets <payments_file> [<secrets_file>]
+    axie_scholar_payments_cli.py generate_QR <secrets_file>
+    axie_scholar_payments_cli.py -h | --help
+    axie_scholar_payments_cli.py --version
+
+Options:
+    -h --help   Shows this extra help options
+    -y --yes    Automatically say "yes" to all confirmation promts (they will not appear).
+    --version   Show version.
 """
 import os
 import sys
@@ -70,7 +79,9 @@ def run_cli():
             raise Exception("Please review your file paths and re-try.")
         # Do Payout
         logging.info("I shall pay my scholars!")
-        apm = AxiePaymentsManager(payments_file_path, secrets_file_path)
+        if args['--yes']:
+            logging.info("Automatic acceptance active, it won't ask before each execution")
+        apm = AxiePaymentsManager(payments_file_path, secrets_file_path, auto=args['--yes'])
         apm.verify_inputs()
         apm.prepare_payout() 
     elif args['claim']:
