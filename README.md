@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
+
 # Axie Scholars Utilities
 
 This software's intent is to automate all activities related to manage Scholars. It is specially aimed to mangers with large scholar roasters.
