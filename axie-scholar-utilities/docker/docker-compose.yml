@@ -6,6 +6,8 @@ services:
       context: ..
       dockerfile: docker/Dockerfile 
       target: production
+    volumes:
+      - ../docker/files:/opt/app/files
   tests:
     build:
       context: ..

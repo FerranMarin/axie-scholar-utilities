@@ -85,6 +85,13 @@ Command looks like:
 
 This means it needs a payments_file path and optionally a secrets_file path. **Do not provide a secrets_file path if you do not have a valid secrets json previously created.** Command will simply generate and save a json called secrets.json on the current folder.
 
+GIF example:
+- without Docker:
+
+    [![asciicast](https://asciinema.org/a/432830.svg)](https://asciinema.org/a/432830)
+- with Docker:
+    [![asciicast](https://asciinema.org/a/432831.svg)](https://asciinema.org/a/432831)
+
 ## Example Files
 
 Please go to the folder [sample_data](sample_data/) to see sample files for how the [payments file](sample_data/sample_payments_file.json) and the [secrets file](sample_data/sample_payments_file.json) need to look like.
