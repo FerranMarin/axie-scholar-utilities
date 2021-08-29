@@ -72,7 +72,7 @@ This configuration file will be in the form of:
 
 Command looks like:
 
-    axie_scholar_payments_cli.py payout <payments_file> <secrets_file>
+    axie_scholar_cli.py payout <payments_file> <secrets_file>
 
 This means you need to provide the path to a payments_file and to secrets_file. After that, just follow instructions in the terminal to complete payouts. It will ask for confirmation for each account.
 
@@ -84,7 +84,7 @@ This utility helps you generate and make sure your secrets file will hold all th
 
 Command looks like:
 
-    axie_scholar_payments_cli.py generate_secrets <payments_file> [<secrets_file>]
+    axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
 
 This means it needs a payments_file path and optionally a secrets_file path. **Do not provide a secrets_file path if you do not have a valid secrets json previously created.** Command will simply generate and save a json called secrets.json on the current folder.
 
@@ -132,14 +132,14 @@ To run my tool you will need Python3 (the language it is written in) to be insta
 7. You are ready to go! To run the CLI program, you will just need to execute any of the following commands:
 
         # This one will execute the payouts
-        poetry run python axie_scholar_payments_cli.py payout <payments_file>
+        poetry run python axie_scholar_cli.py payout <payments_file>
         <secrets_file>
 
         # This one will help you generate the secrets file
-        poetry run axie_scholar_payments_cli.py generate_secrets <payments_file>
+        poetry run axie_scholar_cli.py generate_secrets <payments_file>
 
         # If you give the previous one the location of a generated secrets file, it will update it if needed!
-        poetry run axie_scholar_payments_cli.py generate_secrets <payments_file> <secrets_file>
+        poetry run axie_scholar_cli.py generate_secrets <payments_file> <secrets_file>
 
 For the last step, modify the <payments_file> and <secrets_file> with the location of your JSON files. If they are in the same folder, just giving the name of the file .json will be enough. If they are in another folder, give the full location. To find that, use the Properties tip from step 5.
 
@@ -191,14 +191,14 @@ For the last step, modify the <payments_file> and <secrets_file> with the locati
 9. You are ready to go! To run the CLI program, you will just need to execute any of the following commands:
 
         # This one will execute the payouts
-        poetry run python axie_scholar_payments_cli.py payout <payments_file>
+        poetry run python axie_scholar_cli.py payout <payments_file>
         <secrets_file>
 
         # This one will help you generate the secrets file
-        poetry run axie_scholar_payments_cli.py generate_secrets <payments_file>
+        poetry run axie_scholar_cli.py generate_secrets <payments_file>
 
         # If you give the previous one the location of a generated secrets file, it will update it if needed!
-        poetry run axie_scholar_payments_cli.py generate_secrets <payments_file> <secrets_file>
+        poetry run axie_scholar_cli.py generate_secrets <payments_file> <secrets_file>
 
 For the last step, modify the <payments_file> and <secrets_file> with the location of your JSON files. If they are in the same folder, just giving the name of the file .json will be enough. If they are in another folder, give the full location. Remmember you can use the trick explained on step 7.
 
