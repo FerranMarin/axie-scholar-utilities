@@ -216,11 +216,37 @@ TBD
 
 How to install docker?
 
-[Docker on Windows](https://docs.docker.com/desktop/windows/install/)
-[Docker on Mac](https://docs.docker.com/desktop/mac/install/)
-[Docker on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
-[Docker on Debian](https://docs.docker.com/engine/install/debian/)
-Check the website for more Linux distros.
+- [Docker on Windows](https://docs.docker.com/desktop/windows/install/)
+- [Docker on Mac](https://docs.docker.com/desktop/mac/install/)
+- [Docker on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+- [Docker on Debian](https://docs.docker.com/engine/install/debian/)
+- Check the website for more Linux distros.
+
+I also recommend having docker-compose. It comes by default with Windows and MacOs Desktop versions, so only Linux user will need to:
+
+        # Download it
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        # Add execution perms
+        sudo chmod +x /usr/local/bin/docker-compose
+        # In case you need to create a symlink
+        sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+        # Finally just check it works with
+        docker-compose --version
+
+Once we have docker installed and docker-compose we are done. To use the tool we only need to build and run the image. To do so, please navigate using your terminal to the [docker folder](axie-scholar-utilities/docker). Once there create a folder named files (this is where we will place our payments and secret file), we will link that folder from our host to the docker container.
+
+Once all this preparation is done, just use this commands as needed:
+
+        # Builds the image
+        docker-compose build scholar-utilities
+        # If we want to generate the secrets
+        docker-compose run scholar-utilities generate-secrets files/payments.json
+        # If we want to do payments in auto mode
+        docker-compose run scholar-utilities payout files/payments.json files/secrets.json -y
+        # As a general rule
+        docker-compose run scholar-utilities <here whatever command and arguments you want to run>
+
+If you do not want to build the image yourself, pleaes download it from my [docker hub](https://hub.docker.com/r/epith/axie-scholar-utilities).
 
 
 ## Desktop App
