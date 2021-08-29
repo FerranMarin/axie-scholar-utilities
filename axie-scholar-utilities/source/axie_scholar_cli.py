@@ -3,12 +3,12 @@ This tool will help you perform various actions.
 They are: payout, claim, generate_secrets, generate_QR
 
 Usage:
-    axie_scholar_payments_cli.py payout <payments_file> <secrets_file> [-y]
-    axie_scholar_payments_cli.py claim <secrets_file>
-    axie_scholar_payments_cli.py generate_secrets <payments_file> [<secrets_file>]
-    axie_scholar_payments_cli.py generate_QR <secrets_file>
-    axie_scholar_payments_cli.py -h | --help
-    axie_scholar_payments_cli.py --version
+    axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
+    axie_scholar_cli.py claim <secrets_file>
+    axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
+    axie_scholar_cli.py generate_QR <secrets_file>
+    axie_scholar_cli.py -h | --help
+    axie_scholar_cli.py --version
 
 Options:
     -h --help   Shows this extra help options
