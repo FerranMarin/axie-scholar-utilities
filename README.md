@@ -248,6 +248,8 @@ Once all this preparation is done, just use this commands as needed:
 
 If you do not want to build the image yourself, pleaes download it from my [docker hub](https://hub.docker.com/r/epith/axie-scholar-utilities).
 
+        docker pull epith/axie-scholar-utilities
+
 
 ## Desktop App
 
