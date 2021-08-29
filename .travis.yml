@@ -24,5 +24,5 @@ script:
 after_success:
   - docker-compose build scholar-utilities
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - if ["$TRAVIS_TAG" != "" ]; then docker tag axie-scholar-utilities axie-scholar-utilities:"$TRAVIS_TAG";fi
-  - docker image push axie-scholar-utilities
+  - docker tag axie-scholar-utilities epith/axie-scholar-utilities
+  - docker push epith/axie-scholar-utilities 
