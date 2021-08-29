@@ -20,3 +20,9 @@ script:
   - cd axie-scholar-utilities/docker
   - docker-compose build tests
   - docker-compose run tests
+  
+after_success:
+  - docker-compose build scholar-utilities
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - if ["$TRAVIS_TAG" != "" ]; then docker tag axie-scholar-utilities axie-scholar-utilities:"$TRAVIS_TAG";fi
+  - docker image push axie-scholar-utilities
