@@ -1,6 +1,7 @@
-[![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
-
 # Axie Scholars Utilities
+[![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
+[![Docker Image](https://img.shields.io/badge/docker%20image-available-blue)](https://hub.docker.com/r/epith/axie-scholar-utilities)
+
 
 This software's intent is to automate all activities related to manage Scholars. It is specially aimed to mangers with large scholar roasters.
 I will try to automate some of the tasks like payments to scholars, QR generation and SLP claiming. I am also very open to new ideas, so please leave them in Issues.
