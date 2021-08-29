@@ -32,10 +32,11 @@ formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
+
 def generate_secrets_file(payments_file_path, secrets_file_path=None):
     if not secrets_file_path:
         # Put secrets file in same folder where payments_file is
-        folder =  os.path.dirname(payments_file_path)
+        folder = os.path.dirname(payments_file_path)
         secrets_file_path = os.path.join(folder, "secrets.json")
         with open(secrets_file_path, "w") as f:
             f.write("{}")
@@ -47,15 +48,15 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
             changed = True
             new_secret = ''
             while new_secret == '':
-                new_secret = input(f"Please provide secret key for account {acc['Name']}."
-                                   f"({acc['AccountAddress']}): ")
+                new_secret = input("Please provide secret key for account "
+                                   f"{acc['Name']}.({acc['AccountAddress']}):")
             secrets[acc["AccountAddress"]] = new_secret
-    
+
     if changed:
         logging.info(f"Saving secrets file at {secrets_file_path}")
         with open(secrets_file_path, "w", encoding="utf-8") as f:
             json.dump(secrets, f, ensure_ascii=False, indent=4)
-        logging.info(f"File saved!")
+        logging.info(f"File saved at {secrets_file_path}!")
     else:
         logging.info("Secrets file already had all needed secrets!")
 

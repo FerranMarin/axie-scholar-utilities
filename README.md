@@ -250,6 +250,25 @@ If you do not want to build the image yourself, pleaes download it from my [dock
 
         docker pull epith/axie-scholar-utilities
 
+I recommend setting up this aliases right after pulling the image, so it makes everyones life easier.
+
+        # Alias to generate secrets
+        axie-utils-gen-secrets() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
+        # Alias to execute payments
+        axie-utils-payout() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
+        # Alias to execute auto-payments (no confirmation)
+        axie-utils-auto-payout() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
+
+With these alias all you need is the payments file and a secret file (if you have not yet generate it, please create a file with just '{}' inside and save it as .json). Then the commands you will need to execute are the following:
+
+        #To generate/update secret file
+        axie-utils-gen-secrets name_of_your_payments_file.json name_of_your_secrets_file.json
+        #To execute payments
+        axie-utils-payout name_of_your_payments_file.json name_of_your_secrets_file.json
+        #To execute automatic payments
+        axie-utils-auto-payout name_of_your_payments_file.json name_of_your_secrets_file.json
+
+Once executed, please follow the insturctions that will appear on your terminal (if any).
 
 ## Desktop App
 
