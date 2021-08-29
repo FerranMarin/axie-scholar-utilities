@@ -145,19 +145,19 @@ def test_payments_manager_prepare_payout_low_slp(mocked_payout, mocked_get_nonce
     mocked_payout.assert_called_once()
     # 1st payment
     assert mocked_payout.call_args[0][0] == "Scholar 1"
-    assert mocked_payout.call_args[0][1][0].name == "Payment to scholar"
+    assert mocked_payout.call_args[0][1][0].name == "Payment to scholar of Scholar 1"
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 10
     assert mocked_payout.call_args[0][1][0].nonce == 1
     # 2nd payment
-    assert mocked_payout.call_args[0][1][1].name == "Payment to trainer"
+    assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][1].amount == 1
     assert mocked_payout.call_args[0][1][1].nonce == 2
     # 3rd Payment
-    assert mocked_payout.call_args[0][1][2].name == "Payment to manager"
+    assert mocked_payout.call_args[0][1][2].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][2].amount == 9
@@ -185,25 +185,25 @@ def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_payout, mocked
     mocked_payout.assert_called_once()
     # 1st payment
     assert mocked_payout.call_args[0][0] == "Scholar 1"
-    assert mocked_payout.call_args[0][1][0].name == "Payment to scholar"
+    assert mocked_payout.call_args[0][1][0].name == "Payment to scholar of Scholar 1"
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 500
     assert mocked_payout.call_args[0][1][0].nonce == 1
     # 2nd payment
-    assert mocked_payout.call_args[0][1][1].name == "Payment to trainer"
+    assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][1].amount == 100
     assert mocked_payout.call_args[0][1][1].nonce == 2
     # 3rd Payment (fee)
-    assert mocked_payout.call_args[0][1][2].name == "Donation to software creator"
+    assert mocked_payout.call_args[0][1][2].name == "Donation to software creator for Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][2].amount == round(1000*0.01)
     assert mocked_payout.call_args[0][1][2].nonce == 3
     # 4th Payment
-    assert mocked_payout.call_args[0][1][3].name == "Payment to manager"
+    assert mocked_payout.call_args[0][1][3].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][3].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][3].amount == 400 - round(1000*0.01)
@@ -232,31 +232,31 @@ def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_payout, mocked
     mocked_payout.assert_called_once()
     # 1st payment
     assert mocked_payout.call_args[0][0] == "Scholar 1"
-    assert mocked_payout.call_args[0][1][0].name == "Payment to scholar"
+    assert mocked_payout.call_args[0][1][0].name == "Payment to scholar of Scholar 1"
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 500
     assert mocked_payout.call_args[0][1][0].nonce == 100
     # 2nd payment
-    assert mocked_payout.call_args[0][1][1].name == "Payment to trainer"
+    assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][1].amount == 100
     assert mocked_payout.call_args[0][1][1].nonce == 101
     # 3rd payment (dono)
-    assert mocked_payout.call_args[0][1][2].name == "Donation to Entity 1"
+    assert mocked_payout.call_args[0][1][2].name == "Donation to Entity 1 for Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][2].amount == round(400*0.01)
     assert mocked_payout.call_args[0][1][2].nonce == 102
     # 4th Payment (fee)
-    assert mocked_payout.call_args[0][1][3].name == "Donation to software creator"
+    assert mocked_payout.call_args[0][1][3].name == "Donation to software creator for Scholar 1"
     assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][3].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][3].amount == round(1000*0.01)
     assert mocked_payout.call_args[0][1][3].nonce == 103
     # 5th Payment
-    assert mocked_payout.call_args[0][1][4].name == "Payment to manager"
+    assert mocked_payout.call_args[0][1][4].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][4].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][4].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][4].amount == 400 - round(1000*0.01) - round(400*0.01)
@@ -283,12 +283,11 @@ def test_payments_manager_payout_account_accept(_, mocked_execute, tmpdir, caplo
         with patch.object(builtins, 'input', lambda _: 'y'):
             axp.prepare_payout()
         assert mocked_execute.call_count == 5
-        assert "Payment to scholar(ronin:<scholar_address>) for the ammount of 500 SLP Transaction Sent!" in caplog.text
-        assert "Payment to trainer(ronin:<trainer_address>) for the ammount of 100 SLP Transaction Sent!" in caplog.text
-        assert "Donation to Entity 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP Transaction Sent!" in caplog.text
-        assert "Donation to software creator(ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0) for the ammount of 10 SLP Transaction Sent!" in caplog.text
-        assert "Payment to manager(ronin:<Manager address here>) for the ammount of 386 SLP Transaction Sent!" in caplog.text
-        assert "Transaction hash: abc123 - Explorer: https://explorer.roninchain.com/tx/abc123" in caplog.text
+        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
+        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
+        assert "Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP" in caplog.text
+        assert "Donation to software creator for Scholar 1(ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0) for the ammount of 10 SLP" in caplog.text
+        assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
         assert "Transactions completed for account: 'Scholar 1'" in caplog.text
 
 @patch("axie.payments.Payment.execute", return_value=("abc123", True))
@@ -309,12 +308,11 @@ def test_payments_manager_payout_auto_yes(_, mocked_execute, tmpdir, caplog):
     axp.verify_inputs()
     axp.prepare_payout()
     assert mocked_execute.call_count == 5
-    assert "Payment to scholar(ronin:<scholar_address>) for the ammount of 500 SLP Transaction Sent!" in caplog.text
-    assert "Payment to trainer(ronin:<trainer_address>) for the ammount of 100 SLP Transaction Sent!" in caplog.text
-    assert "Donation to Entity 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP Transaction Sent!" in caplog.text
-    assert "Donation to software creator(ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0) for the ammount of 10 SLP Transaction Sent!" in caplog.text
-    assert "Payment to manager(ronin:<Manager address here>) for the ammount of 386 SLP Transaction Sent!" in caplog.text
-    assert "Transaction hash: abc123 - Explorer: https://explorer.roninchain.com/tx/abc123" in caplog.text
+    assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
+    assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
+    assert "Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP" in caplog.text
+    assert "Donation to software creator for Scholar 1(ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0) for the ammount of 10 SLP" in caplog.text
+    assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
     assert "Transactions completed for account: 'Scholar 1'" in caplog.text
 
 @patch("axie.payments.Payment.execute")
@@ -376,6 +374,8 @@ def test_payment_get_nonce_calls_w3_high_nonce(_, mocked_transaction_count):
     mocked_transaction_count.assert_called_once()
     assert p.nonce == 125
 
+
+@pytest.mark.asyncio
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.eth.Eth.account.sign_transaction")
@@ -383,8 +383,8 @@ def test_payment_get_nonce_calls_w3_high_nonce(_, mocked_transaction_count):
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.contract")
-@patch("web3.eth.Eth.get_transaction_receipt")
-def test_execute_calls_web3_functions(
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+async def test_execute_calls_web3_functions(
     mock_transaction_receipt,
     mock_contract,
     mock_keccak,
@@ -392,7 +392,7 @@ def test_execute_calls_web3_functions(
     mock_send,
     mock_sign,
     mock_checksum,
-    _):
+    _, caplog):
     p = Payment(
         "random_account",
         "ronin:from_ronin",
@@ -403,7 +403,7 @@ def test_execute_calls_web3_functions(
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p.execute()
+        await p.execute()
     mock_file.assert_called_with("axie/slp_abi.json")
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     mock_keccak.assert_called_once()
@@ -416,3 +416,5 @@ def test_execute_calls_web3_functions(
         call(SLP_CONTRACT),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
+    assert 'random_account(ronin:to_ronin) for the ammount of 10 SLP Transaction Sent!' in caplog.text
+    assert 'Transaction hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text

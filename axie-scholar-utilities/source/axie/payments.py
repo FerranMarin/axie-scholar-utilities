@@ -1,8 +1,8 @@
 import os
 import sys
+import asyncio
 import json
 import logging
-from time import sleep
 
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -31,7 +31,7 @@ class Payment(object):
     def get_nonce(self):
         return self.w3.eth.get_transaction_count(Web3.toChecksumAddress(self.from_acc))
 
-    def execute(self):
+    async def execute(self):
         # Prepare transaction
         with open("axie/slp_abi.json") as f:
             slb_abi = json.load(f)
@@ -68,11 +68,15 @@ class Payment(object):
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.info("Waiting for transaction to finish...")
+                logging.info(f"Waiting for transaction '{self.name}' to finish (Nonce:{self.nonce})...")
                 # Sleep 5 seconds not to constantly send requests!
-                sleep(5)
+                await asyncio.sleep(5)
 
-        return hash, success
+        if success:
+            logging.info(f"{self} Transaction Sent!")
+            logging.info(f"Transaction hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+        else:
+            logging.info(f"Transaction {self} reverted by EVM (Ethereum Virtual machine)")
 
     def __str__(self):
         return f"{self.name}({self.to_acc.replace('0x', 'ronin:')}) for the ammount of {self.amount} SLP"
@@ -139,7 +143,7 @@ class AxiePaymentsManager:
             acc_payments = []
             # scholar_payment
             scholar_payment = Payment(
-                "Payment to scholar",
+                f"Payment to scholar of {acc['Name']}",
                 acc["AccountAddress"],
                 self.secrets_file[acc["AccountAddress"]],
                 acc["ScholarPayoutAddress"],
@@ -151,7 +155,7 @@ class AxiePaymentsManager:
             if acc.get("TrainerPayoutAddress"):
                 # trainer_payment
                 acc_payments.append(Payment(
-                    "Payment to trainer",
+                    f"Payment to trainer of {acc['Name']}",
                     acc["AccountAddress"],
                     self.secrets_file[acc["AccountAddress"]],
                     acc["TrainerPayoutAddress"],
@@ -170,7 +174,7 @@ class AxiePaymentsManager:
                         total_dono += amount
                         # donation payment
                         acc_payments.append(Payment(
-                            f"Donation to {dono['Name']}",
+                            f"Donation to {dono['Name']} for {acc['Name']}",
                             acc["AccountAddress"],
                             self.secrets_file[acc["AccountAddress"]],
                             dono["AccountAddress"],
@@ -183,7 +187,7 @@ class AxiePaymentsManager:
             if fee_payout > 1:
                 total_dono += fee_payout
                 acc_payments.append(Payment(
-                            "Donation to software creator",
+                            f"Donation to software creator for {acc['Name']}",
                             acc["AccountAddress"],
                             self.secrets_file[acc["AccountAddress"]],
                             CREATOR_FEE_ADDRESS,
@@ -193,7 +197,7 @@ class AxiePaymentsManager:
                 nonce += 1
             # manager payment
             acc_payments.append(Payment(
-                "Payment to manager",
+                f"Payment to manager of {acc['Name']}",
                 acc["AccountAddress"],
                 self.secrets_file[acc["AccountAddress"]],
                 self.manager_acc,
@@ -209,13 +213,8 @@ class AxiePaymentsManager:
         while accept not in ["y", "n", "Y", "N"]:
             accept = input("Do you want to proceed with these transactions?(y/n): ")
         if accept.lower() == "y":
-            for payment in payment_list:
-                hash, success = payment.execute()
-                if success:
-                    logging.info(f"{payment} Transaction Sent!")
-                    logging.info(f"Transaction hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
-                else:
-                    logging.info(f"Transaction reverted by EVM (Ethereum Virtual machine)")
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(asyncio.gather(*[payment.execute() for payment in payment_list]))
             logging.info(f"Transactions completed for account: '{acc_name}'")
         else:
             logging.info(f"Transactions canceled for account: '{acc_name}'")
