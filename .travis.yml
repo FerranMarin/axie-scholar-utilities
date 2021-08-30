@@ -23,9 +23,8 @@ script:
   
 deploy:
   provider: script
-  before_script:
-    - chmod +x docker_push.sh
   script: 
+    - chmod +x docker_push.sh
     - bash docker_push.sh
   on:
     branch: main
