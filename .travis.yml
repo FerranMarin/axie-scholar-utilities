@@ -23,7 +23,8 @@ script:
   
 deploy:
   provider: script
-  script: 
+  script:
+    - ls 
     - chmod +x docker_push.sh
     - bash docker_push.sh
   on:
