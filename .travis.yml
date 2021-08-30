@@ -22,7 +22,8 @@ script:
   - docker-compose run tests
   
 after_success:
-  - docker-compose build scholar-utilities
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker tag axie-scholar-utilities epith/axie-scholar-utilities
-  - docker push epith/axie-scholar-utilities 
+  if: branch = main AND type NOT IN (pull_request, cron)
+    - docker-compose build scholar-utilities
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker tag axie-scholar-utilities epith/axie-scholar-utilities
+    - docker push epith/axie-scholar-utilities 
