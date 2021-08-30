@@ -10,6 +10,10 @@ branches:
 env:
   - DOCKER_COMPOSE_VERSION=1.29.2
 
+jobs:
+  after_success:
+    - if: branch = main AND type NOT IN (pull_request, cron)
+
 before_install:
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
@@ -22,8 +26,7 @@ script:
   - docker-compose run tests
   
 after_success:
-  if: branch = main AND type NOT IN (pull_request, cron)
-    - docker-compose build scholar-utilities
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker tag axie-scholar-utilities epith/axie-scholar-utilities
-    - docker push epith/axie-scholar-utilities 
+  - docker-compose build scholar-utilities
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker tag axie-scholar-utilities epith/axie-scholar-utilities
+  - docker push epith/axie-scholar-utilities 
