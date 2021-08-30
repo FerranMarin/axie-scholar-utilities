@@ -274,6 +274,14 @@ lint = ["black (>=18.6b4,<19)", "flake8 (==3.7.9)", "isort (>=4.2.15,<5)", "mypy
 test = ["hypothesis (>=4.43.0,<5.0.0)", "pytest (==5.4.1)", "pytest-xdist", "tox (==3.14.6)"]
 
 [[package]]
+name = "fake-useragent"
+version = "0.1.11"
+description = "Up to date simple useragent faker with real world database"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "hexbytes"
 version = "0.2.1"
 description = "hexbytes: Python `bytes` subclass that decodes hex, with a readable console output"
@@ -658,7 +666,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "876003864d0343f5c4188c44908d192f156fce3074942061160da1dd16b86525"
+content-hash = "094753fa3052ea7a1291fdd4f195fbdf067ea0aa61d79677974b326b879d1c37"
 
 [metadata.files]
 aiohttp = [
@@ -792,6 +800,9 @@ eth-typing = [
 eth-utils = [
     {file = "eth-utils-1.10.0.tar.gz", hash = "sha256:bf82762a46978714190b0370265a7148c954d3f0adaa31c6f085ea375e4c61af"},
     {file = "eth_utils-1.10.0-py3-none-any.whl", hash = "sha256:74240a8c6f652d085ed3c85f5f1654203d2f10ff9062f83b3bad0a12ff321c7a"},
+]
+fake-useragent = [
+    {file = "fake-useragent-0.1.11.tar.gz", hash = "sha256:c104998b750eb097eefc28ae28e92d66397598d2cf41a31aa45d5559ef1adf35"},
 ]
 hexbytes = [
     {file = "hexbytes-0.2.1-py3-none-any.whl", hash = "sha256:a093a5533aa63ca6614246fa97feb693b5813f9e736c38b68fe4e2d8fcc35aa5"},

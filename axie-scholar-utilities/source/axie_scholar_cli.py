@@ -22,7 +22,7 @@ import logging
 
 from docopt import docopt
 
-from axie import AxiePaymentsManager
+from axie import AxiePaymentsManager, AxieClaimsManager
 
 # Setup logger
 log = logging.getLogger()
@@ -88,7 +88,8 @@ def run_cli():
     elif args['claim']:
         # Claim SLP
         logging.info('I shall claim SLP')
-        raise NotImplementedError('Sorry, I have yet to implement this command')
+        acm = AxieClaimsManager()
+        acm.prepare_claims()
     elif args['generate_QR']:
         # Generate QR codes
         logging.info('I shall generate QR codes')

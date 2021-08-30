@@ -8,16 +8,18 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
-from axie.schemas import payments_schema
+from schemas import payments_schema
+from utils import check_balance
 
 CREATOR_FEE_ADDRESS = "ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0"
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
-RONIN_PROVIDER = "https://proxy.roninchain.com/free-gas-rpc"
+RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
+RONIN_PROVIDER = "https://api.roninchain.com/rpc"
 
 
-class Payment(object):
+class Payment:
     def __init__(self, name, from_acc, from_private, to_acc, amount, nonce=None):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
+        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         self.name = name
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
@@ -135,10 +137,19 @@ class AxiePaymentsManager:
             sys.exit()
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
-        logging.info("Files correctly validated!")
-    
+        logging.info("Files correctly validated!") 
+
+    def check_acc_has_enough_balance(self, account, balance):
+        account_balance = check_balance(account)
+        if account_balance < balance:
+            logging.critical("Balance in account {account} is "
+                             "inssuficient to cover all planned payments!")
+            return False
+        return True
+
     def prepare_payout(self):
         fee = 0
+        total_payments = 0
         for acc in self.scholar_accounts:
             acc_payments = []
             # scholar_payment
@@ -150,6 +161,7 @@ class AxiePaymentsManager:
                 acc["ScholarPayout"]
             )
             fee += acc["ScholarPayout"]
+            total_payments += acc["ScholarPayout"]
             nonce = scholar_payment.get_nonce() + 1
             acc_payments.append(scholar_payment)
             if acc.get("TrainerPayoutAddress"):
@@ -163,9 +175,11 @@ class AxiePaymentsManager:
                     nonce
                 ))
                 fee += acc["TrainerPayout"]
+                total_payments += acc["TrainerPayout"]
             nonce += 1
             manager_payout = acc["ManagerPayout"]
             fee += manager_payout
+            total_payments += acc["ManagerPayout"]
             total_dono = 0
             if self.donations:
                 for dono in self.donations:
@@ -204,7 +218,12 @@ class AxiePaymentsManager:
                 manager_payout - total_dono,
                 nonce
             ))
-            self.payout_account(acc["Name"], acc_payments)
+            if self.check_acc_has_enough_balance(acc["AccountAddress"], 
+                                              total_payments):
+                self.payout_account(acc["Name"], acc_payments)
+            else:
+                logging.info(f"Skipping payments for account '{acc['Name']}'. "
+                             "Insufficient funds!")
 
     def payout_account(self, acc_name, payment_list):
         logging.info(f"Payments for {acc_name}:")
