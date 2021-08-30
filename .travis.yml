@@ -20,13 +20,13 @@ script:
   - cd axie-scholar-utilities/docker
   - docker-compose build tests
   - docker-compose run tests
-  
+
+after_success:
+  - chmod +x docker_push.sh
+
 deploy:
   provider: script
-  script:
-    - ls 
-    - chmod +x docker_push.sh
-    - bash docker_push.sh
+  script: bash docker_push.sh
   on:
     branch: main
     condition: $TRAVIS_PULL_REQUEST = false
