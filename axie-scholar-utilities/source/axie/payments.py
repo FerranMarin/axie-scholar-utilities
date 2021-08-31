@@ -8,8 +8,8 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
-from schemas import payments_schema
-from utils import check_balance
+from .schemas import payments_schema
+from .utils import check_balance
 
 CREATOR_FEE_ADDRESS = "ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0"
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"

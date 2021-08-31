@@ -12,9 +12,9 @@ from eth_account.messages import encode_defunct
 from web3 import Web3, exceptions
 import requests
 
-from payments import AxiePaymentsManager
-from schemas import payments_schema
-from utils import check_balance
+from .payments import AxiePaymentsManager
+from .schemas import payments_schema
+from .utils import check_balance
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 
@@ -50,7 +50,7 @@ class Claim:
             return "Error! it was not 200!"
         signature = response.json()["blockchain_related"]["signature"]
         nonce = 123
-        #claim = self.slp_contract.
+        # claim = self.slp_contract.
         pass
 
     def has_unclaimed_slp(self):
@@ -79,9 +79,8 @@ class Claim:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            return "Error! it was not 200!"
+            return f"Error! it was not 200! {e}"
         return response.json()['data']['createRandomMessage']
-
 
     def get_jwt(self):
         msg = self.create_random_msg()
@@ -98,32 +97,33 @@ class Claim:
                     "signature": f"{hex_msg}"
                 }
             },
-            "query": 'mutation CreateAccessTokenWithSignature($input: SignatureInput!)'
-            '{createAccessTokenWithSignature(input: $input) '
-            '{newAccount result accessToken __typename}}'
+            "query": "mutation CreateAccessTokenWithSignature($input: SignatureInput!)"
+            "{createAccessTokenWithSignature(input: $input) "
+            "{newAccount result accessToken __typename}}"
         }
         url = "https://axieinfinity.com/graphql-server-v2/graphql"
         response = requests.post(url, headers={"User-Agent": UserAgent().chrome}, json=payload)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            return "Error! it was not 200!"
+            return f"Error! it was not 200!  {e}"
         return response.json()['data']['createAccessTokenWithSignature']['accessToken']
 
 
 class AxieClaimsManager:
     def __init__(self, secrets_file):
         self.secrets_file = AxiePaymentsManager.load_json(secrets_file)
-    
+
     def verify_input(self):
         validation_success = True
         # Check secrets file is not empty
         if not self.secrets_file:
             logging.warning("No secrets contained in secrets file")
             validation_success = False
+        # Check keys and secrets have proper format
         for acc in self.secrets_file:
             if not acc.startswith("ronin:"):
-                logging.critical(f"Public address needs to start with ronin:")
+                logging.critical(f"Public address {acc} needs to start with ronin:")
                 validation_success = False
             if len(self.secrets_file[acc]) != 66 or self.secrets_file[acc][:2] != "0x":
                 logging.critical(f"Private key for account {acc} is not valid, please review it!")
