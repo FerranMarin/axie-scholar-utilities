@@ -219,7 +219,7 @@ class AxiePaymentsManager:
                 nonce
             ))
             if self.check_acc_has_enough_balance(acc["AccountAddress"], 
-                                              total_payments):
+                                                 total_payments):
                 self.payout_account(acc["Name"], acc_payments)
             else:
                 logging.info(f"Skipping payments for account '{acc['Name']}'. "
