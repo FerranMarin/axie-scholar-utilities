@@ -48,8 +48,9 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
             changed = True
             new_secret = ''
             while new_secret == '':
-                new_secret = input("Please provide secret key for account "
-                                   f"{acc['Name']}.({acc['AccountAddress']}):")
+                msg = (f"Please provide secret key for account {acc['Name']}. "
+                       f"({acc['AccountAddress']}):")
+                new_secret = input(msg)
             secrets[acc["AccountAddress"]] = new_secret
 
     if changed:
@@ -70,11 +71,11 @@ def run_cli():
         file_error = False
         if not os.path.isfile(payments_file_path):
             logging.critical("Please provide a correct path to the Payments file. "
-                            f"Path provided: {payments_file_path}")
+                             f"Path provided: {payments_file_path}")
             file_error = True
         if not os.path.isfile(secrets_file_path):
             logging.critical("Please provide a correct path to the Secrets file. "
-                            f"Path provided: {secrets_file_path}")
+                             f"Path provided: {secrets_file_path}")
             file_error = True
         if file_error:
             raise Exception("Please review your file paths and re-try.")
@@ -84,11 +85,16 @@ def run_cli():
             logging.info("Automatic acceptance active, it won't ask before each execution")
         apm = AxiePaymentsManager(payments_file_path, secrets_file_path, auto=args['--yes'])
         apm.verify_inputs()
-        apm.prepare_payout() 
+        apm.prepare_payout()
     elif args['claim']:
+        secrets_file_path = args['<secrets_file>']
+        if not os.path.isfile(secrets_file_path):
+            logging.critical("Please provide a correct path to the Secrets file. "
+                             f"Path provided: {secrets_file_path}")
+            raise Exception("Please review your file paths and re-try.")
         # Claim SLP
         logging.info('I shall claim SLP')
-        acm = AxieClaimsManager()
+        acm = AxieClaimsManager(secrets_file_path)
         acm.prepare_claims()
     elif args['generate_QR']:
         # Generate QR codes
@@ -102,11 +108,11 @@ def run_cli():
         file_error = False
         if not os.path.isfile(payments_file_path):
             logging.critical("Please provide a correct path to the Payments file. "
-                            f"Path provided: {payments_file_path}")
+                             f"Path provided: {payments_file_path}")
             file_error = True
         if secrets_file_path and not os.path.isfile(secrets_file_path):
             logging.critical("Please provide a correct path to the Secrets file. "
-                            f"Path provided: {secrets_file_path}")
+                             f"Path provided: {secrets_file_path}")
             file_error = True
         if file_error:
             raise Exception("Please review your file paths and re-try.")
