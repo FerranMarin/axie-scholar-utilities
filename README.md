@@ -90,10 +90,19 @@ This means it needs a payments_file path and optionally a secrets_file path. **D
 
 GIF example:
 - without Docker:
-
     [![asciicast](https://asciinema.org/a/432830.svg)](https://asciinema.org/a/432830)
 - with Docker:
     [![asciicast](https://asciinema.org/a/432831.svg)](https://asciinema.org/a/432831)
+
+
+## Claim SLP Utility
+
+This utility will claim all the claimable SLP from all the accounts configured in secrets.json. So pleae, run first the secret_gen command to make sure you are not missing any account or private key. After that, simply execute the command and it will attempt to claim from all accounts. If some cannot be claimed, it will let you know, but won't interfere with the rest of claims.
+
+Command looks like:
+
+    axie_scholar_cli.py claim <secrets_file>
+
 
 ## Example Files
 
@@ -135,11 +144,14 @@ To run my tool you will need Python3 (the language it is written in) to be insta
         poetry run python axie_scholar_cli.py payout <payments_file>
         <secrets_file>
 
+        # This one will auto-claim SLP
+        poetry run python axie_scholar_cli.py claim <secrets_file>
+
         # This one will help you generate the secrets file
-        poetry run axie_scholar_cli.py generate_secrets <payments_file>
+        poetry run python axie_scholar_cli.py generate_secrets <payments_file>
 
         # If you give the previous one the location of a generated secrets file, it will update it if needed!
-        poetry run axie_scholar_cli.py generate_secrets <payments_file> <secrets_file>
+        poetry run python axie_scholar_cli.py generate_secrets <payments_file> <secrets_file>
 
 For the last step, modify the <payments_file> and <secrets_file> with the location of your JSON files. If they are in the same folder, just giving the name of the file .json will be enough. If they are in another folder, give the full location. To find that, use the Properties tip from step 5.
 
@@ -191,8 +203,10 @@ For the last step, modify the <payments_file> and <secrets_file> with the locati
 9. You are ready to go! To run the CLI program, you will just need to execute any of the following commands:
 
         # This one will execute the payouts
-        poetry run python axie_scholar_cli.py payout <payments_file>
-        <secrets_file>
+        poetry run python axie_scholar_cli.py payout <payments_file> <secrets_file>
+
+        # This one will auto-claim SLP
+        poetry run python axie_scholar_cli.py claim <secrets_file>
 
         # This one will help you generate the secrets file
         poetry run axie_scholar_cli.py generate_secrets <payments_file>
@@ -241,6 +255,8 @@ Once all this preparation is done, just use this commands as needed:
         docker-compose build scholar-utilities
         # If we want to generate the secrets
         docker-compose run scholar-utilities generate-secrets files/payments.json
+        # If you want to claim SLP
+        docker-compose run scholar-utilities claim files/secrets.json
         # If we want to do payments in auto mode
         docker-compose run scholar-utilities payout files/payments.json files/secrets.json -y
         # As a general rule
@@ -254,6 +270,8 @@ I recommend setting up this aliases right after pulling the image, so it makes e
 
         # Alias to generate secrets
         axie-utils-gen-secrets() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
+        # Alias to execute claims
+        axie-utils-claim() {docker run -it  -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
         # Alias to execute payments
         axie-utils-payout() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
         # Alias to execute auto-payments (no confirmation)
@@ -263,6 +281,8 @@ With these alias all you need is the payments file and a secret file (if you hav
 
         #To generate/update secret file
         axie-utils-gen-secrets name_of_your_payments_file.json name_of_your_secrets_file.json
+        #To claim SLP
+        axie-utils-claim name_of_your_secrets_file.json
         #To execute payments
         axie-utils-payout name_of_your_payments_file.json name_of_your_secrets_file.json
         #To execute automatic payments
@@ -280,8 +300,7 @@ There is embedded in the code a 1% fee. I believe this is a fair charge for this
 
 # Roadmap
 
-- Add functionality to claim SLP
-- Release a dockerized version (No need to install anything other than docker)
+- Integrate with Discord (via a bot, maybe?)
 - Release a desktop app (even more convenient)
 - ...
 - Add functionality to get QR codes, maybe(?)
