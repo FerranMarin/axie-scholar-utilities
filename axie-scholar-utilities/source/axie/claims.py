@@ -14,7 +14,7 @@ import requests
 
 from .payments import AxiePaymentsManager
 from .schemas import payments_schema
-from .utils import check_balance
+from .utils import check_balance, get_nonce
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 
@@ -37,6 +37,11 @@ class Claim:
         self.unclaimed_slp = self.has_unclaimed_slp()
 
     async def execute(self):
+        if not self.unclaimed_slp:
+            logging.info(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
+            return
+        logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
+                     f"{self.unclaimed_slp} unclaimed SLP")
         jwt = self.get_jwt()
         headers = {
             "User-Agent": UserAgent().random,
@@ -49,9 +54,37 @@ class Claim:
         except requests.exceptions.HTTPError:
             return "Error! it was not 200!"
         signature = response.json()["blockchain_related"]["signature"]
-        nonce = 123
-        # claim = self.slp_contract.
-        pass
+        nonce = get_nonce(self.account)
+        claim = self.slp_contract.functions.checkpoint(
+            self.account,
+            signature['amount'],
+            signature['timestamp'],
+            signature['signature'].replace("0x", "")
+        ).buildTransaction({'gas': 1000000, 'gasPrice': 0, 'nonce': nonce})
+        signed_claim = self.w3.eth.account.sign_transaction(
+            claim,
+            private_key=bytearray.fromhex(self.private_key.replace("0x", ""))
+        )
+        self.w3.eth.send_raw_transaction(signed_claim)
+        while True:
+            try:
+                recepit = self.w3.eth.get_transaction_receipt(hash)
+                if recepit["status"] == 1:
+                    success = True
+                else:
+                    success = False
+                break
+            except exceptions.TransactionNotFound:
+                logging.info(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish (Nonce:{nonce})...")
+                # Sleep 5 seconds not to constantly send requests!
+                await asyncio.sleep(5)
+        
+        if success:
+            logging.info(f"Claimed SLP for account {self.account.replace('0x', 'ronin:')}")
+            logging.info(f"New balance  for account {self.account.replace('0x', 'ronin:')} is: "
+                         f"{check_balance(self.account)}")
+        else:
+            logging.info(f"Claim for account {self.account.replace('0x', 'ronin:')} failed")
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"

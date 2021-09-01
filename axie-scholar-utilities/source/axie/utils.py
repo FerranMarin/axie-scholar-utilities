@@ -7,14 +7,22 @@ RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
 RONIN_PROVIDER = "https://api.roninchain.com/rpc"
 
 def check_balance(account):
-        w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
-        with open("axie/min_abi.json") as f:
-            min_abi = json.load(f)
-        slp_contract = w3.eth.contract(
-            address=Web3.toChecksumAddress(SLP_CONTRACT),
-            abi=min_abi
-        )
-        balance = slp_contract.functions.get_balance(
-            Web3.toChecksumAddress(account.replace("ronin:", "0x"))
-        ).call()
-        return int(balance)
+    w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
+    with open("axie/min_abi.json") as f:
+        min_abi = json.load(f)
+    slp_contract = w3.eth.contract(
+        address=Web3.toChecksumAddress(SLP_CONTRACT),
+        abi=min_abi
+    )
+    balance = slp_contract.functions.get_balance(
+        Web3.toChecksumAddress(account.replace("ronin:", "0x"))
+    ).call()
+    return int(balance)
+
+
+def get_nonce(account):
+    w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+    nonce = w3.eth.get_transaction_count(
+        Web3.toChecksumAddress(account.replace("ronin:", "0x"))
+    )
+    return nonce

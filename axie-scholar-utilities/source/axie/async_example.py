@@ -26,3 +26,5 @@ async def main():
 
 asyncio.run(main())
 print("--- %s seconds ---" % (time.time() - start_time))
+
+# another ref: https://dylancastillo.co/fast-and-async-in-python-accelerate-your-requests-using-asyncio/
