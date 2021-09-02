@@ -96,6 +96,7 @@ def run_cli():
         # Claim SLP
         logging.info('I shall claim SLP')
         acm = AxieClaimsManager(secrets_file_path)
+        acm.verify_input()
         acm.prepare_claims()
     elif args['generate_QR']:
         # Generate QR codes

@@ -28,7 +28,7 @@ class Claim:
         )
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
-        self.initial_balance = check_balance()
+        self.initial_balance = check_balance(account)
         self.final_balance = None
         self.unclaimed_slp = self.has_unclaimed_slp()
 
@@ -88,7 +88,7 @@ class Claim:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError:
-            logging.criticaal("Failed to check if there is unclaimed SLP")
+            logging.critical("Failed to check if there is unclaimed SLP")
             return None
         unclaimed_slp = response.json()['total']
         last_claim = datetime.utcfromtimestamp(int(response.json())["last_claimed_item_at"])
@@ -162,7 +162,7 @@ class AxieClaimsManager:
         logging.info("Secret file correctly validated")
 
     def prepare_claims(self):
-        claims = [Claim(acc, acc[acc]).execute() for acc in self.secrets_file]
+        claims = [Claim(acc, self.secrets_file[acc]).execute() for acc in self.secrets_file]
         loop = asyncio.get_event_loop()
         logging.info("Caliming starting...")
         loop.run_until_complete(asyncio.gather(*claims))

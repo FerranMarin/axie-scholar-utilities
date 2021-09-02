@@ -221,11 +221,13 @@ def test_payout_takes_auto_parameter_yes(mock_prepare_payout, mock_verify_input,
 
 @patch("axie.AxieClaimsManager.__init__", return_value=None)
 @patch("axie.AxieClaimsManager.prepare_claims")
-def test_claim(mock_prepare_claims, mock_claimsmanager, tmpdir):
+@patch("axie.AxieClaimsManager.verify_input")
+def test_claim(mock_verify_input, mock_prepare_claims, mock_claimsmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     with patch.object(sys, 'argv', ["", "claim", str(f1)]):
         cli.run_cli()
+    mock_verify_input.assert_called_with()
     mock_prepare_claims.assert_called_with()
     mock_claimsmanager.assert_called_with(str(f1))
 
