@@ -23,6 +23,7 @@ import logging
 from docopt import docopt
 
 from axie import AxiePaymentsManager, AxieClaimsManager
+from axie.utils import load_json
 
 # Setup logger
 log = logging.getLogger()
@@ -40,8 +41,8 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
         secrets_file_path = os.path.join(folder, "secrets.json")
         with open(secrets_file_path, "w") as f:
             f.write("{}")
-    payments = AxiePaymentsManager.load_json(payments_file_path)
-    secrets = AxiePaymentsManager.load_json(secrets_file_path)
+    payments =load_json(payments_file_path)
+    secrets = load_json(secrets_file_path)
     changed = False
     for acc in payments["Scholars"]:
         if acc["AccountAddress"] not in secrets:
@@ -64,7 +65,7 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v0.1')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.0.0')
     if args['payout']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']

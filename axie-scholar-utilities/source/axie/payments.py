@@ -1,4 +1,3 @@
-import os
 import sys
 import asyncio
 import json
@@ -8,8 +7,8 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
-from .schemas import payments_schema
-from .utils import check_balance
+from axie.schemas import payments_schema
+from axie.utils import check_balance, get_nonce, load_json
 
 CREATOR_FEE_ADDRESS = "ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0"
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
@@ -26,12 +25,9 @@ class Payment:
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.amount = amount
         if not nonce:
-            self.nonce = self.get_nonce()
+            self.nonce = get_nonce(self.from_acc)
         else:
-            self.nonce = max(self.get_nonce(), nonce)
-
-    def get_nonce(self):
-        return self.w3.eth.get_transaction_count(Web3.toChecksumAddress(self.from_acc))
+            self.nonce = max(get_nonce(self.from_acc), nonce)
 
     async def execute(self):
         # Prepare transaction
@@ -86,25 +82,12 @@ class Payment:
 
 class AxiePaymentsManager:
     def __init__(self, payments_file, secrets_file, auto=False):
-        self.payments_file = self.load_json(payments_file)
-        self.secrets_file = self.load_json(secrets_file)
+        self.payments_file = load_json(payments_file)
+        self.secrets_file = load_json(secrets_file)
         self.manager_acc = None
         self.scholar_accounts = None
         self.donations = None
         self.auto = auto
-
-    @staticmethod
-    def load_json(json_file):
-        # This is a safe guard, it should never raise as we check this in the CLI bit.
-        if not os.path.isfile(json_file):
-            raise Exception(f"File path {json_file} does not exist. "
-                            f"Please provide a correct one")
-        try:
-            with open(json_file) as f:
-                data = json.load(f)
-        except json.decoder.JSONDecodeError:
-            raise Exception(f"File in path {json_file} is not a correctly encoded JSON.")
-        return data
 
     def verify_inputs(self):
         logging.info("Validating file inputs...")
@@ -162,7 +145,7 @@ class AxiePaymentsManager:
             )
             fee += acc["ScholarPayout"]
             total_payments += acc["ScholarPayout"]
-            nonce = scholar_payment.get_nonce() + 1
+            nonce = get_nonce(acc["AccountAddress"]) + 1
             acc_payments.append(scholar_payment)
             if acc.get("TrainerPayoutAddress"):
                 # trainer_payment

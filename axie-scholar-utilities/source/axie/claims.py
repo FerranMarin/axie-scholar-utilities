@@ -6,15 +6,11 @@ import logging
 from datetime import datetime
 
 from fake_useragent import UserAgent
-from jsonschema import validate
-from jsonschema.exceptions import ValidationError
 from eth_account.messages import encode_defunct
 from web3 import Web3, exceptions
 import requests
 
-from .payments import AxiePaymentsManager
-from .schemas import payments_schema
-from .utils import check_balance, get_nonce
+from axie.utils import check_balance, get_nonce, load_json
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 
@@ -145,7 +141,7 @@ class Claim:
 
 class AxieClaimsManager:
     def __init__(self, secrets_file):
-        self.secrets_file = AxiePaymentsManager.load_json(secrets_file)
+        self.secrets_file = load_json(secrets_file)
 
     def verify_input(self):
         validation_success = True

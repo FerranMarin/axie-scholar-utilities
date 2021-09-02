@@ -2,7 +2,7 @@ import sys
 import builtins
 
 from docopt import docopt, DocoptExit
-from mock import mock_open, patch
+from mock import patch
 import pytest
 
 import axie_scholar_cli as cli

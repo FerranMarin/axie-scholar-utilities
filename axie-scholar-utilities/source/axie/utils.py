@@ -1,3 +1,4 @@
+import os
 import json
 
 from web3 import Web3
@@ -26,3 +27,16 @@ def get_nonce(account):
         Web3.toChecksumAddress(account.replace("ronin:", "0x"))
     )
     return nonce
+
+
+def load_json(json_file):
+    # This is a safe guard, it should never raise as we check this in the CLI.
+    if not os.path.isfile(json_file):
+        raise Exception(f"File path {json_file} does not exist. "
+                        f"Please provide a correct one")
+    try:
+        with open(json_file) as f:
+            data = json.load(f)
+    except json.decoder.JSONDecodeError:
+        raise Exception(f"File in path {json_file} is not a correctly encoded JSON.")
+    return data
