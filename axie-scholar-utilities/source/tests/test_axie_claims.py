@@ -68,27 +68,21 @@ def test_claims_manager_verify_input_wrong_public_private_short(tmpdir, caplog):
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text
 
 
-@patch("axie.claims.Claim.has_unclaimed_slp")
-@patch("axie.claims.check_balance")
 @patch("axie.claims.Claim.execute")
-def test_claims_manager_prepare_claims(mocked_claim_execute, mocked_check_balance, mocked_has_unclaimed_slp, tmpdir):
+def test_claims_manager_prepare_claims(mocked_claim_execute, tmpdir):
     scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     axc = AxieClaimsManager(s_file)
     axc.prepare_claims()
-    mocked_check_balance.assert_called_with(scholar_acc)
-    mocked_has_unclaimed_slp.assert_called_once()
     mocked_claim_execute.assert_called_once()
 
 
-@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
-@patch("axie.claims.check_balance", return_value=123)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_claim_init(mocked_provider, mocked_checksum, mocked_contract, moocked_check_balance, mocked_unclaimed_slp):
+def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
@@ -96,20 +90,14 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract, moocked_c
     mocked_provider.assert_called_with(RONIN_PROVIDER)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-    moocked_check_balance.assert_called_with("ronin:foo")
-    mocked_unclaimed_slp.assert_called_once()
-    assert c.final_balance == None
-    assert c.initial_balance == 123
-    assert c.unclaimed_slp == 456
     assert c.private_key == "bar"
     assert c.account == "0xfoo"
 
 
-@patch("axie.claims.check_balance", return_value=123)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mocked_check_balance):
+def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
     last_claimed_date = datetime.now() - timedelta(days=15)
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
@@ -119,18 +107,17 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mo
                         "open",
                         mock_open(read_data='{"foo": "bar"}')):
             c = Claim("ronin:foo", "0xbar")
-            assert c.unclaimed_slp == 12
+            unclaimed = c.has_unclaimed_slp()
+            assert unclaimed == 12
         mocked_provider.assert_called_with(RONIN_PROVIDER)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-        mocked_check_balance.assert_called_with("ronin:foo")
         
 
-@patch("axie.claims.check_balance", return_value=123)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp_less_than_claim_days(mocked_provider, mocked_checksum, mocked_contract, mocked_check_balance):
+def test_has_unclaimed_slp_less_than_claim_days(mocked_provider, mocked_checksum, mocked_contract):
     last_claimed_date = datetime.now()
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
@@ -140,18 +127,17 @@ def test_has_unclaimed_slp_less_than_claim_days(mocked_provider, mocked_checksum
                         "open",
                         mock_open(read_data='{"foo": "bar"}')):
             c = Claim("ronin:foo", "0xbar")
-            assert c.unclaimed_slp == None
+            unclaimed = c.has_unclaimed_slp()
+            assert unclaimed == None
         mocked_provider.assert_called_with(RONIN_PROVIDER)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-        mocked_check_balance.assert_called_with("ronin:foo")
 
 
-@patch("axie.claims.check_balance", return_value=123)
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_contract, mocked_check_balance, caplog):
+def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_contract, caplog):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
         status_code=500
@@ -160,12 +146,12 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
                         "open",
                         mock_open(read_data='{"foo": "bar"}')):
             c = Claim("ronin:foo", "0xbar")
-            assert c.unclaimed_slp == None
+            unclaimed = c.has_unclaimed_slp()
+            assert unclaimed == None
             assert "Failed to check if there is unclaimed SLP" in caplog.text
         mocked_provider.assert_called_with(RONIN_PROVIDER)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-        mocked_check_balance.assert_called_with("ronin:foo")
 
 
 def test_create_random_msg():
@@ -190,15 +176,11 @@ def test_create_random_msg_fail_req():
 @patch("web3.eth.Eth.contract")
 @patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
 @patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
-@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
-@patch("axie.claims.check_balance", return_value=123)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_get_jwt(
     mocked_provider,
     mocked_checksum,
-    moocked_check_balance,
-    mocked_unclaimed_slp,
     mocked_random_msg,
     mock_sign_message,
     _):
@@ -228,8 +210,6 @@ def test_get_jwt(
     mocked_checksum.assert_has_calls(
         [call(SLP_CONTRACT), call('0xfoo')]
     )
-    moocked_check_balance.assert_called_with("ronin:foo")
-    mocked_unclaimed_slp.assert_called_once()
     mocked_random_msg.assert_called_once()
     mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
 
@@ -237,15 +217,11 @@ def test_get_jwt(
 @patch("web3.eth.Eth.contract")
 @patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
 @patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
-@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
-@patch("axie.claims.check_balance", return_value=123)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_get_jwt_fail_req(
     mocked_provider,
     mocked_checksum,
-    moocked_check_balance,
-    mocked_unclaimed_slp,
     mocked_random_msg,
     mock_sign_message,
     _):
@@ -276,12 +252,11 @@ def test_get_jwt_fail_req(
     mocked_checksum.assert_has_calls(
         [call(SLP_CONTRACT), call('0xfoo')]
     )
-    moocked_check_balance.assert_called_with("ronin:foo")
-    mocked_unclaimed_slp.assert_called_once()
     mocked_random_msg.assert_called_once()
     mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
 
 
+@pytest.mark.asyncio
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
@@ -294,7 +269,7 @@ def test_get_jwt_fail_req(
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_execution(
+async def test_execution(
     mocked_provider,
     mocked_checksum,
     mocked_contract,
@@ -325,15 +300,12 @@ def test_execution(
                 }
             )
             c = Claim("ronin:foo", "0x00003A01C01173D676B64123")
-            c.execute()
+            await c.execute()
     mocked_provider.assert_called_with(RONIN_PROVIDER)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     moocked_check_balance.assert_called_with("0xfoo")
     mocked_unclaimed_slp.assert_called_once()
-    assert c.final_balance == None
-    assert c.initial_balance == 123
-    assert c.unclaimed_slp == 456
     assert c.private_key == "0x00003A01C01173D676B64123"
     assert c.account == "0xfoo"
     mock_get_jwt.assert_called_once()

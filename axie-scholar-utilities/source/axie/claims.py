@@ -27,9 +27,6 @@ class Claim:
         )
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
-        self.initial_balance = check_balance(account)
-        self.final_balance = None
-        self.unclaimed_slp = self.has_unclaimed_slp()
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
@@ -87,12 +84,13 @@ class Claim:
            raise Exception(f"Error! Getting JWT! Error: {e}")
         return response.json()['data']['createAccessTokenWithSignature']['accessToken']
 
-    def execute(self):
-        if not self.unclaimed_slp:
+    async def execute(self):
+        unclaimed =self.has_unclaimed_slp()
+        if not unclaimed:
             logging.info(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
             return
         logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
-                     f"{self.unclaimed_slp} unclaimed SLP")
+                     f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         headers = {
             "User-Agent": UserAgent().random,
@@ -135,7 +133,7 @@ class Claim:
             except exceptions.TransactionNotFound:
                 logging.info(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish (Nonce:{nonce})...")
                 # Sleep 5 seconds not to constantly send requests!
-                sleep(5)
+                await asyncio.sleep(5)
         
         if success:
             logging.info(f"Claimed SLP {signature['amount']} for account {self.account.replace('0x', 'ronin:')}")
@@ -170,8 +168,6 @@ class AxieClaimsManager:
     def prepare_claims(self):
         claims_list = [Claim(acc, self.secrets_file[acc]) for acc in self.secrets_file]
         logging.info("Caliming starting...")
-        for claim in claims_list:
-            claim.execute()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))
         logging.info("Caliming completed!")
-        # loop = asyncio.get_event_loop()
-        # loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))
