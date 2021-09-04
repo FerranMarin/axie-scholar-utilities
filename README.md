@@ -315,4 +315,4 @@ If you want to donate to thank me, feel free to do so at this ronin address:
     
 # Discord
 
-Feel free to join this project's discord: https://discord.gg/bmKvmhenvu
+Feel free to join this project's <a href="https://discord.gg/bmKvmhenvu" target="_blank">Discord</a>
