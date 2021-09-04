@@ -169,14 +169,13 @@ test = ["hypothesis (>=4.18.0,<5)", "pytest (==5.4.1)", "pytest-xdist", "tox (==
 
 [[package]]
 name = "eth-hash"
-version = "0.3.1"
+version = "0.3.2"
 description = "eth-hash: The Ethereum hashing function, keccak256, sometimes (erroneously) called sha3"
 category = "main"
 optional = false
 python-versions = ">=3.5, <4"
 
 [package.dependencies]
-eth-utils = ">=1,<2"
 pycryptodome = {version = ">=3.6.6,<4", optional = true, markers = "extra == \"pycryptodome\""}
 
 [package.extras]
@@ -544,6 +543,22 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 
 [[package]]
+name = "requests-mock"
+version = "1.9.3"
+description = "Mock out responses from the requests package"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+requests = ">=2.3,<3"
+six = "*"
+
+[package.extras]
+fixture = ["fixtures"]
+test = ["fixtures", "mock", "purl", "pytest", "sphinx", "testrepository (>=0.0.18)", "testtools"]
+
+[[package]]
 name = "rlp"
 version = "2.0.1"
 description = "A package for Recursive Length Prefix encoding and decoding"
@@ -667,7 +682,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "094753fa3052ea7a1291fdd4f195fbdf067ea0aa61d79677974b326b879d1c37"
+content-hash = "8750cfc24abcada894eab09f8df82209176e336646789130d41e5936179365fd"
 
 [metadata.files]
 aiohttp = [
@@ -779,8 +794,8 @@ eth-account = [
     {file = "eth_account-0.5.5-py3-none-any.whl", hash = "sha256:e579a898a976ad3436e328036a0ac4bb36573561dd0773f717dba6a72c137a2c"},
 ]
 eth-hash = [
-    {file = "eth-hash-0.3.1.tar.gz", hash = "sha256:aee46d9c43b98ac6d4ddf957cf75d4d0a5174ee814cc6b53dd6134dcedb459bf"},
-    {file = "eth_hash-0.3.1-py3-none-any.whl", hash = "sha256:a3bc7f1c12eb086525999de7f83b9e7ad39740b31f0f4eccb17377ed70de24dd"},
+    {file = "eth-hash-0.3.2.tar.gz", hash = "sha256:3f40cecd5ead88184aa9550afc19d057f103728108c5102f592f8415949b5a76"},
+    {file = "eth_hash-0.3.2-py3-none-any.whl", hash = "sha256:de7385148a8e0237ba1240cddbc06d53f56731140f8593bdb8429306f6b42271"},
 ]
 eth-keyfile = [
     {file = "eth-keyfile-0.5.1.tar.gz", hash = "sha256:939540efb503380bc30d926833e6a12b22c6750de80feef3720d79e5a79de47d"},
@@ -1009,6 +1024,10 @@ pywin32 = [
 requests = [
     {file = "requests-2.26.0-py2.py3-none-any.whl", hash = "sha256:6c1246513ecd5ecd4528a0906f910e8f0f9c6b8ec72030dc9fd154dc1a6efd24"},
     {file = "requests-2.26.0.tar.gz", hash = "sha256:b8aa58f8cf793ffd8782d3d8cb19e66ef36f7aba4353eec859e74678b01b07a7"},
+]
+requests-mock = [
+    {file = "requests-mock-1.9.3.tar.gz", hash = "sha256:8d72abe54546c1fc9696fa1516672f1031d72a55a1d66c85184f972a24ba0eba"},
+    {file = "requests_mock-1.9.3-py2.py3-none-any.whl", hash = "sha256:0a2d38a117c08bb78939ec163522976ad59a6b7fdd82b709e23bb98004a44970"},
 ]
 rlp = [
     {file = "rlp-2.0.1-py2.py3-none-any.whl", hash = "sha256:52a57c9f53f03c88b189283734b397314288250cc4a3c4113e9e36e2ac6bdd16"},

@@ -52,11 +52,11 @@ class Payment:
             transaction, 
             private_key=self.from_private
         )
-        # send raw transaction
+        # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
-        # wait for transaction to finish
+        # Wait for transaction to finish
         while True:
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)

@@ -1,9 +1,15 @@
 import sys
+import builtins
+from datetime import datetime, timedelta
 
-from mock import patch
 import pytest
+from mock import patch, mock_open, call
+import requests_mock
+from hexbytes import HexBytes
+from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
+from axie.claims import Claim, RONIN_PROVIDER, SLP_CONTRACT
 
 
 @patch("axie.claims.load_json")
@@ -77,21 +83,266 @@ def test_claims_manager_prepare_claims(mocked_claim_execute, mocked_check_balanc
     mocked_claim_execute.assert_called_once()
 
 
-def test_claim_init():
-    pass
+@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_claim_init(mocked_provider, mocked_checksum, mocked_contract, moocked_check_balance, mocked_unclaimed_slp):
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
+        c = Claim("ronin:foo", "bar")
+    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_checksum.assert_called_with(SLP_CONTRACT)
+    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    moocked_check_balance.assert_called_with("ronin:foo")
+    mocked_unclaimed_slp.assert_called_once()
+    assert c.final_balance == None
+    assert c.initial_balance == 123
+    assert c.unclaimed_slp == 456
+    assert c.private_key == "bar"
+    assert c.account == "0xfoo"
 
 
-def test_has_unclaimed_slp():
-    pass
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mocked_check_balance):
+    last_claimed_date = datetime.now() - timedelta(days=15)
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        json={"total": 12, "last_claimed_item_at": round(last_claimed_date.timestamp())}
+        )
+        with patch.object(builtins,
+                        "open",
+                        mock_open(read_data='{"foo": "bar"}')):
+            c = Claim("ronin:foo", "0xbar")
+            assert c.unclaimed_slp == 12
+        mocked_provider.assert_called_with(RONIN_PROVIDER)
+        mocked_checksum.assert_called_with(SLP_CONTRACT)
+        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_check_balance.assert_called_with("ronin:foo")
+        
+
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_has_unclaimed_slp_less_than_claim_days(mocked_provider, mocked_checksum, mocked_contract, mocked_check_balance):
+    last_claimed_date = datetime.now()
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        json={"total": 12, "last_claimed_item_at": round(last_claimed_date.timestamp())}
+        )
+        with patch.object(builtins,
+                        "open",
+                        mock_open(read_data='{"foo": "bar"}')):
+            c = Claim("ronin:foo", "0xbar")
+            assert c.unclaimed_slp == None
+        mocked_provider.assert_called_with(RONIN_PROVIDER)
+        mocked_checksum.assert_called_with(SLP_CONTRACT)
+        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_check_balance.assert_called_with("ronin:foo")
+
+
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_contract, mocked_check_balance, caplog):
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+        status_code=500
+        )
+        with patch.object(builtins,
+                        "open",
+                        mock_open(read_data='{"foo": "bar"}')):
+            c = Claim("ronin:foo", "0xbar")
+            assert c.unclaimed_slp == None
+            assert "Failed to check if there is unclaimed SLP" in caplog.text
+        mocked_provider.assert_called_with(RONIN_PROVIDER)
+        mocked_checksum.assert_called_with(SLP_CONTRACT)
+        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+        mocked_check_balance.assert_called_with("ronin:foo")
 
 
 def test_create_random_msg():
-    pass
+     with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        json={"data": {"createRandomMessage": "random_msg"}})
+        resp = Claim.create_random_msg()
+        assert resp == "random_msg"
 
 
-def test_get_jwt():
-    pass
+def test_create_random_msg_fail_req():
+     with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        status_code=500)
+        with pytest.raises(Exception) as ex:
+            Claim.create_random_msg()
+        assert str(ex.value) == ("Error! Creating random msg! "
+                                "Error: 500 Server Error: None for url: "
+                                "https://axieinfinity.com/graphql-server-v2/graphql")
 
 
-def test_execution():
-    pass
+@patch("web3.eth.Eth.contract")
+@patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
+@patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
+@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_get_jwt(
+    mocked_provider,
+    mocked_checksum,
+    moocked_check_balance,
+    mocked_unclaimed_slp,
+    mocked_random_msg,
+    mock_sign_message,
+    _):
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        json={"data": {"createAccessTokenWithSignature": {"accessToken": "test-token"}}}
+        )
+        c = Claim("ronin:foo", "0xbar")
+        resp = c.get_jwt()
+        assert resp == "test-token"
+        expected_payload = {
+             "operationName": "CreateAccessTokenWithSignature",
+            "variables": {
+                "input": {
+                    "mainnet": "ronin",
+                    "owner": "checksum",
+                    "message": "random_msg",
+                    "signature": f"{HexBytes(b'123').hex()}"
+                }
+            },
+            "query": "mutation CreateAccessTokenWithSignature($input: SignatureInput!)"
+            "{createAccessTokenWithSignature(input: $input) "
+            "{newAccount result accessToken __typename}}"
+        }
+        assert req_mocker.request_history[0].json() == expected_payload
+    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_checksum.assert_has_calls(
+        [call(SLP_CONTRACT), call('0xfoo')]
+    )
+    moocked_check_balance.assert_called_with("ronin:foo")
+    mocked_unclaimed_slp.assert_called_once()
+    mocked_random_msg.assert_called_once()
+    mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
+
+
+@patch("web3.eth.Eth.contract")
+@patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
+@patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
+@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_get_jwt_fail_req(
+    mocked_provider,
+    mocked_checksum,
+    moocked_check_balance,
+    mocked_unclaimed_slp,
+    mocked_random_msg,
+    mock_sign_message,
+    _):
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        status_code=500)
+        c = Claim("ronin:foo", "0xbar")
+        with pytest.raises(Exception) as e:
+            c.get_jwt()
+            expected_payload = {
+                "operationName": "CreateAccessTokenWithSignature",
+                "variables": {
+                    "input": {
+                        "mainnet": "ronin",
+                        "owner": "checksum",
+                        "message": "random_msg",
+                        "signature": f"{HexBytes(b'123').hex()}"
+                    }
+                },
+                "query": "mutation CreateAccessTokenWithSignature($input: SignatureInput!)"
+                "{createAccessTokenWithSignature(input: $input) "
+                "{newAccount result accessToken __typename}}"
+            }
+            assert req_mocker.request_history[0].json() == expected_payload
+    assert str(e.value) == ("Error! Getting JWT! Error: 500 Server Error: None for url: "
+                            "https://axieinfinity.com/graphql-server-v2/graphql")
+    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_checksum.assert_has_calls(
+        [call(SLP_CONTRACT), call('0xfoo')]
+    )
+    moocked_check_balance.assert_called_with("ronin:foo")
+    mocked_unclaimed_slp.assert_called_once()
+    mocked_random_msg.assert_called_once()
+    mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
+
+
+@patch("web3.Web3.toHex", return_value="transaction_hash")
+@patch("web3.Web3.keccak", return_value='result_of_keccak')
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
+@patch("web3.eth.Eth.account.sign_transaction")
+@patch("axie.claims.get_nonce", return_value=1)
+@patch("axie.claims.Claim.get_jwt", return_value="token")
+@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_execution(
+    mocked_provider,
+    mocked_checksum,
+    mocked_contract,
+    moocked_check_balance,
+    mocked_unclaimed_slp,
+    mock_get_jwt,
+    mock_get_nonce,
+    mocked_sign_transaction,
+    mock_raw_send,
+    mock_receipt,
+    mock_keccak,
+    mock_to_hex,
+    caplog):
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='{"foo": "bar"}')):
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post(
+                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                json={
+                    "blockchain_related": {
+                        "signature": {
+                            "amount": "456",
+                            "timestamp": str(int(datetime.now().timestamp())),
+                            "signature": "0xsignature"
+                        }
+                    }
+                }
+            )
+            c = Claim("ronin:foo", "0x00003A01C01173D676B64123")
+            c.execute()
+    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_checksum.assert_called_with(SLP_CONTRACT)
+    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    moocked_check_balance.assert_called_with("0xfoo")
+    mocked_unclaimed_slp.assert_called_once()
+    assert c.final_balance == None
+    assert c.initial_balance == 123
+    assert c.unclaimed_slp == 456
+    assert c.private_key == "0x00003A01C01173D676B64123"
+    assert c.account == "0xfoo"
+    mock_get_jwt.assert_called_once()
+    mock_get_nonce.assert_called_with("0xfoo")
+    mocked_sign_transaction.assert_called_once()
+    mock_raw_send.assert_called_once()
+    mock_receipt.assert_called_with("transaction_hash")
+    mock_keccak.assert_called_once()
+    mock_to_hex.assert_called_with("result_of_keccak")
+    assert "Account ronin:foo has 456 unclaimed SLP" in caplog.text
+    assert "Claimed SLP 456 for account ronin:foo" in caplog.text
+    assert "New balance  for account ronin:foo is: 123" in caplog.text
