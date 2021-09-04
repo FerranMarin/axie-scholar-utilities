@@ -22,7 +22,8 @@ import logging
 
 from docopt import docopt
 
-from axie import AxiePaymentsManager
+from axie import AxiePaymentsManager, AxieClaimsManager
+from axie.utils import load_json
 
 # Setup logger
 log = logging.getLogger()
@@ -40,16 +41,17 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
         secrets_file_path = os.path.join(folder, "secrets.json")
         with open(secrets_file_path, "w") as f:
             f.write("{}")
-    payments = AxiePaymentsManager.load_json(payments_file_path)
-    secrets = AxiePaymentsManager.load_json(secrets_file_path)
+    payments =load_json(payments_file_path)
+    secrets = load_json(secrets_file_path)
     changed = False
     for acc in payments["Scholars"]:
         if acc["AccountAddress"] not in secrets:
             changed = True
             new_secret = ''
             while new_secret == '':
-                new_secret = input("Please provide secret key for account "
-                                   f"{acc['Name']}.({acc['AccountAddress']}):")
+                msg = (f"Please provide secret key for account {acc['Name']}. "
+                       f"({acc['AccountAddress']}):")
+                new_secret = input(msg)
             secrets[acc["AccountAddress"]] = new_secret
 
     if changed:
@@ -63,18 +65,18 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v0.1')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.0.0')
     if args['payout']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
         file_error = False
         if not os.path.isfile(payments_file_path):
             logging.critical("Please provide a correct path to the Payments file. "
-                            f"Path provided: {payments_file_path}")
+                             f"Path provided: {payments_file_path}")
             file_error = True
         if not os.path.isfile(secrets_file_path):
             logging.critical("Please provide a correct path to the Secrets file. "
-                            f"Path provided: {secrets_file_path}")
+                             f"Path provided: {secrets_file_path}")
             file_error = True
         if file_error:
             raise Exception("Please review your file paths and re-try.")
@@ -84,11 +86,18 @@ def run_cli():
             logging.info("Automatic acceptance active, it won't ask before each execution")
         apm = AxiePaymentsManager(payments_file_path, secrets_file_path, auto=args['--yes'])
         apm.verify_inputs()
-        apm.prepare_payout() 
+        apm.prepare_payout()
     elif args['claim']:
+        secrets_file_path = args['<secrets_file>']
+        if not os.path.isfile(secrets_file_path):
+            logging.critical("Please provide a correct path to the Secrets file. "
+                             f"Path provided: {secrets_file_path}")
+            raise Exception("Please review your file paths and re-try.")
         # Claim SLP
         logging.info('I shall claim SLP')
-        raise NotImplementedError('Sorry, I have yet to implement this command')
+        acm = AxieClaimsManager(secrets_file_path)
+        acm.verify_input()
+        acm.prepare_claims()
     elif args['generate_QR']:
         # Generate QR codes
         logging.info('I shall generate QR codes')
@@ -101,11 +110,11 @@ def run_cli():
         file_error = False
         if not os.path.isfile(payments_file_path):
             logging.critical("Please provide a correct path to the Payments file. "
-                            f"Path provided: {payments_file_path}")
+                             f"Path provided: {payments_file_path}")
             file_error = True
         if secrets_file_path and not os.path.isfile(secrets_file_path):
             logging.critical("Please provide a correct path to the Secrets file. "
-                            f"Path provided: {secrets_file_path}")
+                             f"Path provided: {secrets_file_path}")
             file_error = True
         if file_error:
             raise Exception("Please review your file paths and re-try.")

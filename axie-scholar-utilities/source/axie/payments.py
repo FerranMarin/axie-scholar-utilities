@@ -1,4 +1,3 @@
-import os
 import sys
 import asyncio
 import json
@@ -9,27 +8,26 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
 from axie.schemas import payments_schema
+from axie.utils import check_balance, get_nonce, load_json
 
 CREATOR_FEE_ADDRESS = "ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0"
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
-RONIN_PROVIDER = "https://proxy.roninchain.com/free-gas-rpc"
+RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
+RONIN_PROVIDER = "https://api.roninchain.com/rpc"
 
 
-class Payment(object):
+class Payment:
     def __init__(self, name, from_acc, from_private, to_acc, amount, nonce=None):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
+        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         self.name = name
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.amount = amount
         if not nonce:
-            self.nonce = self.get_nonce()
+            self.nonce = get_nonce(self.from_acc)
         else:
-            self.nonce = max(self.get_nonce(), nonce)
-
-    def get_nonce(self):
-        return self.w3.eth.get_transaction_count(Web3.toChecksumAddress(self.from_acc))
+            self.nonce = max(get_nonce(self.from_acc), nonce)
 
     async def execute(self):
         # Prepare transaction
@@ -54,11 +52,11 @@ class Payment(object):
             transaction, 
             private_key=self.from_private
         )
-        # send raw transaction
+        # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
-        # wait for transaction to finish
+        # Wait for transaction to finish
         while True:
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
@@ -84,25 +82,12 @@ class Payment(object):
 
 class AxiePaymentsManager:
     def __init__(self, payments_file, secrets_file, auto=False):
-        self.payments_file = self.load_json(payments_file)
-        self.secrets_file = self.load_json(secrets_file)
+        self.payments_file = load_json(payments_file)
+        self.secrets_file = load_json(secrets_file)
         self.manager_acc = None
         self.scholar_accounts = None
         self.donations = None
         self.auto = auto
-
-    @staticmethod
-    def load_json(json_file):
-        # This is a safe guard, it should never raise as we check this in the CLI bit.
-        if not os.path.isfile(json_file):
-            raise Exception(f"File path {json_file} does not exist. "
-                            f"Please provide a correct one")
-        try:
-            with open(json_file) as f:
-                data = json.load(f)
-        except json.decoder.JSONDecodeError:
-            raise Exception(f"File in path {json_file} is not a correctly encoded JSON.")
-        return data
 
     def verify_inputs(self):
         logging.info("Validating file inputs...")
@@ -135,10 +120,19 @@ class AxiePaymentsManager:
             sys.exit()
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
-        logging.info("Files correctly validated!")
-    
+        logging.info("Files correctly validated!") 
+
+    def check_acc_has_enough_balance(self, account, balance):
+        account_balance = check_balance(account)
+        if account_balance < balance:
+            logging.critical("Balance in account {account} is "
+                             "inssuficient to cover all planned payments!")
+            return False
+        return True
+
     def prepare_payout(self):
         fee = 0
+        total_payments = 0
         for acc in self.scholar_accounts:
             acc_payments = []
             # scholar_payment
@@ -150,7 +144,8 @@ class AxiePaymentsManager:
                 acc["ScholarPayout"]
             )
             fee += acc["ScholarPayout"]
-            nonce = scholar_payment.get_nonce() + 1
+            total_payments += acc["ScholarPayout"]
+            nonce = get_nonce(acc["AccountAddress"]) + 1
             acc_payments.append(scholar_payment)
             if acc.get("TrainerPayoutAddress"):
                 # trainer_payment
@@ -163,9 +158,11 @@ class AxiePaymentsManager:
                     nonce
                 ))
                 fee += acc["TrainerPayout"]
+                total_payments += acc["TrainerPayout"]
             nonce += 1
             manager_payout = acc["ManagerPayout"]
             fee += manager_payout
+            total_payments += acc["ManagerPayout"]
             total_dono = 0
             if self.donations:
                 for dono in self.donations:
@@ -204,7 +201,12 @@ class AxiePaymentsManager:
                 manager_payout - total_dono,
                 nonce
             ))
-            self.payout_account(acc["Name"], acc_payments)
+            if self.check_acc_has_enough_balance(acc["AccountAddress"], 
+                                                 total_payments):
+                self.payout_account(acc["Name"], acc_payments)
+            else:
+                logging.info(f"Skipping payments for account '{acc['Name']}'. "
+                             "Insufficient funds!")
 
     def payout_account(self, acc_name, payment_list):
         logging.info(f"Payments for {acc_name}:")

@@ -2,7 +2,7 @@ import sys
 import builtins
 
 from docopt import docopt, DocoptExit
-from mock import mock_open, patch
+from mock import patch
 import pytest
 
 import axie_scholar_cli as cli
@@ -85,17 +85,22 @@ def test_parses_params(params, expected_result):
     args = docopt(cli.__doc__, params)
     assert args == expected_result
 
+
 @pytest.mark.parametrize("params",
                          [
                             (["a", "b", "c"]),
                             (["generate_QR"]),
                             (["generate_secrets"]),
+                            (["claim"]),
+                            (["claim", "file1", "file2"]),
+                            (["payout"]),
                             (["payout", "file1"]),
                             (["payout", "file1", "file2", "file3"])
                          ])
 def test_wrong_inputs(params):
     with pytest.raises(DocoptExit):
         docopt(cli.__doc__, params)
+
 
 def test_payout_file_check_fail(capsys):
     with pytest.raises(Exception) as e:
@@ -106,6 +111,7 @@ def test_payout_file_check_fail(capsys):
             assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
     assert str(e.value) == "Please review your file paths and re-try."
 
+
 def test_secret_gen_file_check_fail(capsys):
     with pytest.raises(Exception) as e:
         with patch.object(sys, 'argv', ["", "generate_secrets", "p_file.json", "s_file.json"]):
@@ -114,6 +120,7 @@ def test_secret_gen_file_check_fail(capsys):
             assert "CRITICAL: Please provide a correct path to the Payments file. Path provided: p_file.json" in out
             assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
     assert str(e.value) == "Please review your file paths and re-try."
+
 
 def test_secret_gen_file_check_fail_only_payment_file(capsys):
     with pytest.raises(Exception) as e:
@@ -124,9 +131,9 @@ def test_secret_gen_file_check_fail_only_payment_file(capsys):
             assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" not in out
     assert str(e.value) == "Please review your file paths and re-try."
 
+
 @pytest.mark.parametrize("params",
                          [
-                            (["", "claim", "file1"]),
                             (["", "generate_QR", "file1"])
                          ])
 def test_not_implemented_methods(params):
@@ -134,6 +141,7 @@ def test_not_implemented_methods(params):
         with patch.object(sys, 'argv', params):
             cli.run_cli()
     assert str(e.value) == "Sorry, I have yet to implement this command"
+
 
 def test_generate_secrets_no_secrets_file(tmpdir):
     f1 = tmpdir.join("file1.json")
@@ -145,6 +153,7 @@ def test_generate_secrets_no_secrets_file(tmpdir):
     assert f2.read() == ('{\n    "ronin:<account_s1_address>": "some_input",\n'
                          '    "ronin:<account_s2_address>": "some_input"\n}')
 
+
 def test_generate_secrets_no_secrets_file_other_folder(tmpdir):
     f1 = tmpdir.mkdir("other_folder").join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
@@ -154,6 +163,7 @@ def test_generate_secrets_no_secrets_file_other_folder(tmpdir):
         cli.generate_secrets_file(f1.strpath)
     assert f2.read() == ('{\n    "ronin:<account_s1_address>": "some_input",\n'
                          '    "ronin:<account_s2_address>": "some_input"\n}')
+
 
 def test_generate_secrets_already_there(tmpdir):
     f1 = tmpdir.join("file1.json")
@@ -166,6 +176,7 @@ def test_generate_secrets_already_there(tmpdir):
         cli.generate_secrets_file(f1.strpath, f2.strpath)
     assert f2.read() == expected_out
 
+
 def test_generate_secrets_partially_there(tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
@@ -176,6 +187,7 @@ def test_generate_secrets_partially_there(tmpdir):
         cli.generate_secrets_file(f1.strpath, f2.strpath)
     assert f2.read() == ('{\n    "ronin:<account_s1_address>": "hello",\n'
                          '    "ronin:<account_s2_address>": "some_input"\n}')
+
 
 @patch("axie.AxiePaymentsManager.__init__", return_value=None)
 @patch("axie.AxiePaymentsManager.verify_inputs")
@@ -191,10 +203,11 @@ def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, moc
     mock_verify_input.assert_called_with()
     mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=False)
 
+
 @patch("axie.AxiePaymentsManager.__init__", return_value=None)
 @patch("axie.AxiePaymentsManager.verify_inputs")
 @patch("axie.AxiePaymentsManager.prepare_payout")
-def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, mocked_paymentsmanager, tmpdir):
+def test_payout_takes_auto_parameter_yes(mock_prepare_payout, mock_verify_input, mocked_paymentsmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"}]}')
     f2 = tmpdir.join("file2.json")
@@ -204,3 +217,25 @@ def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, moc
     mock_prepare_payout.assert_called_with()
     mock_verify_input.assert_called_with()
     mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=True)
+
+
+@patch("axie.AxieClaimsManager.__init__", return_value=None)
+@patch("axie.AxieClaimsManager.prepare_claims")
+@patch("axie.AxieClaimsManager.verify_input")
+def test_claim(mock_verify_input, mock_prepare_claims, mock_claimsmanager, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "claim", str(f1)]):
+        cli.run_cli()
+    mock_verify_input.assert_called_with()
+    mock_prepare_claims.assert_called_with()
+    mock_claimsmanager.assert_called_with(str(f1))
+
+
+def test_claim_file_check_fail(capsys):
+    with pytest.raises(Exception) as e:
+        with patch.object(sys, 'argv', ["", "claim", "s_file.json"]):
+            cli.run_cli()
+            out, _ = capsys.readouterr()
+            assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
+    assert str(e.value) == "Please review your file paths and re-try."
