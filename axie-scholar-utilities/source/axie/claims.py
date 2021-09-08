@@ -19,11 +19,11 @@ RONIN_PROVIDER = "https://api.roninchain.com/rpc"
 class Claim:
     def __init__(self, account, private_key):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
-        with open("axie/min_abi.json") as f:
-            min_abi = json.load(f)
+        with open("axie/slp_abi.json") as f:
+            slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
-            abi=min_abi
+            abi=slp_abi
         )
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
