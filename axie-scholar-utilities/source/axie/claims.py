@@ -67,7 +67,7 @@ class Claim:
             "variables": {
                 "input": {
                     "mainnet": "ronin",
-                    "owner": f"{Web3.toChecksumAddress(self.account)}",
+                    "owner": f"{self.account}",
                     "message": f"{msg}",
                     "signature": f"{hex_msg}"
                 }
@@ -94,7 +94,7 @@ class Claim:
         jwt = self.get_jwt()
         headers = {
             "User-Agent": self.user_agent,
-            "authorisation": f"Bearer {jwt}"
+            "authorization": f"Bearer {jwt}"
         }
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
         response = requests.post(url, headers=headers)

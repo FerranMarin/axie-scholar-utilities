@@ -3,7 +3,7 @@ import builtins
 from datetime import datetime, timedelta
 
 import pytest
-from mock import patch, mock_open, call
+from mock import patch, mock_open
 import requests_mock
 from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
@@ -196,7 +196,7 @@ def test_get_jwt(
             "variables": {
                 "input": {
                     "mainnet": "ronin",
-                    "owner": "checksum",
+                    "owner": "0xfoo",
                     "message": "random_msg",
                     "signature": f"{HexBytes(b'123').hex()}"
                 }
@@ -207,9 +207,7 @@ def test_get_jwt(
         }
         assert req_mocker.request_history[0].json() == expected_payload
     mocked_provider.assert_called_with(RONIN_PROVIDER)
-    mocked_checksum.assert_has_calls(
-        [call(SLP_CONTRACT), call('0xfoo')]
-    )
+    mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_random_msg.assert_called_once()
     mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
 
@@ -249,9 +247,7 @@ def test_get_jwt_fail_req(
     assert str(e.value) == ("Error! Getting JWT! Error: 500 Server Error: None for url: "
                             "https://graphql-gateway.axieinfinity.com/graphql")
     mocked_provider.assert_called_with(RONIN_PROVIDER)
-    mocked_checksum.assert_has_calls(
-        [call(SLP_CONTRACT), call('0xfoo')]
-    )
+    mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_random_msg.assert_called_once()
     mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
 
