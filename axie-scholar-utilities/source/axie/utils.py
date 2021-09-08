@@ -9,13 +9,13 @@ RONIN_PROVIDER = "https://api.roninchain.com/rpc"
 
 def check_balance(account):
     w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
-    with open("axie/min_abi.json") as f:
+    with open("axie/slp_abi.json") as f:
         min_abi = json.load(f)
     slp_contract = w3.eth.contract(
         address=Web3.toChecksumAddress(SLP_CONTRACT),
         abi=min_abi
     )
-    balance = slp_contract.functions.get_balance(
+    balance = slp_contract.functions.balanceOf(
         Web3.toChecksumAddress(account.replace("ronin:", "0x"))
     ).call()
     return int(balance)

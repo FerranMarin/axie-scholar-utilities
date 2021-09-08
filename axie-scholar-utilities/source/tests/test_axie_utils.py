@@ -21,7 +21,7 @@ def test_check_balance(mock_provider, mock_contract, mock_checksum, _):
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
         result = check_balance("ronin:abc")
-    mock_file.assert_called_with("axie/min_abi.json")
+    mock_file.assert_called_with("axie/slp_abi.json")
     mock_provider.assert_called_with(RONIN_PROVIDER)
     mock_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xabc")])
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
