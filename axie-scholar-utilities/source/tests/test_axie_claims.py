@@ -156,7 +156,7 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
 
 def test_create_random_msg():
      with requests_mock.Mocker() as req_mocker:
-        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
         json={"data": {"createRandomMessage": "random_msg"}})
         resp = Claim.create_random_msg()
         assert resp == "random_msg"
@@ -164,13 +164,13 @@ def test_create_random_msg():
 
 def test_create_random_msg_fail_req():
      with requests_mock.Mocker() as req_mocker:
-        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
         status_code=500)
         with pytest.raises(Exception) as ex:
             Claim.create_random_msg()
         assert str(ex.value) == ("Error! Creating random msg! "
                                 "Error: 500 Server Error: None for url: "
-                                "https://axieinfinity.com/graphql-server-v2/graphql")
+                                "https://graphql-gateway.axieinfinity.com/graphql")
 
 
 @patch("web3.eth.Eth.contract")
@@ -185,7 +185,7 @@ def test_get_jwt(
     mock_sign_message,
     _):
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
         json={"data": {"createAccessTokenWithSignature": {"accessToken": "test-token"}}}
         )
         c = Claim("ronin:foo", "0xbar")
@@ -226,7 +226,7 @@ def test_get_jwt_fail_req(
     mock_sign_message,
     _):
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.post("https://axieinfinity.com/graphql-server-v2/graphql",
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
         status_code=500)
         c = Claim("ronin:foo", "0xbar")
         with pytest.raises(Exception) as e:
@@ -247,7 +247,7 @@ def test_get_jwt_fail_req(
             }
             assert req_mocker.request_history[0].json() == expected_payload
     assert str(e.value) == ("Error! Getting JWT! Error: 500 Server Error: None for url: "
-                            "https://axieinfinity.com/graphql-server-v2/graphql")
+                            "https://graphql-gateway.axieinfinity.com/graphql")
     mocked_provider.assert_called_with(RONIN_PROVIDER)
     mocked_checksum.assert_has_calls(
         [call(SLP_CONTRACT), call('0xfoo')]

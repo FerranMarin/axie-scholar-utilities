@@ -49,7 +49,7 @@ class Claim:
             "variables": {},
             "query": "mutation CreateRandomMessage{createRandomMessage}"
         }
-        url = "https://axieinfinity.com/graphql-server-v2/graphql"
+        url = "https://graphql-gateway.axieinfinity.com/graphql"
         response = requests.post(url, headers={"User-Agent": UserAgent().random}, json=payload)
         try:
             response.raise_for_status()
@@ -76,7 +76,7 @@ class Claim:
             "{createAccessTokenWithSignature(input: $input) "
             "{newAccount result accessToken __typename}}"
         }
-        url = "https://axieinfinity.com/graphql-server-v2/graphql"
+        url = "https://graphql-gateway.axieinfinity.com/graphql"
         response = requests.post(url, headers={"User-Agent": UserAgent().chrome}, json=payload)
         try:
             response.raise_for_status()
