@@ -3,7 +3,6 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timedelta
-from time import sleep
 
 from fake_useragent import UserAgent
 from eth_account.messages import encode_defunct

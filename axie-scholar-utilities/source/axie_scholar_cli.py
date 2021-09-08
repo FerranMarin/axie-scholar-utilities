@@ -65,7 +65,7 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.0.0')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.1')
     if args['payout']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
