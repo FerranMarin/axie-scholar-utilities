@@ -107,7 +107,7 @@ class Claim:
         nonce = get_nonce(self.account)
         # Build claim
         claim = self.slp_contract.functions.checkpoint(
-            self.account,
+            Web3.toChecksumAddress(self.account),
             signature['amount'],
             signature['timestamp'],
             signature['signature'].replace("0x", "")
@@ -137,7 +137,7 @@ class Claim:
         
         if success:
             logging.info(f"Claimed SLP {signature['amount']} for account {self.account.replace('0x', 'ronin:')}")
-            logging.info(f"New balance  for account {self.account.replace('0x', 'ronin:')} is: "
+            logging.info(f"New balance for account {self.account.replace('0x', 'ronin:')} is: "
                          f"{check_balance(self.account)}")
         else:
             logging.info(f"Claim for account {self.account.replace('0x', 'ronin:')} failed")
@@ -167,7 +167,7 @@ class AxieClaimsManager:
 
     def prepare_claims(self):
         claims_list = [Claim(acc, self.secrets_file[acc]) for acc in self.secrets_file]
-        logging.info("Caliming starting...")
+        logging.info("Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))
-        logging.info("Caliming completed!")
+        logging.info("Claiming completed!")

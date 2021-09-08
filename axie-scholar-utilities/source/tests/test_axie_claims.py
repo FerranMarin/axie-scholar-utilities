@@ -3,7 +3,7 @@ import builtins
 from datetime import datetime, timedelta
 
 import pytest
-from mock import patch, mock_open
+from mock import patch, mock_open, call
 import requests_mock
 from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
@@ -298,7 +298,7 @@ async def test_execution(
             c = Claim("ronin:foo", "0x00003A01C01173D676B64123")
             await c.execute()
     mocked_provider.assert_called_with(RONIN_PROVIDER)
-    mocked_checksum.assert_called_with(SLP_CONTRACT)
+    mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     moocked_check_balance.assert_called_with("0xfoo")
     mocked_unclaimed_slp.assert_called_once()
@@ -313,4 +313,4 @@ async def test_execution(
     mock_to_hex.assert_called_with("result_of_keccak")
     assert "Account ronin:foo has 456 unclaimed SLP" in caplog.text
     assert "Claimed SLP 456 for account ronin:foo" in caplog.text
-    assert "New balance  for account ronin:foo is: 123" in caplog.text
+    assert "New balance for account ronin:foo is: 123" in caplog.text
