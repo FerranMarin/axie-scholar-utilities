@@ -27,10 +27,11 @@ class Claim:
         )
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
+        self.user_agent = UserAgent().chrome
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
-        response = requests.get(url, headers={"User-Agent": UserAgent().random})
+        response = requests.get(url, headers={"User-Agent": self.user_agent})
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError:
@@ -42,15 +43,14 @@ class Claim:
             return unclaimed_slp
         return None
 
-    @staticmethod
-    def create_random_msg():
+    def create_random_msg(self):
         payload = {
             "operationName": "CreateRandomMessage",
             "variables": {},
             "query": "mutation CreateRandomMessage{createRandomMessage}"
         }
         url = "https://graphql-gateway.axieinfinity.com/graphql"
-        response = requests.post(url, headers={"User-Agent": UserAgent().random}, json=payload)
+        response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -77,7 +77,7 @@ class Claim:
             "{newAccount result accessToken __typename}}"
         }
         url = "https://graphql-gateway.axieinfinity.com/graphql"
-        response = requests.post(url, headers={"User-Agent": UserAgent().chrome}, json=payload)
+        response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -93,7 +93,7 @@ class Claim:
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         headers = {
-            "User-Agent": UserAgent().random,
+            "User-Agent": self.user_agent,
             "authorisation": f"Bearer {jwt}"
         }
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"

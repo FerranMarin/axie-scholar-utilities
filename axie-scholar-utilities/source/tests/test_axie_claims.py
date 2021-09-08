@@ -158,7 +158,7 @@ def test_create_random_msg():
      with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
         json={"data": {"createRandomMessage": "random_msg"}})
-        resp = Claim.create_random_msg()
+        resp = Claim("ronin:foo", "0xbar").create_random_msg()
         assert resp == "random_msg"
 
 
@@ -167,7 +167,7 @@ def test_create_random_msg_fail_req():
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
         status_code=500)
         with pytest.raises(Exception) as ex:
-            Claim.create_random_msg()
+            Claim("ronin:foo", "0xbar").create_random_msg()
         assert str(ex.value) == ("Error! Creating random msg! "
                                 "Error: 500 Server Error: None for url: "
                                 "https://graphql-gateway.axieinfinity.com/graphql")
