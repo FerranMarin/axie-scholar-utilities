@@ -109,12 +109,12 @@ class Claim:
             Web3.toChecksumAddress(self.account),
             signature['amount'],
             signature['timestamp'],
-            signature['signature'].replace("0x", "")
+            signature['signature']
         ).buildTransaction({'gas': 1000000, 'gasPrice': 0, 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
-            private_key=bytearray.fromhex(self.private_key.replace("0x", ""))
+            private_key=self.private_key
         )
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
