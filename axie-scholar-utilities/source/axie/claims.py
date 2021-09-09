@@ -95,7 +95,7 @@ class Claim:
             "authorization": f"Bearer {jwt}"
         }
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
-        response = requests.post(url, headers=headers)
+        response = requests.post(url, headers=headers, json="")
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -108,12 +108,12 @@ class Claim:
             Web3.toChecksumAddress(self.account),
             signature['amount'],
             signature['timestamp'],
-            signature['signature']
+            signature['signature'].replace("0x", "")
         ).buildTransaction({'gas': 1000000, 'gasPrice': 0, 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
-            private_key=self.private_key
+            private_key=bytearray.fromhex(self.private_key.replace("0x", ""))
         )
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
@@ -129,7 +129,8 @@ class Claim:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.info(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish (Nonce:{nonce})...")
+                logging.info(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish (Nonce:{nonce})"
+                             f" (Hash: {hash})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         
