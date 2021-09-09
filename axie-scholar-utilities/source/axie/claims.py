@@ -4,7 +4,6 @@ import json
 import logging
 from datetime import datetime, timedelta
 
-from fake_useragent import UserAgent
 from eth_account.messages import encode_defunct
 from web3 import Web3, exceptions
 import requests
@@ -26,7 +25,7 @@ class Claim:
         )
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
-        self.user_agent = UserAgent().chrome
+        self.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36"
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
@@ -36,7 +35,7 @@ class Claim:
         except requests.exceptions.HTTPError:
             logging.critical("Failed to check if there is unclaimed SLP")
             return None
-        unclaimed_slp = int(response.json()['total'])
+        unclaimed_slp = int(response.json()['total']) - int(response.json()['claimable_total'])
         last_claim = datetime.utcfromtimestamp(int(response.json()["last_claimed_item_at"]))
         if datetime.utcnow() - timedelta(days=14) >= last_claim and unclaimed_slp > 0:
             return unclaimed_slp
