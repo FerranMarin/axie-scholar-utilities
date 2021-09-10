@@ -36,10 +36,8 @@ class Claim:
             logging.critical("Failed to check if there is unclaimed SLP")
             return None
         unclaimed_slp = int(response.json()['total']) - int(response.json()['claimable_total'])
-        last_claim = datetime.utcfromtimestamp(int(response.json()["last_claimed_item_at"]))
-        if datetime.utcnow() - timedelta(days=14) >= last_claim and unclaimed_slp > 0:
-            return unclaimed_slp
-        return None
+        return unclaimed_slp
+
 
     def create_random_msg(self):
         payload = {
