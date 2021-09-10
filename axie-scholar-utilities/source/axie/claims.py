@@ -25,7 +25,8 @@ class Claim:
         )
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
-        self.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36"
+        self.user_agent = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) "
+                           "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36")
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
@@ -79,11 +80,11 @@ class Claim:
         try:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-           raise Exception(f"Error! Getting JWT! Error: {e}")
+            raise Exception(f"Error! Getting JWT! Error: {e}")
         return response.json()['data']['createAccessTokenWithSignature']['accessToken']
 
     async def execute(self):
-        unclaimed =self.has_unclaimed_slp()
+        unclaimed = self.has_unclaimed_slp()
         if not unclaimed:
             logging.info(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
             return
@@ -108,16 +109,16 @@ class Claim:
             Web3.toChecksumAddress(self.account),
             signature['amount'],
             signature['timestamp'],
-            signature['signature'].replace("0x", "")
+            bytes(signature['signature'], 'utf-8')
         ).buildTransaction({'gas': 1000000, 'gasPrice': 0, 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
-            private_key=bytearray.fromhex(self.private_key.replace("0x", ""))
+            private_key=self.private_key
         )
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
-         # Get transaction hash
+        # Get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
         # Wait for transaction to finish
         while True:
@@ -133,7 +134,6 @@ class Claim:
                              f" (Hash: {hash})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
-        
         if success:
             logging.info(f"Claimed SLP {signature['amount']} for account {self.account.replace('0x', 'ronin:')}")
             logging.info(f"New balance for account {self.account.replace('0x', 'ronin:')} is: "
