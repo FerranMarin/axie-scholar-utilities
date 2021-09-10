@@ -11,12 +11,12 @@ import requests
 from axie.utils import check_balance, get_nonce, load_json
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
-RONIN_PROVIDER = "https://api.roninchain.com/rpc"
+RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
 
 
 class Claim:
     def __init__(self, account, private_key):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
+        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         with open("axie/slp_abi.json") as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
@@ -36,11 +36,7 @@ class Claim:
         except requests.exceptions.HTTPError:
             logging.critical("Failed to check if there is unclaimed SLP")
             return None
-        unclaimed_slp = int(response.json()['total']) - int(response.json()['claimable_total'])
-        last_claim = datetime.utcfromtimestamp(int(response.json()["last_claimed_item_at"]))
-        if datetime.utcnow() - timedelta(days=14) >= last_claim and unclaimed_slp > 0:
-            return unclaimed_slp
-        return None
+        return int(response.json()['total'])
 
     def create_random_msg(self):
         payload = {
@@ -109,7 +105,7 @@ class Claim:
             Web3.toChecksumAddress(self.account),
             signature['amount'],
             signature['timestamp'],
-            bytes(signature['signature'], 'utf-8')
+            signature['signature']
         ).buildTransaction({'gas': 1000000, 'gasPrice': 0, 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(

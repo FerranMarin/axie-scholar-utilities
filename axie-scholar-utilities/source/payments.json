@@ -1,0 +1,12 @@
+{
+    "Manager": "ronin:9fa1bc784c665e683597d3f29375e45786617550",
+    "Scholars":[
+        {
+            "Name": "Account 1",
+            "AccountAddress": "ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0",
+            "ScholarPayoutAddress": "ronin:de0577588f56cbacf1458b6fae684771ee95815f",
+            "ScholarPayout": 5,
+            "ManagerPayout": 10
+        }
+    ]
+}

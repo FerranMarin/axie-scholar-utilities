@@ -9,7 +9,7 @@ from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
-from axie.claims import Claim, RONIN_PROVIDER, SLP_CONTRACT
+from axie.claims import Claim, RONIN_PROVIDER_FREE, SLP_CONTRACT
 
 
 @patch("axie.claims.load_json")
@@ -87,7 +87,7 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):
         c = Claim("ronin:foo", "bar")
-    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     assert c.private_key == "bar"
@@ -110,28 +110,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
             c = Claim("ronin:foo", "0xbar")
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed == 12
-        mocked_provider.assert_called_with(RONIN_PROVIDER)
-        mocked_checksum.assert_called_with(SLP_CONTRACT)
-        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-
-
-@patch("web3.eth.Eth.contract")
-@patch("web3.Web3.toChecksumAddress", return_value="checksum")
-@patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp_less_than_claim_days(mocked_provider, mocked_checksum, mocked_contract):
-    last_claimed_date = datetime.now()
-    with requests_mock.Mocker() as req_mocker:
-        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
-                       json={"total": 12,
-                             "last_claimed_item_at": round(last_claimed_date.timestamp()),
-                             "claimable_total": 0})
-        with patch.object(builtins,
-                          "open",
-                          mock_open(read_data='{"foo": "bar"}')):
-            c = Claim("ronin:foo", "0xbar")
-            unclaimed = c.has_unclaimed_slp()
-            assert unclaimed is None
-        mocked_provider.assert_called_with(RONIN_PROVIDER)
+        mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
 
@@ -150,7 +129,7 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed is None
             assert "Failed to check if there is unclaimed SLP" in caplog.text
-        mocked_provider.assert_called_with(RONIN_PROVIDER)
+        mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
 
@@ -206,7 +185,7 @@ def test_get_jwt(
              "{newAccount result accessToken __typename}}"
         }
         assert req_mocker.request_history[0].json() == expected_payload
-    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_random_msg.assert_called_once()
     mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
@@ -246,7 +225,7 @@ def test_get_jwt_fail_req(
             assert req_mocker.request_history[0].json() == expected_payload
     assert str(e.value) == ("Error! Getting JWT! Error: 500 Server Error: None for url: "
                             "https://graphql-gateway.axieinfinity.com/graphql")
-    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_random_msg.assert_called_once()
     mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
@@ -297,7 +276,7 @@ async def test_execution(
             )
             c = Claim("ronin:foo", "0x00003A01C01173D676B64123")
             await c.execute()
-    mocked_provider.assert_called_with(RONIN_PROVIDER)
+    mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     moocked_check_balance.assert_called_with("0xfoo")
