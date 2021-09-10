@@ -130,9 +130,9 @@ class AxiePaymentsManager:
         return True
 
     def prepare_payout(self):
-        fee = 0
-        total_payments = 0
         for acc in self.scholar_accounts:
+            fee = 0
+            total_payments = 0
             acc_payments = []
             # scholar_payment
             scholar_payment = Payment(
