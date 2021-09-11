@@ -10,7 +10,7 @@ from web3 import Web3, exceptions
 from axie.schemas import payments_schema
 from axie.utils import check_balance, get_nonce, load_json
 
-CREATOR_FEE_ADDRESS = "ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0"
+CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
 

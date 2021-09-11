@@ -307,7 +307,7 @@ def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_
         assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
         assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
         assert "Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP" in caplog.text
-        assert "Donation to software creator for Scholar 1(ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0) for the ammount of 10 SLP" in caplog.text
+        assert "Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) for the ammount of 10 SLP" in caplog.text
         assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
         assert "Transactions completed for account: 'Scholar 1'" in caplog.text
 
@@ -335,7 +335,7 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
     assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
     assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
     assert "Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP" in caplog.text
-    assert "Donation to software creator for Scholar 1(ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0) for the ammount of 10 SLP" in caplog.text
+    assert "Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) for the ammount of 10 SLP" in caplog.text
     assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
     assert "Transactions completed for account: 'Scholar 1'" in caplog.text
 

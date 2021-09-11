@@ -325,7 +325,7 @@ Feel free to open issues requesting features. I will consider all of them and ma
 
 If you want to donate to thank me, feel free to do so at this ronin address:
 
-    ronin:cac6cb4a85ba1925f96abc9a302b4a34dbb8c6b0
+    ronin:9fa1bc784c665e683597d3f29375e45786617550
     
 # Discord
 
