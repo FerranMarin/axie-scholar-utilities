@@ -158,7 +158,7 @@ class AxiePaymentsManager:
                 ))
                 fee += acc["TrainerPayout"]
                 total_payments += acc["TrainerPayout"]
-            nonce += 1
+                nonce += 1
             manager_payout = acc["ManagerPayout"]
             fee += manager_payout
             total_payments += acc["ManagerPayout"]
