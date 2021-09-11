@@ -254,7 +254,7 @@ Once all this preparation is done, just use this commands as needed:
         # Builds the image
         docker-compose build scholar-utilities
         # If we want to generate the secrets
-        docker-compose run scholar-utilities generate-secrets files/payments.json
+        docker-compose run scholar-utilities generate_secrets files/payments.json
         # If you want to claim SLP
         docker-compose run scholar-utilities claim files/secrets.json
         # If we want to do payments in auto mode
@@ -268,6 +268,8 @@ If you do not want to build the image yourself, pleaes download it from my [dock
 
 I recommend setting up this aliases right after pulling the image, so it makes everyones life easier.
 
+For MAC/Linux:
+
         # Alias to generate secrets
         axie-utils-gen-secrets() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
         # Alias to execute claims
@@ -276,6 +278,17 @@ I recommend setting up this aliases right after pulling the image, so it makes e
         axie-utils-payout() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
         # Alias to execute auto-payments (no confirmation)
         axie-utils-auto-payout() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
+
+For Windows (PowerShell):
+
+        # Alias to generate secrets
+        function axie-utils-gen-secrets {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
+        # Alias to execute claims
+        function axie-utils-claim {docker run -it  -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
+        # Alias to execute payments
+        function axie-utils-payout {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
+        # Alias to execute auto-payments (no confirmation)
+        function axie-utils-auto-payout {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
 
 With these alias all you need is the payments file and a secret file (if you have not yet generate it, please create a file with just '{}' inside and save it as .json). Then the commands you will need to execute are the following:
 
@@ -301,6 +314,7 @@ There is embedded in the code a 1% fee. I believe this is a fair charge for this
 # Roadmap
 
 - Integrate with Discord (via a bot, maybe?)
+- Add transfer axies capabilities (will need an axie to transfer from account to account)
 - Release a desktop app (even more convenient)
 - ...
 - Add functionality to get QR codes, maybe(?)
@@ -315,4 +329,4 @@ If you want to donate to thank me, feel free to do so at this ronin address:
     
 # Discord
 
-Feel free to join this project's <a href="https://discord.gg/bmKvmhenvu" target="_blank">Discord</a>
+Feel free to join this project's <a href="https://discord.gg/bmKvmhenvu">Discord</a>
