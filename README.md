@@ -247,7 +247,7 @@ I also recommend having docker-compose. It comes by default with Windows and Mac
         # Finally just check it works with
         docker-compose --version
 
-Once we have docker installed and docker-compose we are done. To use the tool we only need to build and run the image. To do so, please navigate using your terminal to the [docker folder](axie-scholar-utilities/docker). Once there create a folder named files (this is where we will place our payments and secret file), we will link that folder from our host to the docker container.
+Once we have docker installed and docker-compose we are done. To use the tool we only need to build and run the image. To do so, please navigate using your terminal to the [docker folder](axie-scholar-utilities/docker). Once there create a folder named files (this is where we will place our payments and secret file and a file called results.log which is empty), we will link that folder from our host to the docker container.
 
 Once all this preparation is done, just use this commands as needed:
 
@@ -275,9 +275,9 @@ For MAC/Linux:
         # Alias to execute claims
         axie-utils-claim() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
         # Alias to execute payments
-        axie-utils-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
+        axie-utils-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/${3}:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
         # Alias to execute auto-payments (no confirmation)
-        axie-utils-auto-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
+        axie-utils-auto-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/${3}:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
 
 For Windows (PowerShell):
 
@@ -286,9 +286,9 @@ For Windows (PowerShell):
         # Alias to execute claims
         function axie-utils-claim {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
         # Alias to execute payments
-        function axie-utils-payout {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
+        function axie-utils-payout {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/${3}:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
         # Alias to execute auto-payments (no confirmation)
-        function axie-utils-auto-payout {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
+        function axie-utils-auto-payout {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/${3}:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
 
 With these alias all you need is the payments file and a secret file (if you have not yet generate it, please create a file with just '{}' inside and save it as .json). Then the commands you will need to execute are the following:
 
@@ -297,11 +297,11 @@ With these alias all you need is the payments file and a secret file (if you hav
         #To claim SLP
         axie-utils-claim name_of_your_secrets_file.json
         #To execute payments
-        axie-utils-payout name_of_your_payments_file.json name_of_your_secrets_file.json
+        axie-utils-payout name_of_your_payments_file.json name_of_your_secrets_file.json results.log
         #To execute automatic payments
-        axie-utils-auto-payout name_of_your_payments_file.json name_of_your_secrets_file.json
+        axie-utils-auto-payout name_of_your_payments_file.json name_of_your_secrets_file.json results.log
 
-Once executed, please follow the insturctions that will appear on your terminal (if any).
+Once executed, please follow the instructions that will appear on your terminal (if any).
 
 ## Desktop App
 
