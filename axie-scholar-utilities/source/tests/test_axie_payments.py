@@ -24,8 +24,8 @@ def test_payments_manager_init(mocked_load_json):
 
 def test_payments_manager_verify_input_success(tmpdir):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":10,'
@@ -38,23 +38,23 @@ def test_payments_manager_verify_input_success(tmpdir):
     axp.verify_inputs()
     assert axp.manager_acc == "ronin:<Manager address here>"
     assert axp.scholar_accounts == [
-        {"Name":"Scholar 1",
+        {"Name": "Scholar 1",
          "AccountAddress": scholar_acc,
-         "ScholarPayoutAddress":"ronin:<scholar_address>",
-         "ScholarPayout":10,
-         "TrainerPayoutAddress":"ronin:<trainer_address>",
-         "TrainerPayout":1,
-         "ManagerPayout":9}]
+         "ScholarPayoutAddress": "ronin:<scholar_address>",
+         "ScholarPayout": 10,
+         "TrainerPayoutAddress": "ronin:<trainer_address>",
+         "TrainerPayout": 1,
+         "ManagerPayout": 9}]
     assert axp.donations == [
-        {"Name":"Entity 1",
+        {"Name": "Entity 1",
          "AccountAddress": "ronin:<donation_entity_1_address>",
-         "Percent":0.01}]
+         "Percent": 0.01}]
 
 
 def test_payments_manager_verify_input_donations_exceed_max(tmpdir, caplog):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":10,'
@@ -66,14 +66,13 @@ def test_payments_manager_verify_input_donations_exceed_max(tmpdir, caplog):
     with patch.object(sys, "exit") as mocked_sys:
         axp = AxiePaymentsManager(p_file, s_file)
         axp.verify_inputs()
-    
     mocked_sys.assert_called_once()
     assert "Payments file donations exeeds 100%, please review it" in caplog.text
 
 
 def test_payments_manager_verify_input_missing_private_key(tmpdir, caplog):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":10,'
@@ -85,14 +84,13 @@ def test_payments_manager_verify_input_missing_private_key(tmpdir, caplog):
     with patch.object(sys, "exit") as mocked_sys:
         axp = AxiePaymentsManager(p_file, s_file)
         axp.verify_inputs()
-    
     mocked_sys.assert_called_once()
     assert "Account 'Scholar 1' is not present in secret file, please add it." in caplog.text
 
 
 def test_payments_manager_verify_input_invalid_private_key(tmpdir, caplog):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345'
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
@@ -105,7 +103,6 @@ def test_payments_manager_verify_input_invalid_private_key(tmpdir, caplog):
     with patch.object(sys, "exit") as mocked_sys:
         axp = AxiePaymentsManager(p_file, s_file)
         axp.verify_inputs()
-    
     mocked_sys.assert_called_once()
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text
 
@@ -115,9 +112,9 @@ def test_payments_manager_verify_input_invalid_private_key(tmpdir, caplog):
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_low_slp(mocked_check_balance, mocked_payout, mocked_get_nonce, tmpdir):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     clean_scholar_acc = scholar_acc.replace("ronin:", "0x")
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":10,'
@@ -157,11 +154,14 @@ def test_payments_manager_prepare_payout_low_slp(mocked_check_balance, mocked_pa
 @patch("axie.utils.get_nonce", return_value=1)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_check_balance, mocked_payout, mocked_get_nonce, tmpdir):
+def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_check_balance,
+                                                           mocked_payout,
+                                                           mocked_get_nonce,
+                                                           tmpdir):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     clean_scholar_acc = scholar_acc.replace("ronin:", "0x")
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
@@ -206,11 +206,14 @@ def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_check_balance,
 @patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_check_balance, mocked_payout, mocked_get_nonce, tmpdir):
+def test_payments_manager_prepare_payout_high_slp_with_donos(mocked_check_balance,
+                                                             mocked_payout,
+                                                             mocked_get_nonce,
+                                                             tmpdir):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     clean_scholar_acc = scholar_acc.replace("ronin:", "0x")
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
@@ -262,10 +265,13 @@ def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_check_balance,
 @patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=False)
-def test_payments_manager_prepare_no_payout_it_not_enough_balance(mocked_check_balance, mocked_payout, mocked_get_nonce, tmpdir):
+def test_payments_manager_prepare_no_payout_it_not_enough_balance(mocked_check_balance,
+                                                                  mocked_payout,
+                                                                  mocked_get_nonce,
+                                                                  tmpdir):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
@@ -287,8 +293,8 @@ def test_payments_manager_prepare_no_payout_it_not_enough_balance(mocked_check_b
 @patch("axie.payments.get_nonce", return_value=1)
 def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_execute, tmpdir, caplog):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
@@ -306,8 +312,10 @@ def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_
         assert mocked_execute.call_count == 5
         assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
         assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
-        assert "Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP" in caplog.text
-        assert "Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) for the ammount of 10 SLP" in caplog.text
+        assert ("Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) "
+                "for the ammount of 4 SLP" in caplog.text)
+        assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) "
+                "for the ammount of 10 SLP" in caplog.text)
         assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
         assert "Transactions completed for account: 'Scholar 1'" in caplog.text
 
@@ -317,8 +325,8 @@ def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_
 @patch("axie.payments.get_nonce", return_value=1)
 def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execute, tmpdir, caplog):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
@@ -334,8 +342,10 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
     assert mocked_execute.call_count == 5
     assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
     assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
-    assert "Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount of 4 SLP" in caplog.text
-    assert "Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) for the ammount of 10 SLP" in caplog.text
+    assert ("Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount "
+            "of 4 SLP" in caplog.text)
+    assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550)"
+            "for the ammount of 10 SLP" in caplog.text)
     assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
     assert "Transactions completed for account: 'Scholar 1'" in caplog.text
 
@@ -345,8 +355,8 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
 @patch("axie.payments.get_nonce", return_value=1)
 def test_payments_manager_payout_account_deny(_, mocked_check_balance, mocked_execute, tmpdir, caplog):
     p_file = tmpdir.join("p.json")
-    scholar_acc = 'ronin:<account_s1_address>'+ "".join([str(x) for x in range(10)]*4)
-    scholar_private_acc = '0x<account_s1_private_address>012345'+ "".join([str(x) for x in range(10)]*3)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
@@ -377,6 +387,7 @@ def test_payment_get_nonce_calls_w3_low_nonce(_, mocked_transaction_count):
     mocked_transaction_count.assert_called_once()
     assert p.nonce == 123
 
+
 @patch("web3.Web3.toChecksumAddress")
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
 def test_payment_get_nonce_calls_w3_high_nonce(_, mocked_transaction_count):
@@ -400,15 +411,15 @@ def test_payment_get_nonce_calls_w3_high_nonce(_, mocked_transaction_count):
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.contract")
 @patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
-async def test_execute_calls_web3_functions(
-    mock_transaction_receipt,
-    mock_contract,
-    mock_keccak,
-    mock_to_hex,
-    mock_send,
-    mock_sign,
-    mock_checksum,
-    _, caplog):
+async def test_execute_calls_web3_functions(mock_transaction_receipt,
+                                            mock_contract,
+                                            mock_keccak,
+                                            mock_to_hex,
+                                            mock_send,
+                                            mock_sign,
+                                            mock_checksum,
+                                            _,
+                                            caplog):
     p = Payment(
         "random_account",
         "ronin:from_ronin",
@@ -433,4 +444,5 @@ async def test_execute_calls_web3_functions(
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     assert 'random_account(ronin:to_ronin) for the ammount of 10 SLP Transaction Sent!' in caplog.text
-    assert 'Transaction hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text
+    assert ('Transaction hash: transaction_hash -'
+            'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)

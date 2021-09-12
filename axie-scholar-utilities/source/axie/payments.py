@@ -48,7 +48,7 @@ class Payment:
         })
         # Sign Transaction
         signed = self.w3.eth.account.sign_transaction(
-            transaction, 
+            transaction,
             private_key=self.from_private
         )
         # Send raw transaction
@@ -119,7 +119,7 @@ class AxiePaymentsManager:
             sys.exit()
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
-        logging.info("Files correctly validated!") 
+        logging.info("Files correctly validated!")
 
     def check_acc_has_enough_balance(self, account, balance):
         account_balance = check_balance(account)
@@ -200,7 +200,7 @@ class AxiePaymentsManager:
                 manager_payout - total_dono,
                 nonce
             ))
-            if self.check_acc_has_enough_balance(acc["AccountAddress"], 
+            if self.check_acc_has_enough_balance(acc["AccountAddress"],
                                                  total_payments):
                 self.payout_account(acc["Name"], acc_payments)
             else:

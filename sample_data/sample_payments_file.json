@@ -1,6 +1,6 @@
 {
     "Manager": "ronin:<Manager address here>",
-    "Scholars":[
+    "Scholars": [
         {
             "Name": "Scholar 1",
             "AccountAddress": "ronin:<account_s1_address>",

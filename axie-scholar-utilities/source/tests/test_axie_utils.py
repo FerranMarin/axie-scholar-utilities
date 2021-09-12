@@ -53,7 +53,7 @@ def test_load_json_not_json(tmpdir):
 @patch("web3.Web3.toChecksumAddress", return_value="foo")
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
 def test_get_nonce_calls_w3(mocked_transaction_count, mocked_checksum):
-    nonce = get_nonce("ronin:from_ronin") 
+    nonce = get_nonce("ronin:from_ronin")
     mocked_checksum.assert_called_with("0xfrom_ronin")
     mocked_transaction_count.assert_called_with("foo")
     assert nonce == 123

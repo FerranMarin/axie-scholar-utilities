@@ -2,7 +2,6 @@ import sys
 import asyncio
 import json
 import logging
-from datetime import datetime, timedelta
 
 from eth_account.messages import encode_defunct
 from web3 import Web3, exceptions
@@ -142,7 +141,7 @@ class AxieClaimsManager:
     def __init__(self, payments_file, secrets_file):
         self.secrets_file = self.load_secrets(secrets_file, payments_file)
 
-    def load_secrets(secrets_file, payments_file):
+    def load_secrets(self, secrets_file, payments_file):
         secrets = load_json(secrets_file)
         payments = load_json(payments_file)
         refined_secrets = {}

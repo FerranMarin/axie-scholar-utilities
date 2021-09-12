@@ -1,4 +1,5 @@
 import sys
+import json
 import builtins
 from datetime import datetime, timedelta
 
@@ -12,19 +13,64 @@ from axie import AxieClaimsManager
 from axie.claims import Claim, RONIN_PROVIDER_FREE, SLP_CONTRACT
 
 
-@patch("axie.claims.load_json")
-def test_claims_manager_init(mocked_load_json):
+@patch("axie.AxieClaimsManager.load_secrets")
+def test_claims_manager_init(mocked_load_secrets):
     secrets_file = "sample_secrets_file.json"
-    AxieClaimsManager(secrets_file)
-    mocked_load_json.assert_called_with(secrets_file)
+    payments_file = "sample_payments_file.json"
+    AxieClaimsManager(payments_file, secrets_file)
+    mocked_load_secrets.assert_called_with(secrets_file, payments_file)
 
 
 def test_claims_manager_verify_input_success(tmpdir):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file = tmpdir.join("p.json")
+    data = {
+        "Manager": "ronin:<Manager address here>",
+        "Scholars": [
+            {
+                "Name": "Scholar 1",
+                "AccountAddress": f"{scholar_acc}",
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPayout": 100,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPayout": 10,
+                "ManagerPayout": 90
+            }]
+    }
+    p_file.write(json.dumps(data))
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
-    axc = AxieClaimsManager(s_file)
+    axc = AxieClaimsManager(p_file, s_file)
+    axc.verify_input()
+    axc.secrets_file = {scholar_acc: scholar_private_acc}
+
+
+def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file = tmpdir.join("p.json")
+    data = {
+        "Manager": "ronin:<Manager address here>",
+        "Scholars": [
+            {
+                "Name": "Scholar 1",
+                "AccountAddress": f"{scholar_acc}",
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPayout": 100,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPayout": 10,
+                "ManagerPayout": 90
+            }]
+    }
+    p_file.write(json.dumps(data))
+    s_file = tmpdir.join("s.json")
+    s_data = {
+        scholar_acc: scholar_private_acc,
+        "ronin:acc": "ronin:secret"
+    }
+    s_file.write(json.dumps(s_data))
+    axc = AxieClaimsManager(p_file, s_file)
     axc.verify_input()
     axc.secrets_file = {scholar_acc: scholar_private_acc}
 
@@ -32,10 +78,25 @@ def test_claims_manager_verify_input_success(tmpdir):
 def test_claims_manager_verify_input_wrong_public_ronin(tmpdir, caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file = tmpdir.join("p.json")
+    data = {
+        "Manager": "ronin:<Manager address here>",
+        "Scholars": [
+            {
+                "Name": "Scholar 1",
+                "AccountAddress": f"{scholar_acc}",
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPayout": 100,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPayout": 10,
+                "ManagerPayout": 90
+            }]
+    }
+    p_file.write(json.dumps(data))
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     with patch.object(sys, "exit") as mocked_sys:
-        axc = AxieClaimsManager(s_file)
+        axc = AxieClaimsManager(p_file, s_file)
         axc.verify_input()
 
     mocked_sys.assert_called_once()
@@ -45,10 +106,25 @@ def test_claims_manager_verify_input_wrong_public_ronin(tmpdir, caplog):
 def test_claims_manager_verify_input_wrong_public_private_ronin(tmpdir, caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = 'ronin:<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file = tmpdir.join("p.json")
+    data = {
+        "Manager": "ronin:<Manager address here>",
+        "Scholars": [
+            {
+                "Name": "Scholar 1",
+                "AccountAddress": f"{scholar_acc}",
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPayout": 100,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPayout": 10,
+                "ManagerPayout": 90
+            }]
+    }
+    p_file.write(json.dumps(data))
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     with patch.object(sys, "exit") as mocked_sys:
-        axc = AxieClaimsManager(s_file)
+        axc = AxieClaimsManager(p_file, s_file)
         axc.verify_input()
 
     mocked_sys.assert_called_once()
@@ -58,10 +134,25 @@ def test_claims_manager_verify_input_wrong_public_private_ronin(tmpdir, caplog):
 def test_claims_manager_verify_input_wrong_public_private_short(tmpdir, caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = 'ronin:<account_s1_private_address>012345'
+    p_file = tmpdir.join("p.json")
+    data = {
+        "Manager": "ronin:<Manager address here>",
+        "Scholars": [
+            {
+                "Name": "Scholar 1",
+                "AccountAddress": f"{scholar_acc}",
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPayout": 100,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPayout": 10,
+                "ManagerPayout": 90
+            }]
+    }
+    p_file.write(json.dumps(data))
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     with patch.object(sys, "exit") as mocked_sys:
-        axc = AxieClaimsManager(s_file)
+        axc = AxieClaimsManager(p_file, s_file)
         axc.verify_input()
 
     mocked_sys.assert_called_once()
@@ -72,9 +163,24 @@ def test_claims_manager_verify_input_wrong_public_private_short(tmpdir, caplog):
 def test_claims_manager_prepare_claims(mocked_claim_execute, tmpdir):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file = tmpdir.join("p.json")
+    data = {
+        "Manager": "ronin:<Manager address here>",
+        "Scholars": [
+            {
+                "Name": "Scholar 1",
+                "AccountAddress": f"{scholar_acc}",
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPayout": 100,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPayout": 10,
+                "ManagerPayout": 90
+            }]
+    }
+    p_file.write(json.dumps(data))
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
-    axc = AxieClaimsManager(s_file)
+    axc = AxieClaimsManager(p_file, s_file)
     axc.prepare_claims()
     mocked_claim_execute.assert_called_once()
 
@@ -158,12 +264,7 @@ def test_create_random_msg_fail_req():
 @patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_get_jwt(
-    mocked_provider,
-    mocked_checksum,
-    mocked_random_msg,
-    mock_sign_message,
-    _):
+def test_get_jwt(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createAccessTokenWithSignature": {"accessToken": "test-token"}}})
@@ -196,12 +297,7 @@ def test_get_jwt(
 @patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_get_jwt_fail_req(
-    mocked_provider,
-    mocked_checksum,
-    mocked_random_msg,
-    mock_sign_message,
-    _):
+def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         status_code=500)
@@ -244,20 +340,19 @@ def test_get_jwt_fail_req(
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-async def test_execution(
-    mocked_provider,
-    mocked_checksum,
-    mocked_contract,
-    moocked_check_balance,
-    mocked_unclaimed_slp,
-    mock_get_jwt,
-    mock_get_nonce,
-    mocked_sign_transaction,
-    mock_raw_send,
-    mock_receipt,
-    mock_keccak,
-    mock_to_hex,
-    caplog):
+async def test_execution(mocked_provider,
+                         mocked_checksum,
+                         mocked_contract,
+                         moocked_check_balance,
+                         mocked_unclaimed_slp,
+                         mock_get_jwt,
+                         mock_get_nonce,
+                         mocked_sign_transaction,
+                         mock_raw_send,
+                         mock_receipt,
+                         mock_keccak,
+                         mock_to_hex,
+                         caplog):
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):
