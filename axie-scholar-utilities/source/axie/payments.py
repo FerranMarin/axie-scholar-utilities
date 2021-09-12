@@ -65,15 +65,15 @@ class Payment:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.info(f"Waiting for transaction '{self.name}' to finish (Nonce:{self.nonce})...")
+                logging.debug(f"Waiting for transaction '{self}' to finish (Nonce:{self.nonce})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
 
         if success:
-            logging.info(f"{self} Transaction Sent!")
-            logging.info(f"Transaction hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+            logging.info(f"Transaction {self} completed! Hash: {hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
         else:
-            logging.info(f"Transaction {self} reverted by EVM (Ethereum Virtual machine)")
+            logging.info(f"Transaction {self} failed")
 
     def __str__(self):
         return f"{self.name}({self.to_acc.replace('0x', 'ronin:')}) for the ammount of {self.amount} SLP"
@@ -89,7 +89,7 @@ class AxiePaymentsManager:
         self.auto = auto
 
     def verify_inputs(self):
-        logging.info("Validating file inputs...")
+        logging.debug("Validating file inputs...")
         validation_success = True
         # Validate payments file
         try:
@@ -119,7 +119,7 @@ class AxiePaymentsManager:
             sys.exit()
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
-        logging.info("Files correctly validated!")
+        logging.debug("Files correctly validated!")
 
     def check_acc_has_enough_balance(self, account, balance):
         account_balance = check_balance(account)
@@ -208,8 +208,8 @@ class AxiePaymentsManager:
                              "Insufficient funds!")
 
     def payout_account(self, acc_name, payment_list):
-        logging.info(f"Payments for {acc_name}:")
-        logging.info(",\n".join(str(p) for p in payment_list))
+        logging.debug(f"Payments for {acc_name}:")
+        logging.debug(",\n".join(str(p) for p in payment_list))
         accept = "y" if self.auto else None
         while accept not in ["y", "n", "Y", "N"]:
             accept = input("Do you want to proceed with these transactions?(y/n): ")

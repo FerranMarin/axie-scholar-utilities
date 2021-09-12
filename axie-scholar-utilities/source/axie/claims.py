@@ -81,10 +81,10 @@ class Claim:
     async def execute(self):
         unclaimed = self.has_unclaimed_slp()
         if not unclaimed:
-            logging.info(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
+            logging.debug(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
             return
-        logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
-                     f"{unclaimed} unclaimed SLP")
+        logging.debug(f"Account {self.account.replace('0x', 'ronin:')} has "
+                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         headers = {
             "User-Agent": self.user_agent,
@@ -125,8 +125,8 @@ class Claim:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.info(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish (Nonce:{nonce})"
-                             f" (Hash: {hash})...")
+                logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
+                              f"(Nonce:{nonce}) (Hash: {hash}), (Amount: {signature['amount']})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:
@@ -166,11 +166,11 @@ class AxieClaimsManager:
                 validation_success = False
         if not validation_success:
             sys.exit()
-        logging.info("Secret file correctly validated")
+        logging.debug("Secret file correctly validated")
 
     def prepare_claims(self):
         claims_list = [Claim(acc, self.secrets_file[acc]) for acc in self.secrets_file]
-        logging.info("Claiming starting...")
+        logging.debug("Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))
-        logging.info("Claiming completed!")
+        logging.debug("Claiming completed!")
