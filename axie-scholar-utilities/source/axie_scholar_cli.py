@@ -4,7 +4,7 @@ They are: payout, claim, generate_secrets, generate_QR
 
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
-    axie_scholar_cli.py claim <secrets_file>
+    axie_scholar_cli.py claim <payments_file> <secrets_file>
     axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
     axie_scholar_cli.py generate_QR <secrets_file>
     axie_scholar_cli.py -h | --help
@@ -41,7 +41,7 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
         secrets_file_path = os.path.join(folder, "secrets.json")
         with open(secrets_file_path, "w") as f:
             f.write("{}")
-    payments =load_json(payments_file_path)
+    payments = load_json(payments_file_path)
     secrets = load_json(secrets_file_path)
     changed = False
     for acc in payments["Scholars"]:
@@ -88,14 +88,22 @@ def run_cli():
         apm.verify_inputs()
         apm.prepare_payout()
     elif args['claim']:
+        payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
+        file_error = False
+        if not os.path.isfile(payments_file_path):
+            logging.critical("Please provide a correct path to the Payments file. "
+                             f"Path provided: {payments_file_path}")
+            file_error = True
         if not os.path.isfile(secrets_file_path):
             logging.critical("Please provide a correct path to the Secrets file. "
                              f"Path provided: {secrets_file_path}")
+            file_error = True
+        if file_error:
             raise Exception("Please review your file paths and re-try.")
         # Claim SLP
         logging.info('I shall claim SLP')
-        acm = AxieClaimsManager(secrets_file_path)
+        acm = AxieClaimsManager(payments_file_path, secrets_file_path)
         acm.verify_input()
         acm.prepare_claims()
     elif args['generate_QR']:

@@ -139,8 +139,17 @@ class Claim:
 
 
 class AxieClaimsManager:
-    def __init__(self, secrets_file):
-        self.secrets_file = load_json(secrets_file)
+    def __init__(self, payments_file, secrets_file):
+        self.secrets_file = self.load_secrets(secrets_file, payments_file)
+
+    def load_secrets(secrets_file, payments_file):
+        secrets = load_json(secrets_file)
+        payments = load_json(payments_file)
+        refined_secrets = {}
+        for scholar in payments['Scholars']:
+            key = scholar['AccountAddress']
+            refined_secrets[key] = secrets[key]
+        return refined_secrets
 
     def verify_input(self):
         validation_success = True

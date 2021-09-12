@@ -40,12 +40,12 @@ import axie_scholar_cli as cli
                               "generate_QR": False,
                               "generate_secrets": False,
                               "payout": True}),
-                            (["claim", "file1"],
+                            (["claim", "file1", "file2"],
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              "<payments_file>": None,
-                              "<secrets_file>": "file1",
+                              "<payments_file>": "file1",
+                              "<secrets_file>": "file2",
                               "claim": True,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -92,7 +92,7 @@ def test_parses_params(params, expected_result):
                             (["generate_QR"]),
                             (["generate_secrets"]),
                             (["claim"]),
-                            (["claim", "file1", "file2"]),
+                            (["claim", "file1"]),
                             (["payout"]),
                             (["payout", "file1"]),
                             (["payout", "file1", "file2", "file3"])
@@ -225,17 +225,20 @@ def test_payout_takes_auto_parameter_yes(mock_prepare_payout, mock_verify_input,
 def test_claim(mock_verify_input, mock_prepare_claims, mock_claimsmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
-    with patch.object(sys, 'argv', ["", "claim", str(f1)]):
+    f2 = tmpdir.join("file2.json")
+    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "claim", str(f1), str(f2)]):
         cli.run_cli()
     mock_verify_input.assert_called_with()
     mock_prepare_claims.assert_called_with()
-    mock_claimsmanager.assert_called_with(str(f1))
+    mock_claimsmanager.assert_called_with(str(f1), str(f2))
 
 
 def test_claim_file_check_fail(capsys):
     with pytest.raises(Exception) as e:
-        with patch.object(sys, 'argv', ["", "claim", "s_file.json"]):
+        with patch.object(sys, 'argv', ["", "claim", "p_file.json", "s_file.json"]):
             cli.run_cli()
             out, _ = capsys.readouterr()
+            assert "CRITICAL: Please provide a correct path to the Payments file. Path provided: p_file.json" in out
             assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
     assert str(e.value) == "Please review your file paths and re-try."
