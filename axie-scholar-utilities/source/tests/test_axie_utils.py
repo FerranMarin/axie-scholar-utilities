@@ -1,3 +1,4 @@
+import os
 import builtins
 
 import pytest
@@ -10,6 +11,12 @@ from axie.utils import (
     RONIN_PROVIDER,
     SLP_CONTRACT
 )
+
+
+@pytest.fixture(autouse=True)
+def cleanup_log_file():
+    if os.path.exists("results.log"):
+        os.remove("results.log")
 
 
 @patch("web3.eth.Eth.contract.functions.get_balance.call", return_value=1)

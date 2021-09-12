@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import builtins
@@ -11,6 +12,12 @@ from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
 from axie.claims import Claim, RONIN_PROVIDER_FREE, SLP_CONTRACT
+
+
+@pytest.fixture(autouse=True)
+def cleanup_log_file():
+    if os.path.exists("results.log"):
+        os.remove("results.log")
 
 
 @patch("axie.AxieClaimsManager.load_secrets")
