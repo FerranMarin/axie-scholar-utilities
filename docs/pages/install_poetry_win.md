@@ -26,4 +26,4 @@ To run my tool you will need Python3 (the language it is written in) to be insta
         poetry install
 
 
-To learn how to run the commands, please follow this [link](./pages/poetry_cmds.md)
+To learn how to run the commands, please follow this [link](../pages/poetry_cmds.html)
