@@ -15,7 +15,7 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 ## Secret Generation
 
-To help in generating secrets, you simply need to execute this command from the [source folder](axie-scholar-utilities/source).
+To help in generating secrets, you simply need to execute this command from the source folder.
 
     poetry run axie_scholar_cli.py generate_secrets payments.json secrets.json
 
@@ -23,13 +23,13 @@ This will update the secrets.json either from an emtpy one with only {}, to one 
 
 ## Claim SLP
 
-To Claim SLP from the scholar accounts in the payments.json file. You need to run this command from the [source folder](axie-scholar-utilities/source).
+To Claim SLP from the scholar accounts in the payments.json file. You need to run this command from the source folder.
 
    poetry run python axie_scholar_cli.py claim payments.json secrets.json
 
 ## Payout
 
-To payout from the scholar accounts, you need to run this command from the [source folder](axie-scholar-utilities/source).
+To payout from the scholar accounts, you need to run this command from the source folder.
 
    poetry run python axie_scholar_cli.py payout payments.json secrets.json
 

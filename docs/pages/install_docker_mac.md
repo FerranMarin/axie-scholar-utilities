@@ -26,7 +26,7 @@ If you go this route, I recomend also setting up these alias in your terminal to
         axie-utils-auto-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/${3}:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
 
 
-To learn how to run the commands, please follow this [link](/pages/docker_hub_cmds.md)
+To learn how to run the commands, please follow this [link](./pages/docker_hub_cmds.md)
 
 
 # Build docker image from repository
@@ -40,4 +40,4 @@ Once we reach this point. Use the following command to build the docker image:
 
     docker-compose build scholar-utilities
 
-To learn how to run the commands, please follow this [link](/pages/docker_compose_cmds.md)
+To learn how to run the commands, please follow this [link](./pages/docker_compose_cmds.md)

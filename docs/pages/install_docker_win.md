@@ -25,7 +25,7 @@ If you go this route, I recomend also setting up these alias in [PowerShell](htt
     # Alias to execute auto-payments (no confirmation)
         function axie-utils-auto-payout {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/${3}:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
 
-To learn how to run the commands, please follow this [link](/pages/docker_hub_cmds.md)
+To learn how to run the commands, please follow this [link](./pages/docker_hub_cmds.md)
 
 
 # Build docker image from repository
@@ -33,10 +33,10 @@ To learn how to run the commands, please follow this [link](/pages/docker_hub_cm
 If you do not want to rely on the image I provide on docker hub, you can build it from the repository.
 To do that, first you need to download my code, either download it as a zip and unzip it, or git clone it (whatever is easier for you).
 
-After that, navigate using your terminal to the [docker folder](axie-scholar-utilities/docker).Once there create a folder named **files** (this is where we will place our payments and secret file and a file called results.log which is empty), we will link that folder from our host to the docker container.
+After that, navigate using your terminal to the docker folder.Once there create a folder named **files** (this is where we will place our payments and secret file and a file called results.log which is empty), we will link that folder from our host to the docker container.
 
 Once we reach this point. Use the following command to build the docker image:
 
     docker-compose build scholar-utilities
 
-To learn how to run the commands, please follow this [link](/pages/docker_compose_cmds.md)
+To learn how to run the commands, please follow this [link](./pages/docker_compose_cmds.md)

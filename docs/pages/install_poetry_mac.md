@@ -35,7 +35,7 @@ To run my tool you will need Python3 (the language it is written in) to be insta
     - Use [git](https://git-scm.com/downloads). This is a method I would only recommend if you are already familiar with git. So you know, clone away this repo ;)
     - Go to releases and download the latest one. Currently [v0.1](https://github.com/FerranMarin/axie-scholar-utilities/releases/tag/v0.1). Then just Unzip it somewhere in your computer.
 
-7. Wherever you have my code in your computer you will need to navigate using your Terminal to [axie-scholar-utilities/source](axie-scholar-utilities/source). If you are not comfortable with a terminal, you can just navigate using Finder, and drag and drop the folder to the Terminal window. It will copy the path. So first type `cd ` and then drag and drop the folder. Command you run should look something like:
+7. Wherever you have my code in your computer you will need to navigate using your Terminal to axie-scholar-utilities/source. If you are not comfortable with a terminal, you can just navigate using Finder, and drag and drop the folder to the Terminal window. It will copy the path. So first type `cd ` and then drag and drop the folder. Command you run should look something like:
 
         cd /Users/<your_user>/axie-scholar-utilities/README.md
 
@@ -44,4 +44,4 @@ To run my tool you will need Python3 (the language it is written in) to be insta
         poetry install
 
 
-To learn how to run the commands, please follow this [link](/pages/poetry_cmds.md)
+To learn how to run the commands, please follow this [link](./pages/poetry_cmds.md)

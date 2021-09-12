@@ -1,6 +1,6 @@
 # How to Execute Comands when you build your own Docker image from the Code
 
-For this to work, you will need a folder called **files** inside the [docker folder](axie-scholar-utilities/docker) with these files:
+For this to work, you will need a folder called **files** inside the docker folder with these files:
 
 - payments.json
 - secrets.json
@@ -18,7 +18,7 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 ## Secret Generation
 
-To help in generating secrets, you simply need to execute this command from the [docker folder](axie-scholar-utilities/docker).
+To help in generating secrets, you simply need to execute this command from the docker folder.
 
     docker-compose run scholar-utilities generate_secrets files/payments.json
 
@@ -26,13 +26,13 @@ This will update the secrets.json either from an emtpy one with only {}, to one 
 
 ## Claim SLP
 
-To Claim SLP from the scholar accounts in the payments.json file. You need to run this command from the [docker folder](axie-scholar-utilities/docker).
+To Claim SLP from the scholar accounts in the payments.json file. You need to run this command from the docker folder.
 
     docker-compose run scholar-utilities claim files/payments.json files/secrets.json
 
 ## Payout
 
-To payout from the scholar accounts, you need to run this command from the [docker folder](axie-scholar-utilities/docker).
+To payout from the scholar accounts, you need to run this command from the docker folder.
 
    docker-compose run scholar-utilities payout files/payments.json files/secrets.json
 

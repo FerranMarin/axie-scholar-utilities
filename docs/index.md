@@ -97,7 +97,7 @@ This JSON file is much simpler, and you should never need to create it as you ca
 
 ## Example Files
 
-If after that you still unclear on how they look like. Please go to the folder [sample_data](sample_data/) to see sample files for how the [payments file](sample_data/sample_payments_file.json) and the [secrets file](sample_data/sample_payments_file.json) need to look like.
+If after that you still unclear on how they look like. Please go to the folder sample_data to see sample files for how the payments file and the secrets file need to look like.
 
 # Caution Messages
 
