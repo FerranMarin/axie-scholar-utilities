@@ -101,7 +101,7 @@ This utility will claim all the claimable SLP from all the accounts configured i
 
 Command looks like:
 
-    axie_scholar_cli.py claim <secrets_file>
+    axie_scholar_cli.py claim <payments_file> <secrets_file>
 
 
 ## Example Files
@@ -271,24 +271,24 @@ I recommend setting up this aliases right after pulling the image, so it makes e
 For MAC/Linux:
 
         # Alias to generate secrets
-        axie-utils-gen-secrets() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
+        axie-utils-gen-secrets() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
         # Alias to execute claims
-        axie-utils-claim() {docker run -it  -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
+        axie-utils-claim() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
         # Alias to execute payments
-        axie-utils-payout() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
+        axie-utils-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
         # Alias to execute auto-payments (no confirmation)
-        axie-utils-auto-payout() {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
+        axie-utils-auto-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
 
 For Windows (PowerShell):
 
         # Alias to generate secrets
-        function axie-utils-gen-secrets {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
+        function axie-utils-gen-secrets {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
         # Alias to execute claims
-        function axie-utils-claim {docker run -it  -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
+        function axie-utils-claim {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/secrets.json}
         # Alias to execute payments
-        function axie-utils-payout {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
+        function axie-utils-payout {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json}
         # Alias to execute auto-payments (no confirmation)
-        function axie-utils-auto-payout {docker run -it  -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
+        function axie-utils-auto-payout {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
 
 With these alias all you need is the payments file and a secret file (if you have not yet generate it, please create a file with just '{}' inside and save it as .json). Then the commands you will need to execute are the following:
 
