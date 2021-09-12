@@ -116,6 +116,10 @@ class AxiePaymentsManager:
                 logging.critical(f"Private key for account {sf} is not valid, please review it!")
                 validation_success = False
         if not validation_success:
+            logging.critical("Please make sure your payments.json file looks like the one in the README.md\n"
+                             "Find it here: https://github.com/FerranMarin/axie-scholar-utilities/#payments-utility")
+            logging.critical("If your problem is with secrets.json, "
+                             "delete it and re-generate the file starting with an empty secrets file.")
             sys.exit()
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
