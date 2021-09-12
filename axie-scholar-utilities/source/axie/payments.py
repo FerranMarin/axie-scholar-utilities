@@ -127,6 +127,9 @@ class AxiePaymentsManager:
             logging.critical("Balance in account {account} is "
                              "inssuficient to cover all planned payments!")
             return False
+        elif account_balance - balance > 0:
+            logging.debug(f'These payments will leave {account_balance - balance} SLP in your wallet.'
+                          'Cancel payments and adjust payments if you want to leave 0 SLP in it.')
         return True
 
     def prepare_payout(self):

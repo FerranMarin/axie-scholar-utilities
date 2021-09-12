@@ -272,10 +272,10 @@ def test_payments_manager_prepare_payout_high_slp_with_donos(mocked_check_balanc
 @patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=False)
-def test_payments_manager_prepare_no_payout_it_not_enough_balance(mocked_check_balance,
-                                                                  mocked_payout,
-                                                                  mocked_get_nonce,
-                                                                  tmpdir):
+def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_balance,
+                                                               mocked_payout,
+                                                               mocked_get_nonce,
+                                                               tmpdir):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
@@ -293,6 +293,35 @@ def test_payments_manager_prepare_no_payout_it_not_enough_balance(mocked_check_b
     assert mocked_get_nonce.call_count == 6
     mocked_check_balance.assert_called_with(scholar_acc, 1000)
     mocked_payout.assert_not_called()
+
+
+@patch("axie.payments.get_nonce", return_value=100)
+@patch("axie.AxiePaymentsManager.payout_account")
+@patch("axie.payments.check_balance", return_value=90000)
+def test_payments_manager_enough_balance_with_leftovers(mocked_check_balance,
+                                                        mocked_payout,
+                                                        mocked_get_nonce,
+                                                        tmpdir,
+                                                        caplog):
+    p_file = tmpdir.join("p.json")
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file.write(('{"Manager":"ronin:<Manager address here>","Scholars":'
+                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
+                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
+                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPayout":100,'
+                  '"ManagerPayout":400}], "Donations":[{"Name":"Entity 1",'
+                  '"AccountAddress": "ronin:<donation_entity_1_address>","Percent":0.01}]}'))
+    s_file = tmpdir.join("s.json")
+    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    axp = AxiePaymentsManager(p_file, s_file)
+    axp.verify_inputs()
+    axp.prepare_payout()
+    assert mocked_get_nonce.call_count == 6
+    mocked_check_balance.assert_called_with(scholar_acc)
+    mocked_payout.assert_called()
+    assert ("These payments will leave 89000 SLP in your wallet."
+            "Cancel payments and adjust payments if you want to leave 0 SLP in it." in caplog.text)
 
 
 @patch("axie.payments.Payment.execute", return_value=("abc123", True))
