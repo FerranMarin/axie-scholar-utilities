@@ -151,7 +151,7 @@ def test_payments_manager_prepare_payout_low_slp(mocked_check_balance, mocked_pa
     assert len(mocked_payout.call_args[0][1]) == 3
 
 
-@patch("axie.utils.get_nonce", return_value=1)
+@patch("axie.payments.get_nonce", return_value=1)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_check_balance,
@@ -305,7 +305,7 @@ def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
-    with caplog.at_level(logging.INFO):
+    with caplog.at_level(logging.DEBUG):
         with patch.object(builtins, 'input', lambda _: 'y'):
             axp.prepare_payout()
         mocked_check_balance.assert_called_with(scholar_acc, 1000)
@@ -337,17 +337,18 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     axp = AxiePaymentsManager(p_file, s_file, auto=True)
     axp.verify_inputs()
-    axp.prepare_payout()
-    mocked_check_balance.assert_called_with(scholar_acc, 1000)
-    assert mocked_execute.call_count == 5
-    assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
-    assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
-    assert ("Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount "
-            "of 4 SLP" in caplog.text)
-    assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550)"
-            "for the ammount of 10 SLP" in caplog.text)
-    assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
-    assert "Transactions completed for account: 'Scholar 1'" in caplog.text
+    with caplog.at_level(logging.DEBUG):
+        axp.prepare_payout()
+        mocked_check_balance.assert_called_with(scholar_acc, 1000)
+        assert mocked_execute.call_count == 5
+        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
+        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
+        assert ("Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount "
+                "of 4 SLP" in caplog.text)
+        assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) "
+                "for the ammount of 10 SLP" in caplog.text)
+        assert "Payment to manager of Scholar 1(ronin:<Manager address here>) for the ammount of 386 SLP" in caplog.text
+        assert "Transactions completed for account: 'Scholar 1'" in caplog.text
 
 
 @patch("axie.payments.Payment.execute")
@@ -443,6 +444,5 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
         call(SLP_CONTRACT),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
-    assert 'random_account(ronin:to_ronin) for the ammount of 10 SLP Transaction Sent!' in caplog.text
-    assert ('Transaction hash: transaction_hash -'
+    assert ('Transaction random_account(ronin:to_ronin) for the ammount of 10 SLP completed! Hash: transaction_hash - '
             'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)
