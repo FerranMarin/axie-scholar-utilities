@@ -128,7 +128,7 @@ class AxiePaymentsManager:
     def check_acc_has_enough_balance(self, account, balance):
         account_balance = check_balance(account)
         if account_balance < balance:
-            logging.critical("Balance in account {account} is "
+            logging.critical(f"Balance in account {account} is "
                              "inssuficient to cover all planned payments!")
             return False
         elif account_balance - balance > 0:
