@@ -33,7 +33,7 @@ To run my tool you will need Python3 (the language it is written in) to be insta
 6. Now it is time to download my code, there are multiple ways:
 
     - Use [git](https://git-scm.com/downloads). This is a method I would only recommend if you are already familiar with git. So you know, clone away this repo ;)
-    - Go to releases and download the latest one. Currently [v0.1](https://github.com/FerranMarin/axie-scholar-utilities/releases/tag/v0.1). Then just Unzip it somewhere in your computer.
+    - Go to releases and download the latest one. Check for the latest one [here](https://github.com/FerranMarin/axie-scholar-utilities/releases/). Then just Unzip it somewhere in your computer.
 
 7. Wherever you have my code in your computer you will need to navigate using your Terminal to axie-scholar-utilities/source. If you are not comfortable with a terminal, you can just navigate using Finder, and drag and drop the folder to the Terminal window. It will copy the path. So first type `cd ` and then drag and drop the folder. Command you run should look something like:
 
