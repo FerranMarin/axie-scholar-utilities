@@ -9,12 +9,6 @@ import pytest
 import axie_scholar_cli as cli
 
 
-@pytest.fixture(autouse=True)
-def cleanup_log_file():
-    if os.path.exists("results.log"):
-        os.remove("results.log")
-
-
 @pytest.mark.parametrize("params, expected_result",
                          [
                             (["payout", "file1", "file2"],

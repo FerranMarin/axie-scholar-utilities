@@ -14,12 +14,6 @@ from axie import AxieClaimsManager
 from axie.claims import Claim, RONIN_PROVIDER_FREE, SLP_CONTRACT
 
 
-@pytest.fixture(autouse=True)
-def cleanup_log_file():
-    if os.path.exists("results.log"):
-        os.remove("results.log")
-
-
 @patch("axie.AxieClaimsManager.load_secrets")
 def test_claims_manager_init(mocked_load_secrets):
     secrets_file = "sample_secrets_file.json"

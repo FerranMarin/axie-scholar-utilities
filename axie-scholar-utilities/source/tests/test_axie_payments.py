@@ -10,7 +10,6 @@ from axie import AxiePaymentsManager
 from axie.payments import Payment, SLP_CONTRACT
 
 
-@pytest.fixture(autouse=True)
 def cleanup_log_file():
     if os.path.exists("results.log"):
         os.remove("results.log")

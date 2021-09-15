@@ -13,13 +13,7 @@ from axie.utils import (
 )
 
 
-@pytest.fixture(autouse=True)
-def cleanup_log_file():
-    if os.path.exists("results.log"):
-        os.remove("results.log")
-
-
-@patch("web3.eth.Eth.contract.functions.get_balance.call", return_value=1)
+@patch("web3.eth.Eth.contract.functions.balanceOf.call", return_value=1)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.HTTPProvider", return_value='foo')
