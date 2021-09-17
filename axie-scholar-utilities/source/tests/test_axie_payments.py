@@ -9,10 +9,14 @@ from mock import patch, call, mock_open
 from axie import AxiePaymentsManager
 from axie.payments import Payment, SLP_CONTRACT
 
+LOG_FILE_PATH = '/opt/app/results.log'
 
-def cleanup_log_file():
-    if os.path.exists("results.log"):
-        os.remove("results.log")
+
+async def cleanup_log_file():
+    """ Cleans up log file to avoid logs leaking from test to test. Called
+    at the end of the test as a teardown """
+    with open(LOG_FILE_PATH, 'w+') as f:
+        f.write('')
 
 
 @patch("axie.payments.load_json")
@@ -485,3 +489,9 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
     mock_transaction_receipt.assert_called_with("transaction_hash")
     assert ('Transaction random_account(ronin:to_ronin) for the ammount of 10 SLP completed! Hash: transaction_hash - '
             'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)
+
+    with open(LOG_FILE_PATH) as f:
+        log_file = f.readlines()
+        assert len(log_file) == 1
+
+    await cleanup_log_file()
