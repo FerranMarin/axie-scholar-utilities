@@ -1,11 +1,19 @@
 import os
 import json
+import logging
 
 from web3 import Web3
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
 RONIN_PROVIDER = "https://api.roninchain.com/rpc"
+
+
+class ImportantLogsFilter(logging.Filter):
+    """ Logging filter used to only keep important messages which will be
+    written to the log file """
+    def filter(self, record):
+        return record.getMessage().startswith('Important:')
 
 
 def check_balance(account):
