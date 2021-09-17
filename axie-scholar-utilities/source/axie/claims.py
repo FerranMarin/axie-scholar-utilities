@@ -85,9 +85,9 @@ class Claim:
     async def execute(self):
         unclaimed = self.has_unclaimed_slp()
         if not unclaimed:
-            logging.debug(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
+            logging.info(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
             return
-        logging.debug(f"Account {self.account.replace('0x', 'ronin:')} has "
+        logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
                       f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         headers = {
@@ -131,7 +131,7 @@ class Claim:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
+                logging.info(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
                               f"(Nonce:{nonce}) (Hash: {hash}), (Amount: {signature['amount']})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
@@ -172,11 +172,11 @@ class AxieClaimsManager:
                 validation_success = False
         if not validation_success:
             sys.exit()
-        logging.debug("Secret file correctly validated")
+        logging.info("Secret file correctly validated")
 
     def prepare_claims(self):
         claims_list = [Claim(acc, self.secrets_file[acc]) for acc in self.secrets_file]
-        logging.debug("Claiming starting...")
+        logging.info("Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))
-        logging.debug("Claiming completed!")
+        logging.info("Claiming completed!")

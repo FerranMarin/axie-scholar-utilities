@@ -8,11 +8,19 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
 from axie.schemas import payments_schema
-from axie.utils import check_balance, get_nonce, load_json
+from axie.utils import check_balance, get_nonce, load_json, ImportantLogsFilter
 
 CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler('results.log', mode='w')
+file_handler.setLevel(logging.INFO)
+file_handler.addFilter(ImportantLogsFilter())
+logger.addHandler(file_handler)
+
 
 
 class Payment:
@@ -65,15 +73,15 @@ class Payment:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.debug(f"Waiting for transaction '{self}' to finish (Nonce:{self.nonce})...")
+                logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{self.nonce})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
 
         if success:
-            logging.info(f"Transaction {self} completed! Hash: {hash} - "
+            logging.info(f"Important: Transaction {self} completed! Hash: {hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
         else:
-            logging.info(f"Transaction {self} failed")
+            logging.info(f"Important: Transaction {self} failed")
 
     def __str__(self):
         return f"{self.name}({self.to_acc.replace('0x', 'ronin:')}) for the ammount of {self.amount} SLP"
@@ -89,7 +97,7 @@ class AxiePaymentsManager:
         self.auto = auto
 
     def verify_inputs(self):
-        logging.debug("Validating file inputs...")
+        logging.info("Validating file inputs...")
         validation_success = True
         # Validate payments file
         try:
@@ -123,16 +131,16 @@ class AxiePaymentsManager:
             sys.exit()
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
-        logging.debug("Files correctly validated!")
+        logging.info("Files correctly validated!")
 
     def check_acc_has_enough_balance(self, account, balance):
         account_balance = check_balance(account)
         if account_balance < balance:
-            logging.critical(f"Balance in account {account} is "
+            logging.critical(f"Important: Balance in account {account} is "
                              "inssuficient to cover all planned payments!")
             return False
         elif account_balance - balance > 0:
-            logging.debug(f'These payments will leave {account_balance - balance} SLP in your wallet.'
+            logging.info(f'These payments will leave {account_balance - balance} SLP in your wallet.'
                           'Cancel payments and adjust payments if you want to leave 0 SLP in it.')
         return True
 
@@ -215,8 +223,8 @@ class AxiePaymentsManager:
                              "Insufficient funds!")
 
     def payout_account(self, acc_name, payment_list):
-        logging.debug(f"Payments for {acc_name}:")
-        logging.debug(",\n".join(str(p) for p in payment_list))
+        logging.info(f"Payments for {acc_name}:")
+        logging.info(",\n".join(str(p) for p in payment_list))
         accept = "y" if self.auto else None
         while accept not in ["y", "n", "Y", "N"]:
             accept = input("Do you want to proceed with these transactions?(y/n): ")

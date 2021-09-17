@@ -15,3 +15,5 @@ services:
       context: ..
       dockerfile: docker/Dockerfile 
       target: tests
+    volumes:
+      - ../source/:/opt/app/

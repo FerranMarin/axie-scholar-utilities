@@ -27,16 +27,11 @@ from axie.utils import load_json
 
 # Setup logger
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 ch = logging.StreamHandler(sys.stdout)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
 ch.setFormatter(formatter)
 log.addHandler(ch)
-
-# Setup file logger
-file_handler = logging.FileHandler('results.log')
-file_handler.setLevel(logging.INFO)
-log.addHandler(file_handler)
 
 
 def generate_secrets_file(payments_file_path, secrets_file_path=None):
@@ -60,12 +55,12 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
             secrets[acc["AccountAddress"]] = new_secret
 
     if changed:
-        logging.debug(f"Saving secrets file at {secrets_file_path}")
+        logging.info(f"Saving secrets file at {secrets_file_path}")
         with open(secrets_file_path, "w", encoding="utf-8") as f:
             json.dump(secrets, f, ensure_ascii=False, indent=4)
-        logging.debug(f"File saved at {secrets_file_path}!")
+        logging.info(f"File saved at {secrets_file_path}!")
     else:
-        logging.debug("Secrets file already had all needed secrets!")
+        logging.info("Secrets file already had all needed secrets!")
 
 
 def run_cli():
@@ -86,9 +81,9 @@ def run_cli():
         if file_error:
             raise Exception("Please review your file paths and re-try.")
         # Do Payout
-        logging.debug("I shall pay my scholars!")
+        logging.info("I shall pay my scholars!")
         if args['--yes']:
-            logging.debug("Automatic acceptance active, it won't ask before each execution")
+            logging.info("Automatic acceptance active, it won't ask before each execution")
         apm = AxiePaymentsManager(payments_file_path, secrets_file_path, auto=args['--yes'])
         apm.verify_inputs()
         apm.prepare_payout()
@@ -107,17 +102,17 @@ def run_cli():
         if file_error:
             raise Exception("Please review your file paths and re-try.")
         # Claim SLP
-        logging.debug('I shall claim SLP')
+        logging.info('I shall claim SLP')
         acm = AxieClaimsManager(payments_file_path, secrets_file_path)
         acm.verify_input()
         acm.prepare_claims()
     elif args['generate_QR']:
         # Generate QR codes
-        logging.debug('I shall generate QR codes')
+        logging.info('I shall generate QR codes')
         raise NotImplementedError('Sorry, I have yet to implement this command')
     elif args['generate_secrets']:
         # Generate Secrets
-        logging.debug('I shall help you generate your secrets file')
+        logging.info('I shall help you generate your secrets file')
         payments_file_path = args['<payments_file>']
         secrets_file_path = args.get('<secrets_file>')
         file_error = False
