@@ -76,6 +76,10 @@ class Claim:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise Exception(f"Error! Getting JWT! Error: {e}")
+        if (not response.json()['data'].get('createAccessTokenWithSignature') or 
+            not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
+            raise Exception("Could not retreive JWT, probably your private key for this account is wrong. "
+                            f"Account: {self.account}")
         return response.json()['data']['createAccessTokenWithSignature']['accessToken']
 
     async def execute(self):
@@ -97,7 +101,9 @@ class Claim:
         except requests.exceptions.HTTPError as e:
             raise Exception("Error! Executing SLP claim API call for account "
                             f"{self.account.replace('0x', 'ronin:')}. Error {e}")
-        signature = response.json()["blockchain_related"]["signature"]
+        signature = response.json()["blockchain_related"].get("signature")
+        if not signature or not signature["signature"]:
+            raise Exception(f"Account {self.account.replace('0x', 'ronin:')} had no signature in blockchain_related")
         nonce = get_nonce(self.account)
         # Build claim
         claim = self.slp_contract.functions.checkpoint(

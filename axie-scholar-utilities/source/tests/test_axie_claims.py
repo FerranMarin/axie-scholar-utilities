@@ -328,6 +328,75 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
     mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
 
 
+@patch("web3.eth.Eth.contract")
+@patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
+@patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _):
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", json={"data": {}})
+            c = Claim("ronin:foo", "0xbar")
+            with pytest.raises(Exception) as e:
+                c.get_jwt()
+                expected_payload = {
+                    "operationName": "CreateAccessTokenWithSignature",
+                    "variables": {
+                        "input": {
+                            "mainnet": "ronin",
+                            "owner": "checksum",
+                            "message": "random_msg",
+                            "signature": f"{HexBytes(b'123').hex()}"
+                        }
+                    },
+                    "query": "mutation CreateAccessTokenWithSignature($input: SignatureInput!)"
+                    "{createAccessTokenWithSignature(input: $input) "
+                    "{newAccount result accessToken __typename}}"
+                }
+                assert req_mocker.request_history[0].json() == expected_payload
+        assert str(e.value) == ("Could not retreive JWT, probably your private key for this account is wrong. "
+                                f"Account: {c.account}")
+        mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
+        mocked_checksum.assert_called_with(SLP_CONTRACT)
+        mocked_random_msg.assert_called_once()
+        mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
+
+
+@patch("web3.eth.Eth.contract")
+@patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
+@patch("axie.claims.Claim.create_random_msg", return_value="random_msg")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _):
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", 
+                            json={"data": {"createAccessTokenWithSignature": {}}})
+            c = Claim("ronin:foo", "0xbar")
+            with pytest.raises(Exception) as e:
+                c.get_jwt()
+                expected_payload = {
+                    "operationName": "CreateAccessTokenWithSignature",
+                    "variables": {
+                        "input": {
+                            "mainnet": "ronin",
+                            "owner": "checksum",
+                            "message": "random_msg",
+                            "signature": f"{HexBytes(b'123').hex()}"
+                        }
+                    },
+                    "query": "mutation CreateAccessTokenWithSignature($input: SignatureInput!)"
+                    "{createAccessTokenWithSignature(input: $input) "
+                    "{newAccount result accessToken __typename}}"
+                }
+                assert req_mocker.request_history[0].json() == expected_payload
+        assert str(e.value) == ("Could not retreive JWT, probably your private key for this account is wrong. "
+                                f"Account: {c.account}")
+        mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
+        mocked_checksum.assert_called_with(SLP_CONTRACT)
+        mocked_random_msg.assert_called_once()
+        mock_sign_message.assert_called_with(encode_defunct(text="random_msg"), private_key=c.private_key)
+
+
 @pytest.mark.asyncio
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
@@ -389,3 +458,66 @@ async def test_execution(mocked_provider,
     assert "Account ronin:foo has 456 unclaimed SLP" in caplog.text
     assert "Claimed SLP 456 for account ronin:foo" in caplog.text
     assert "New balance for account ronin:foo is: 123" in caplog.text
+
+
+@pytest.mark.asyncio
+@patch("web3.Web3.toHex", return_value="transaction_hash")
+@patch("web3.Web3.keccak", return_value='result_of_keccak')
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
+@patch("web3.eth.Eth.account.sign_transaction")
+@patch("axie.claims.get_nonce", return_value=1)
+@patch("axie.claims.Claim.get_jwt", return_value="token")
+@patch("axie.claims.Claim.has_unclaimed_slp", return_value=456)
+@patch("axie.claims.check_balance", return_value=123)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+async def test_execution_failed_get_blockchain(mocked_provider,
+                                               mocked_checksum,
+                                               mocked_contract,
+                                               moocked_check_balance,
+                                               mocked_unclaimed_slp,
+                                               mock_get_jwt,
+                                               mock_get_nonce,
+                                               mocked_sign_transaction,
+                                               mock_raw_send,
+                                               mock_receipt,
+                                               mock_keccak,
+                                               mock_to_hex,
+                                               caplog):
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='{"foo": "bar"}')):
+        with requests_mock.Mocker() as req_mocker:
+            req_mocker.post(
+                "https://game-api.skymavis.com/game-api/clients/0xfoo/items/1/claim",
+                json={
+                    "blockchain_related": {
+                        "signature": {
+                            "amount": "",
+                            "timestamp": 0,
+                            "signature": ""
+                        }
+                    }
+                }
+            )
+            c = Claim("ronin:foo", "0x00003A01C01173D676B64123")
+            with pytest.raises(Exception) as e:
+                await c.execute()
+            assert str(e.value) == "Account ronin:foo had no signature in blockchain_related"
+    mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
+    mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
+    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    moocked_check_balance.assert_not_called()
+    mocked_unclaimed_slp.assert_called_once()
+    assert c.private_key == "0x00003A01C01173D676B64123"
+    assert c.account == "0xfoo"
+    mock_get_jwt.assert_called_once()
+    mock_get_nonce.assert_not_called()
+    mocked_sign_transaction.assert_not_called()
+    mock_raw_send.assert_not_called()
+    mock_receipt.assert_not_called()
+    mock_keccak.assert_not_called()
+    mock_to_hex.assert_not_called()
+    
