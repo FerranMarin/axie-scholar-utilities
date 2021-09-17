@@ -494,4 +494,6 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
         log_file = f.readlines()
         assert len(log_file) == 1
 
+    # Needs to be called at the end and with an `await` because the patched
+    # functions get executed before any function call within the test
     await cleanup_log_file()
