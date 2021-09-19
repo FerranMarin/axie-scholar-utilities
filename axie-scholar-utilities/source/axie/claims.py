@@ -7,10 +7,17 @@ from eth_account.messages import encode_defunct
 from web3 import Web3, exceptions
 import requests
 
-from axie.utils import check_balance, get_nonce, load_json
+from axie.utils import check_balance, get_nonce, load_json, ImportantLogsFilter
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler('results.log', mode='w')
+file_handler.setLevel(logging.INFO)
+file_handler.addFilter(ImportantLogsFilter())
+logger.addHandler(file_handler)
 
 
 class Claim:
@@ -85,7 +92,7 @@ class Claim:
     async def execute(self):
         unclaimed = self.has_unclaimed_slp()
         if not unclaimed:
-            logging.info(f"Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
+            logging.info(f"Important: Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
             return
         logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
                       f"{unclaimed} unclaimed SLP")
@@ -131,16 +138,15 @@ class Claim:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.info(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
-                              f"(Nonce:{nonce}) (Hash: {hash}), (Amount: {signature['amount']})...")
+                logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
+                              f"(Nonce:{nonce}) (Hash: {hash})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:
-            logging.info(f"Claimed SLP {signature['amount']} for account {self.account.replace('0x', 'ronin:')}")
-            logging.info(f"New balance for account {self.account.replace('0x', 'ronin:')} is: "
-                         f"{check_balance(self.account)}")
+            logging.info(f"Important: SLP Claimed! New balance for account ({self.account.replace('0x', 'ronin:')}) is:"
+                         f" {check_balance(self.account)}")
         else:
-            logging.info(f"Claim for account {self.account.replace('0x', 'ronin:')} failed")
+            logging.info(f"Important: Claim for account ({self.account.replace('0x', 'ronin:')}) failed")
 
 
 class AxieClaimsManager:

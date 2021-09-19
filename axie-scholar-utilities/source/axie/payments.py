@@ -22,7 +22,6 @@ file_handler.addFilter(ImportantLogsFilter())
 logger.addHandler(file_handler)
 
 
-
 class Payment:
     def __init__(self, name, from_acc, from_private, to_acc, amount, nonce=None):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
@@ -136,7 +135,7 @@ class AxiePaymentsManager:
     def check_acc_has_enough_balance(self, account, balance):
         account_balance = check_balance(account)
         if account_balance < balance:
-            logging.critical(f"Important: Balance in account {account} is "
+            logging.critical(f"Balance in account {account} is "
                              "inssuficient to cover all planned payments!")
             return False
         elif account_balance - balance > 0:
@@ -219,7 +218,7 @@ class AxiePaymentsManager:
                                                  total_payments):
                 self.payout_account(acc["Name"], acc_payments)
             else:
-                logging.info(f"Skipping payments for account '{acc['Name']}'. "
+                logging.info(f"Important: Skipping payments for account '{acc['Name']}'. "
                              "Insufficient funds!")
 
     def payout_account(self, acc_name, payment_list):

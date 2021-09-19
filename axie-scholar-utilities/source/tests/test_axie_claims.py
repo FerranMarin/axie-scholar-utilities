@@ -12,6 +12,7 @@ from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
 from axie.claims import Claim, RONIN_PROVIDER_FREE, SLP_CONTRACT
+from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 
 
 @patch("axie.AxieClaimsManager.load_secrets")
@@ -423,6 +424,8 @@ async def test_execution(mocked_provider,
                          mock_keccak,
                          mock_to_hex,
                          caplog):
+    # Make sure file is clean to start
+    await cleanup_log_file()
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):
@@ -456,8 +459,13 @@ async def test_execution(mocked_provider,
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     assert "Account ronin:foo has 456 unclaimed SLP" in caplog.text
-    assert "Claimed SLP 456 for account ronin:foo" in caplog.text
-    assert "New balance for account ronin:foo is: 123" in caplog.text
+    print(caplog.text)
+    assert "SLP Claimed! New balance for account (ronin:foo) is: 123" in caplog.text
+    with open(LOG_FILE_PATH) as f:
+        log_file = f.readlines()
+        assert len(log_file) == 1
+    assert "Important: SLP Claimed! New balance for account (ronin:foo) is: 123" in log_file[0]
+    await cleanup_log_file()
 
 
 @pytest.mark.asyncio
