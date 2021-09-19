@@ -1,6 +1,7 @@
 # Axie Scholars Utilities
 [![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
 [![Docker Image](https://img.shields.io/badge/docker%20image-available-blue)](https://hub.docker.com/r/epith/axie-scholar-utilities)
+[![Known Vulnerabilities](https://snyk.io/test/github/FerranMarin/axie-scholar-utilities/badge.svg)](https://snyk.io/test/github/FerranMarin/axie-scholar-utilities)
 
 
 This software's intent is to automate all activities related to manage Scholars. It is specially aimed to mangers with large scholar roasters.
