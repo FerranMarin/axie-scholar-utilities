@@ -106,6 +106,9 @@ class AxiePaymentsManager:
                              f"Error given: {ex.message}. "
                              f"For attribute in: {list(ex.path)}")
             validation_success = False
+        if len(self.payments_file["Manager"].replace("ronin:", "0x")) != 42:
+            logging.critical(f"Check your manager ronin {self.payments_file['Manager']}, it has an incorrect format")
+            validation_success = False
         # check donations do not exceed 100%
         if self.payments_file.get("Donations"):
             total = sum([x["Percent"] for x in self.payments_file.get("Donations")])
