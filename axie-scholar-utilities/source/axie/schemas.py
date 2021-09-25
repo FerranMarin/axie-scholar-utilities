@@ -6,7 +6,8 @@ payments_schema = {
     ],
     "properties": {
         "Manager": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^ronin:"
         },
         "Scholars": {
             "type": "array",
