@@ -20,7 +20,7 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 To help in generating secrets, you simply need to execute this command from the docker folder.
 
-    docker-compose run scholar-utilities generate_secrets files/payments.json
+    docker-compose run scholar-utilities generate_secrets files/payments.json files/secrets.json
 
 This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts. If no file was present, this would create a new one.
 
