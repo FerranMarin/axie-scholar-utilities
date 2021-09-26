@@ -38,6 +38,6 @@ To payout from the scholar accounts, you need to run this command from the docke
 
 This will execute the payments defined in payments.json. Results.log will be updated with the logs relevant to payments so you can easily copy paste them to send them to your scholars.
 
-If you do now want to confirm account by account, you can run this other command (result will be the same):
+If you do not want to confirm account by account, you can run this other command (result will be the same):
 
     docker-compose run scholar-utilities payout files/payments.json files/secrets.json -y
