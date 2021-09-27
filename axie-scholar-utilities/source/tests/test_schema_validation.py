@@ -7,14 +7,14 @@ from axie.schemas import payments_schema
 
 @pytest.mark.parametrize("json_input, expected_error", [
         ({}, "'Manager' is a required property"),
-        ({"Manager": "ronin"}, "'Scholars' is a required property"),
-        ({"Manager": "ronin", "Scholars": [{}]}, "'Name' is a required property"),
-        ({"Manager": "ronin", "Scholars": [{"Name": "foo"}]},
+        ({"Manager": "ronin:123"}, "'Scholars' is a required property"),
+        ({"Manager": "ronin:123", "Scholars": [{}]}, "'Name' is a required property"),
+        ({"Manager": "ronin:123", "Scholars": [{"Name": "foo"}]},
          "'AccountAddress' is a required property"),
-        ({"Manager": "ronin", "Scholars": [{
+        ({"Manager": "ronin:123", "Scholars": [{
             "Name": "foo", "AccountAddress": "ronin:abc"}]},
          "'ScholarPayoutAddress' is a required property"),
-        ({"Manager": "ronin", "Scholars": [{
+        ({"Manager": "ronin:123", "Scholars": [{
             "Name": "foo",
             "AccountAddress": "ronin:abc",
             "ScholarPayoutAddress": "ronin:def"}]},
@@ -25,23 +25,23 @@ from axie.schemas import payments_schema
             "ScholarPayoutAddress": "ronin:def",
             "ScholarPayout": 123}]},
             "'ManagerPayout' is a required property"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:123", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 123,
            "ManagerPayout": "345"}]}, "'345' is not of type 'number'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": "123",
            "ManagerPayout": 345}]}, "'123' is not of type 'number'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:rfa", "Scholars": [
           {"Name": "foo", "AccountAddress": "0x:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 123,
            "ManagerPayout": 345}]}, "'0x:abc' does not match '^ronin:'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:haga", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "def", "ScholarPayout": 123,
            "ManagerPayout": 345}]}, "'def' does not match '^ronin:'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:gha", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 123,
            "ManagerPayout": 345, "TrainerPayoutAddress": "ronin:xyz"}]},
