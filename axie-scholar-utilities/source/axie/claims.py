@@ -42,7 +42,7 @@ class Claim:
         except requests.exceptions.HTTPError:
             logging.critical("Failed to check if there is unclaimed SLP")
             return None
-        return int(response.json()['total'])
+        return int(response.json()['unclaimed_total'])
 
     def create_random_msg(self):
         payload = {
