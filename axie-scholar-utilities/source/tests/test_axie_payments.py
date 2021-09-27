@@ -374,10 +374,10 @@ def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_
             axp.prepare_payout()
         mocked_check_balance.assert_called_with(scholar_acc, 1000)
         assert mocked_execute.call_count == 5
-        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the amount of 500 SLP" in caplog.text
-        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the amount of 100 SLP" in caplog.text
+        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
+        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
         assert ("Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) "
-                "for the amount of 4 SLP" in caplog.text)
+                "for the ammount of 4 SLP" in caplog.text)
         assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) "
                 "for the ammount of 10 SLP" in caplog.text)
         assert f"Payment to manager of Scholar 1({manager_acc}) for the ammount of 386 SLP" in caplog.text
@@ -406,9 +406,9 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
         axp.prepare_payout()
         mocked_check_balance.assert_called_with(scholar_acc, 1000)
         assert mocked_execute.call_count == 5
-        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the amount of 500 SLP" in caplog.text
-        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the amount of 100 SLP" in caplog.text
-        assert ("Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the amount "
+        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the ammount of 500 SLP" in caplog.text
+        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the ammount of 100 SLP" in caplog.text
+        assert ("Donation to Entity 1 for Scholar 1(ronin:<donation_entity_1_address>) for the ammount "
                 "of 4 SLP" in caplog.text)
         assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) "
                 "for the ammount of 10 SLP" in caplog.text)
@@ -512,11 +512,11 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
         call(SLP_CONTRACT),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
-    assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
+    assert ('Transaction random_account(ronin:to_ronin) for the ammount of 10 SLP completed! Hash: transaction_hash - '
             'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)
     with open(LOG_FILE_PATH) as f:
         log_file = f.readlines()
         assert len(log_file) == 1
-    assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! "
+    assert ("Important: Transaction random_account(ronin:to_ronin) for the ammount of 10 SLP completed! "
             "Hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash") in log_file[0]
     await cleanup_log_file()
