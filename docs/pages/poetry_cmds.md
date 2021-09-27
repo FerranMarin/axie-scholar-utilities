@@ -11,7 +11,7 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 2. Have a secrets.json file that only contains this inside:
 
-        {}
+        { }
 
 ## Secret Generation
 
