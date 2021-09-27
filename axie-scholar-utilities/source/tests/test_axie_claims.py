@@ -210,7 +210,6 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
                        json={"total": 12,
-                             "unclaimed_total": 10,
                              "last_claimed_item_at": round(last_claimed_date.timestamp()),
                              "claimable_total": 0})
         with patch.object(builtins,
@@ -218,7 +217,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
                           mock_open(read_data='{"foo": "bar"}')):
             c = Claim("ronin:foo", "0xbar")
             unclaimed = c.has_unclaimed_slp()
-            assert unclaimed == 10
+            assert unclaimed == 12
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
