@@ -128,10 +128,6 @@ class AxiePaymentsManager:
             if total > 0.99:
                 logging.critical("Payments file donations exeeds 100%, please review it")
                 validation_success = False
-            if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]):
-                logging.critical("Please review the ronins in your donations. One or more are wrong!")
-                validation_success = False
-            self.payments_file["Donations"]
             self.donations = self.payments_file["Donations"]
         # Check we have private keys for all accounts
         for acc in self.payments_file["Scholars"]:
