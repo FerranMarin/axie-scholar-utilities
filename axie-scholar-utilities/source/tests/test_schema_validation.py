@@ -19,7 +19,7 @@ from axie.schemas import payments_schema
             "AccountAddress": "ronin:abc",
             "ScholarPayoutAddress": "ronin:def"}]},
          "'ScholarPayout' is a required property"),
-        ({"Manager": "ronin", "Scholars": [{
+        ({"Manager": "ronin:abc", "Scholars": [{
             "Name": "foo",
             "AccountAddress": "ronin:abc",
             "ScholarPayoutAddress": "ronin:def",
@@ -46,49 +46,49 @@ from axie.schemas import payments_schema
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 123,
            "ManagerPayout": 345, "TrainerPayoutAddress": "ronin:xyz"}]},
             "'TrainerPayout' is a dependency of 'TrainerPayoutAddress'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 123,
            "ManagerPayout": 345, "TrainerPayout": 678}]},
             "'TrainerPayoutAddress' is a dependency of 'TrainerPayout'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def",
            "ScholarPayout": 123,
            "ManagerPayout": 345, "TrainerPayout": 678,
            "TrainerPayoutAddress": "xyz2"}]},
             "'xyz2' does not match '^ronin:'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 123,
            "ManagerPayout": 345, "TrainerPayout": "678",
            "TrainerPayoutAddress": "ronin:xyz2"}]},
             "'678' is not of type 'number'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 0,
            "ManagerPayout": 345, "TrainerPayout": 678,
            "TrainerPayoutAddress": "ronin:xyz2"}]},
             "0 is less than the minimum of 1"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 345, "TrainerPayout": 0,
            "TrainerPayoutAddress": "ronin:xyz2"}]},
             "0 is less than the minimum of 1"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 0, "TrainerPayout": 45,
            "TrainerPayoutAddress": "ronin:xyz2"}]},
             "0 is less than the minimum of 1"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 10, "TrainerPayout": 45,
            "TrainerPayoutAddress": "ronin:xyz2"}], "Donations": [{}]},
             "'Name' is a required property"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 10, "TrainerPayout": 45,
@@ -96,7 +96,7 @@ from axie.schemas import payments_schema
             "Name": "foo"
            }]},
             "'AccountAddress' is a required property"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 10, "TrainerPayout": 45,
@@ -104,7 +104,7 @@ from axie.schemas import payments_schema
             "Name": "foo", "AccountAddress": "ronin:dono"
            }]},
             "'Percent' is a required property"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 10, "TrainerPayout": 45,
@@ -112,7 +112,7 @@ from axie.schemas import payments_schema
             "Name": "foo", "AccountAddress": "dono", "Percent": 0.01
            }]},
             "'dono' does not match '^ronin:'"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 10, "TrainerPayout": 45,
@@ -120,7 +120,7 @@ from axie.schemas import payments_schema
             "Name": "foo", "AccountAddress": "ronin:dono", "Percent": 1.1
            }]},
             "1.1 is greater than the maximum of 1"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 10, "TrainerPayout": 45,
@@ -128,7 +128,7 @@ from axie.schemas import payments_schema
             "Name": "foo", "AccountAddress": "ronin:dono", "Percent": 0
            }]},
             "0 is less than the minimum of 0.01"),
-        ({"Manager": "ronin", "Scholars": [
+        ({"Manager": "ronin:abc", "Scholars": [
           {"Name": "foo", "AccountAddress": "ronin:abc",
            "ScholarPayoutAddress": "ronin:def", "ScholarPayout": 12,
            "ManagerPayout": 10, "TrainerPayout": 45,
@@ -220,8 +220,8 @@ def test_json_validator_error(json_input, expected_error):
                     "ManagerPayout": 190
                 }
             ]}),
-        ({"Manager": "ronin", "Scholars": []}),
-        ({"Manager": "ronin", "Scholars": [], "Donations": []}),
+        ({"Manager": "ronin:abc", "Scholars": []}),
+        ({"Manager": "ronin:abc", "Scholars": [], "Donations": []}),
     ])
 def test_json_validator_pass_optional_params(json_input):
     validate(json_input, payments_schema)

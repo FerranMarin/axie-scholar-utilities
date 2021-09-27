@@ -1,4 +1,3 @@
-import os
 import sys
 import builtins
 import logging
@@ -7,7 +6,7 @@ import pytest
 from mock import patch, call, mock_open
 
 from axie import AxiePaymentsManager
-from axie.payments import Payment, SLP_CONTRACT
+from axie.payments import Payment, SLP_CONTRACT, PaymentsSummary
 from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 
 
@@ -432,7 +431,7 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     axp = AxiePaymentsManager(p_file, s_file, auto=True)
     axp.verify_inputs()
-    with caplog.at_level(logging.DEBUG):
+    with caplog.at_level(logging.INFO):
         axp.prepare_payout()
         mocked_check_balance.assert_called_with(scholar_acc, 1000)
         assert mocked_execute.call_count == 5
@@ -444,6 +443,8 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
                 "for the amount of 10 SLP" in caplog.text)
         assert f"Payment to manager of Scholar 1({manager_acc}) for the amount of 386 SLP" in caplog.text
         assert "Transactions completed for account: 'Scholar 1'" in caplog.text
+        assert "Transactions Summary:" in caplog.text
+
 
 
 @patch("axie.payments.Payment.execute")
@@ -477,10 +478,12 @@ def test_payments_manager_payout_account_deny(_, mocked_check_balance, mocked_ex
 def test_payment_get_nonce_calls_w3_low_nonce(_, mocked_transaction_count):
     p = Payment(
         "random_account",
+        "manager",
         "ronin:from_ronin",
         "ronin:from_private_ronin",
         "ronin:to_ronin",
         10,
+        PaymentsSummary(),
         1)
     mocked_transaction_count.assert_called_once()
     assert p.nonce == 123
@@ -491,10 +494,12 @@ def test_payment_get_nonce_calls_w3_low_nonce(_, mocked_transaction_count):
 def test_payment_get_nonce_calls_w3_high_nonce(_, mocked_transaction_count):
     p = Payment(
         "random_account",
+        "manager",
         "ronin:from_ronin",
         "ronin:from_private_ronin",
         "ronin:to_ronin",
         10,
+        PaymentsSummary(),
         125)
     mocked_transaction_count.assert_called_once()
     assert p.nonce == 125
@@ -520,12 +525,15 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             caplog):
     # Make sure file is clean to start
     await cleanup_log_file()
+    s = PaymentsSummary()
     p = Payment(
         "random_account",
+        "manager",
         "ronin:from_ronin",
         "ronin:from_private_ronin",
         "ronin:to_ronin",
-        10
+        10,
+        s
     )
     with patch.object(builtins,
                       "open",
@@ -545,6 +553,7 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
     mock_transaction_receipt.assert_called_with("transaction_hash")
     assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
             'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)
+    assert str(s) == "Paid 14 managers, 10 SLP.\n"
     with open(LOG_FILE_PATH) as f:
         log_file = f.readlines()
         assert len(log_file) == 1

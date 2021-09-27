@@ -1,4 +1,3 @@
-from re import A
 import sys
 import asyncio
 import json
@@ -107,6 +106,7 @@ class AxiePaymentsManager:
         self.scholar_accounts = None
         self.donations = None
         self.auto = auto
+        self.summary = PaymentsSummary()
 
     def verify_inputs(self):
         logging.info("Validating file inputs...")
@@ -164,7 +164,6 @@ class AxiePaymentsManager:
         return True
 
     def prepare_payout(self):
-        summary = PaymentsSummary()
         for acc in self.scholar_accounts:
             fee = 0
             total_payments = 0
@@ -177,7 +176,7 @@ class AxiePaymentsManager:
                 self.secrets_file[acc["AccountAddress"]],
                 acc["ScholarPayoutAddress"],
                 acc["ScholarPayout"],
-                summary
+                self.summary
             )
             fee += acc["ScholarPayout"]
             total_payments += acc["ScholarPayout"]
@@ -192,7 +191,7 @@ class AxiePaymentsManager:
                     self.secrets_file[acc["AccountAddress"]],
                     acc["TrainerPayoutAddress"],
                     acc["TrainerPayout"],
-                    summary,
+                    self.summary,
                     nonce
                 ))
                 fee += acc["TrainerPayout"]
@@ -215,7 +214,7 @@ class AxiePaymentsManager:
                             self.secrets_file[acc["AccountAddress"]],
                             dono["AccountAddress"],
                             amount,
-                            summary,
+                            self.summary,
                             nonce
                         ))
                         nonce += 1
@@ -230,7 +229,7 @@ class AxiePaymentsManager:
                             self.secrets_file[acc["AccountAddress"]],
                             CREATOR_FEE_ADDRESS,
                             fee_payout,
-                            summary,
+                            self.summary,
                             nonce
                         ))
                 nonce += 1
@@ -242,7 +241,7 @@ class AxiePaymentsManager:
                 self.secrets_file[acc["AccountAddress"]],
                 self.manager_acc,
                 manager_payout - total_dono,
-                summary,
+                self.summary,
                 nonce
             ))
             if self.check_acc_has_enough_balance(acc["AccountAddress"],
@@ -251,9 +250,9 @@ class AxiePaymentsManager:
             else:
                 logging.info(f"Important: Skipping payments for account '{acc['Name']}'. "
                              "Insufficient funds!")
-            logging.info(f"Transactions Summary: {summary}")
+        logging.info(f"Transactions Summary:\n {self.summary}")
 
-    def payout_account(self, acc_name, payment_list, summary):
+    def payout_account(self, acc_name, payment_list):
         logging.info(f"Payments for {acc_name}:")
         logging.info(",\n".join(str(p) for p in payment_list))
         accept = "y" if self.auto else None
@@ -274,7 +273,7 @@ class PaymentsSummary:
         self.trainer = {"accounts": [], "slp": 0}
         self.scholar = {"accounts": [], "slp": 0}
         self.donations = {"accounts": [], "slp": 0}
-    
+
     def increase_payout(self, amount, address, payout_type):
         if payout_type == "manager":
             self.increase_manager_payout(amount, address)
@@ -286,7 +285,7 @@ class PaymentsSummary:
             self.increase_trainer_payout(amount, address)
 
     def increase_manager_payout(self, amount, address):
-        self.manger["slp"] += amount
+        self.manager["slp"] += amount
         if address not in self.manager["accounts"]:
             self.manager["accounts"] += address
 
@@ -306,8 +305,14 @@ class PaymentsSummary:
             self.donations["accounts"] += address
     
     def __str__(self):
-        msg = f'Paid {len(self.manager["accounts"])} managers, {self.manager["slp"]} SLP.\n'
-        msg += f'Paid {len(self.scholar["accounts"])} scholars, {self.scholar["slp"]} SLP.\n'
+        msg = "No payments made!"
+        if self.manager["accounts"] and self.scholar["accounts"]:
+            msg = f'Paid {len(self.manager["accounts"])} managers, {self.manager["slp"]} SLP.\n'
+            msg += f'Paid {len(self.scholar["accounts"])} scholars, {self.scholar["slp"]} SLP.\n'
+        if self.manager["accounts"] and not self.scholar["accounts"]:
+            msg = f'Paid {len(self.manager["accounts"])} managers, {self.manager["slp"]} SLP.\n'
+        if self.scholar["accounts"] and not self.manager["accounts"]:
+            msg = f'Paid {len(self.scholar["accounts"])} scholars, {self.scholar["slp"]} SLP.\n'
         if self.trainer["slp"] > 0:
             msg += f'Paid {len(self.trainer["accounts"])} trainers, {self.trainer["slp"]} SLP.\n'
         if self.donations["slp"] > 0:
