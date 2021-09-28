@@ -17,7 +17,7 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 To help in generating secrets, you simply need to execute this command from the source folder.
 
-    poetry run axie_scholar_cli.py generate_secrets payments.json secrets.json
+    poetry run python axie_scholar_cli.py generate_secrets payments.json secrets.json
 
 This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
 
