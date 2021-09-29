@@ -43,7 +43,7 @@ def test_claims_manager_verify_input_success(tmpdir):
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     axc = AxieClaimsManager(p_file, s_file)
-    axc.verify_input()
+    axc.verify_inputs()
     axc.secrets_file = {scholar_acc: scholar_private_acc}
 
 
@@ -72,11 +72,11 @@ def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
     }
     s_file.write(json.dumps(s_data))
     axc = AxieClaimsManager(p_file, s_file)
-    axc.verify_input()
+    axc.verify_inputs()
     axc.secrets_file = {scholar_acc: scholar_private_acc}
 
 
-def test_claims_manager_verify_input_wrong_public_ronin(tmpdir, caplog):
+def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file = tmpdir.join("p.json")
@@ -98,7 +98,7 @@ def test_claims_manager_verify_input_wrong_public_ronin(tmpdir, caplog):
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     with patch.object(sys, "exit") as mocked_sys:
         axc = AxieClaimsManager(p_file, s_file)
-        axc.verify_input()
+        axc.verify_inputs()
 
     mocked_sys.assert_called_once()
     assert f"Public address {scholar_acc} needs to start with ronin:" in caplog.text
@@ -126,7 +126,7 @@ def test_claims_manager_verify_input_wrong_public_private_ronin(tmpdir, caplog):
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     with patch.object(sys, "exit") as mocked_sys:
         axc = AxieClaimsManager(p_file, s_file)
-        axc.verify_input()
+        axc.verify_inputs()
 
     mocked_sys.assert_called_once()
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text
@@ -154,7 +154,7 @@ def test_claims_manager_verify_input_wrong_public_private_short(tmpdir, caplog):
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     with patch.object(sys, "exit") as mocked_sys:
         axc = AxieClaimsManager(p_file, s_file)
-        axc.verify_input()
+        axc.verify_inputs()
 
     mocked_sys.assert_called_once()
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text

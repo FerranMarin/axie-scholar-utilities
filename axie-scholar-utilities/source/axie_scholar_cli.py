@@ -7,6 +7,7 @@ Usage:
     axie_scholar_cli.py claim <payments_file> <secrets_file>
     axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
     axie_scholar_cli.py generate_QR <secrets_file>
+    axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file>
     axie_scholar_cli.py -h | --help
     axie_scholar_cli.py --version
 
@@ -22,7 +23,7 @@ import logging
 
 from docopt import docopt
 
-from axie import AxiePaymentsManager, AxieClaimsManager
+from axie import AxiePaymentsManager, AxieClaimsManager, AxieTransferManager
 from axie.utils import load_json
 
 # Setup logger
@@ -104,7 +105,7 @@ def run_cli():
         # Claim SLP
         logging.info('I shall claim SLP')
         acm = AxieClaimsManager(payments_file_path, secrets_file_path)
-        acm.verify_input()
+        acm.verify_inputs()
         acm.prepare_claims()
     elif args['generate_QR']:
         # Generate QR codes
@@ -127,6 +128,25 @@ def run_cli():
         if file_error:
             raise Exception("Please review your file paths and re-try.")
         generate_secrets_file(payments_file_path, secrets_file_path)
+    elif args['transfer_axies']:
+        # Make Axie Transfers
+        logging.info('I shall send axies around')
+        transfers_file_path = args['<transfers_file>']
+        secrets_file_path = args['<secrets_file>']
+        file_error = False
+        if not os.path.isfile(transfers_file_path):
+            logging.critical("Please provide a correct path to the Payments file. "
+                             f"Path provided: {transfers_file_path}")
+            file_error = True
+        if not os.path.isfile(secrets_file_path):
+            logging.critical("Please provide a correct path to the Secrets file. "
+                             f"Path provided: {secrets_file_path}")
+            file_error = True
+        if file_error:
+            raise Exception("Please review your file paths and re-try.")
+        atm = AxieTransferManager(transfers_file_path, secrets_file_path)
+        atm.verify_inputs()
+        atm.prepare_transfers()
 
 
 if __name__ == '__main__':

@@ -20,9 +20,8 @@ There is embedded in the code a 1% fee. I believe this is a fair charge for this
 # Roadmap
 
 - Add capability to payout from accounts with Trezor (needs investigation)
-- Add transfer/gift axies command
+- Add automatic breeding
 - Integrate with Discord (via a bot, maybe?)
-- Add transfer axies capabilities (will need an axie to transfer from account to account)
 - Release a desktop app (even more convenient)
 - ...
 - Add functionality to get QR codes, maybe(?)
