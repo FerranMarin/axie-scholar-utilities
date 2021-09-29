@@ -155,7 +155,7 @@ def test_payments_manager_verify_input_invalid_private_key(tmpdir, caplog):
     mocked_sys.assert_called_once()
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text
     assert ("Please make sure your payments.json file looks like the one in the README.md\n"
-           "Find it here: https://github.com/FerranMarin/axie-scholar-utilities/#payments-utility" in caplog.text)
+           "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/" in caplog.text)
     assert ("If your problem is with secrets.json, delete it and re-generate the file starting with "
             "an empty secrets file" in caplog.text)
 

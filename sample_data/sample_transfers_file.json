@@ -1,0 +1,36 @@
+[
+    {
+        "AccountAddress": "ronin:<whohasanaxie>",
+        "Transfers": [
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            }
+        ]
+    },
+    {
+        "AccountAddress": "ronin:<whohasanaxie>",
+        "Transfers": [
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            }
+        ]
+    }
+]

@@ -162,7 +162,7 @@ class AxieClaimsManager:
             refined_secrets[key] = secrets[key]
         return refined_secrets
 
-    def verify_input(self):
+    def verify_inputs(self):
         validation_success = True
         # Check secrets file is not empty
         if not self.secrets_file:

@@ -57,7 +57,7 @@ class Payment:
             self.amount
         ).buildTransaction({
             "chainId": 2020,
-            "gas": 100000,
+            "gas": 500000,
             "gasPrice": self.w3.toWei("0", "gwei"),
             "nonce": self.nonce
         })
@@ -144,7 +144,7 @@ class AxiePaymentsManager:
                 validation_success = False
         if not validation_success:
             logging.critical("Please make sure your payments.json file looks like the one in the README.md\n"
-                             "Find it here: https://github.com/FerranMarin/axie-scholar-utilities/#payments-utility")
+                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/")
             logging.critical("If your problem is with secrets.json, "
                              "delete it and re-generate the file starting with an empty secrets file.")
             sys.exit()
@@ -245,12 +245,15 @@ class AxiePaymentsManager:
                 nonce
             ))
             if self.check_acc_has_enough_balance(acc["AccountAddress"],
-                                                 total_payments):
+                                                 total_payments) and manager_payout - total_dono >= 0:
                 self.payout_account(acc["Name"], acc_payments)
-            else:
+            elif not self.check_acc_has_enough_balance(acc["AccountAddress"], total_payments):
                 logging.info(f"Important: Skipping payments for account '{acc['Name']}'. "
                              "Insufficient funds!")
-        logging.info(f"Transactions Summary:\n {self.summary}")
+            else:
+                logging.info("Fix your payments, currently after fees and donations manager is receiving a negative "
+                             f"payment of {manager_payout - total_dono}")
+        logging.info(f"Important: Transactions Summary:\n {self.summary}")
 
     def payout_account(self, acc_name, payment_list):
         logging.info(f"Payments for {acc_name}:")

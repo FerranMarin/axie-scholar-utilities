@@ -82,3 +82,39 @@ payments_schema = {
         }
     }
 }
+
+transfers_schema = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "Name",
+            "Transfers"
+        ],
+        "properties": {
+            "AccountAddress": {
+                "type": "string",
+                "pattern": "^ronin:"
+            },
+            "Transfers": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": [
+                        "AxieId",
+                        "ReceiverAddress"
+                    ],
+                    "properties": {
+                        "AxieId": {
+                            "type": "number"
+                        },
+                        "ReceiverAddress": {
+                            "type": "string",
+                            "pattern": "^ronin:"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
