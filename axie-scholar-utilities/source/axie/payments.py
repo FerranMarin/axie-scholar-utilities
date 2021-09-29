@@ -131,7 +131,6 @@ class AxiePaymentsManager:
             if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]):
                 logging.critical("Please review the ronins in your donations. One or more are wrong!")
                 validation_success = False
-            self.payments_file["Donations"]
             self.donations = self.payments_file["Donations"]
         # Check we have private keys for all accounts
         for acc in self.payments_file["Scholars"]:
@@ -268,6 +267,7 @@ class AxiePaymentsManager:
 
 class PaymentsSummary:
     __metaclass__ = SingletonMetaClass
+
     def __init__(self):
         self.manager = {"accounts": [], "slp": 0}
         self.trainer = {"accounts": [], "slp": 0}
@@ -307,14 +307,14 @@ class PaymentsSummary:
     def __str__(self):
         msg = "No payments made!"
         if self.manager["accounts"] and self.scholar["accounts"]:
-            msg = f'Paid {len(self.manager["accounts"])} managers, {self.manager["slp"]} SLP.\n'
-            msg += f'Paid {len(self.scholar["accounts"])} scholars, {self.scholar["slp"]} SLP.\n'
+            msg = f'Paid {len(set(self.manager["accounts"]))} managers, {self.manager["slp"]} SLP.\n'
+            msg += f'Paid {len(set(self.scholar["accounts"]))} scholars, {self.scholar["slp"]} SLP.\n'
         if self.manager["accounts"] and not self.scholar["accounts"]:
-            msg = f'Paid {len(self.manager["accounts"])} managers, {self.manager["slp"]} SLP.\n'
+            msg = f'Paid {len(set(self.manager["accounts"]))} managers, {self.manager["slp"]} SLP.\n'
         if self.scholar["accounts"] and not self.manager["accounts"]:
-            msg = f'Paid {len(self.scholar["accounts"])} scholars, {self.scholar["slp"]} SLP.\n'
+            msg = f'Paid {len(set(self.scholar["accounts"]))} scholars, {self.scholar["slp"]} SLP.\n'
         if self.trainer["slp"] > 0:
-            msg += f'Paid {len(self.trainer["accounts"])} trainers, {self.trainer["slp"]} SLP.\n'
+            msg += f'Paid {len(set(self.trainer["accounts"]))} trainers, {self.trainer["slp"]} SLP.\n'
         if self.donations["slp"] > 0:
-            msg += f'Donated to {len(self.donations["accounts"])} organisations, {self.donations["slp"]} SLP.\n'
+            msg += f'Donated to {len(set(self.donations["accounts"]))} organisations, {self.donations["slp"]} SLP.\n'
         return msg
