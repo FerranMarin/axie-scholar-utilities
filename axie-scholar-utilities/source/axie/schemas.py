@@ -88,7 +88,7 @@ transfers_schema = {
     "items": {
         "type": "object",
         "required": [
-            "Name",
+            "AccountAddress",
             "Transfers"
         ],
         "properties": {

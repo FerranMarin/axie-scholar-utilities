@@ -27,7 +27,10 @@ class Singleton:
 
     def clear(cls):
         # We need this for testing purposes!
-        del Singleton._instance
+        try:
+            del Singleton._instance
+        except AttributeError:
+            pass
 
 
 def check_balance(account):

@@ -64,22 +64,26 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
         logging.info("Secrets file already had all needed secrets!")
 
 
+def check_files(file1, file2):
+    error = False
+    if not os.path.isfile(file1):
+        logging.critical("Please provide a correct path to the Payments file. "
+                         f"Path provided: {file1}")
+        error = True
+    if not os.path.isfile(file2):
+        logging.critical("Please provide a correct path to the Secrets file. "
+                         f"Path provided: {file2}")
+        error = True
+    return error
+
+
 def run_cli():
     """ Wrapper function for testing purposes"""
     args = docopt(__doc__, version='Axie Scholar Payments CLI v1.3')
     if args['payout']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
-        file_error = False
-        if not os.path.isfile(payments_file_path):
-            logging.critical("Please provide a correct path to the Payments file. "
-                             f"Path provided: {payments_file_path}")
-            file_error = True
-        if not os.path.isfile(secrets_file_path):
-            logging.critical("Please provide a correct path to the Secrets file. "
-                             f"Path provided: {secrets_file_path}")
-            file_error = True
-        if file_error:
+        if check_files(payments_file_path, secrets_file_path):
             raise Exception("Please review your file paths and re-try.")
         # Do Payout
         logging.info("I shall pay my scholars!")
@@ -91,16 +95,7 @@ def run_cli():
     elif args['claim']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
-        file_error = False
-        if not os.path.isfile(payments_file_path):
-            logging.critical("Please provide a correct path to the Payments file. "
-                             f"Path provided: {payments_file_path}")
-            file_error = True
-        if not os.path.isfile(secrets_file_path):
-            logging.critical("Please provide a correct path to the Secrets file. "
-                             f"Path provided: {secrets_file_path}")
-            file_error = True
-        if file_error:
+        if check_files(payments_file_path, secrets_file_path):
             raise Exception("Please review your file paths and re-try.")
         # Claim SLP
         logging.info('I shall claim SLP')
@@ -134,15 +129,7 @@ def run_cli():
         transfers_file_path = args['<transfers_file>']
         secrets_file_path = args['<secrets_file>']
         file_error = False
-        if not os.path.isfile(transfers_file_path):
-            logging.critical("Please provide a correct path to the Payments file. "
-                             f"Path provided: {transfers_file_path}")
-            file_error = True
-        if not os.path.isfile(secrets_file_path):
-            logging.critical("Please provide a correct path to the Secrets file. "
-                             f"Path provided: {secrets_file_path}")
-            file_error = True
-        if file_error:
+        if check_files(transfers_file_path, secrets_file_path):
             raise Exception("Please review your file paths and re-try.")
         atm = AxieTransferManager(transfers_file_path, secrets_file_path)
         atm.verify_inputs()
