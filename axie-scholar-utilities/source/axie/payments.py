@@ -12,7 +12,7 @@ from axie.utils import (
     check_balance,
     get_nonce,
     load_json,
-    SingletonMetaClass,
+    Singleton,
     ImportantLogsFilter
 )
 
@@ -269,8 +269,8 @@ class AxiePaymentsManager:
             logging.info(f"Transactions canceled for account: '{acc_name}'")
 
 
-class PaymentsSummary:
-    __metaclass__ = SingletonMetaClass
+class PaymentsSummary(Singleton):
+
     def __init__(self):
         self.manager = {"accounts": [], "slp": 0}
         self.trainer = {"accounts": [], "slp": 0}
@@ -290,22 +290,22 @@ class PaymentsSummary:
     def increase_manager_payout(self, amount, address):
         self.manager["slp"] += amount
         if address not in self.manager["accounts"]:
-            self.manager["accounts"] += address
+            self.manager["accounts"].append(address)
 
     def increase_trainer_payout(self, amount, address):
         self.trainer["slp"] += amount
         if address not in self.trainer["accounts"]:
-            self.trainer["accounts"] += address
+            self.trainer["accounts"].append(address)
 
     def increase_scholar_payout(self, amount, address):
         self.scholar["slp"] += amount
         if address not in self.scholar["accounts"]:
-            self.scholar["accounts"] += address
+            self.scholar["accounts"].append(address)
 
     def increase_donations_payout(self, amount, address):
         self.donations["slp"] += amount
         if address not in self.donations["accounts"]:
-            self.donations["accounts"] += address
+            self.donations["accounts"].append(address)
     
     def __str__(self):
         msg = "No payments made!"

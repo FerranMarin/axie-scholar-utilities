@@ -556,6 +556,7 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             caplog):
     # Make sure file is clean to start
     await cleanup_log_file()
+    PaymentsSummary().clear()
     s = PaymentsSummary()
     p = Payment(
         "random_account",
@@ -584,7 +585,7 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
     mock_transaction_receipt.assert_called_with("transaction_hash")
     assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
             'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)
-    assert str(s) == "Paid 14 managers, 10 SLP.\n"
+    assert str(s) == "Paid 1 managers, 10 SLP.\n"
     with open(LOG_FILE_PATH) as f:
         log_file = f.readlines()
         assert len(log_file) == 1
