@@ -38,3 +38,9 @@ This will execute the payments defined in payments.json. Results.log will be upd
 If you do now want to confirm account by account, you can run this other command (result will be the same):
 
     poetry run python axie_scholar_cli.py payout payments.json secrets.json
+
+## Axie Transfers
+
+For this command to work, remmember you will need to have in the source folder (or the folder you use for the rest of files) the json file called transfers.json. The command will be as follows:
+
+    poetry run python axie_scholar_cli.py transfer_axies transfers.json secrets.json

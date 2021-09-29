@@ -24,6 +24,7 @@ Depending on how you've installed the tool, to run the commands you will need to
 - **Generate Secrets**: This is a helper command so you can easily create the secrets.json file.
 - **Claim SLP**: This command will claim the SLP from all the scholar accounts in the payments.json file.
 - **Payout**: This command will pay from the scholar account to Scholar, Trainer and Manager. Trainer is optional. It can be executed asking for approval for each set of transactions (each scholar account), or go in auto-mode, without asking for approval before executing transactions.
+- **Transfer Axies**: This command will help you transfer multiple axies from multiple accounts to multiple accounts.
 
 To read the instructions on how to run these commands:
 
@@ -33,7 +34,7 @@ To read the instructions on how to run these commands:
 
 
 # File Format
-This tool depends mainly on 2 files. A Payments file and a Secrets file. Below find the format I expect them to be.
+This tool depends on various files. Below find the format I expect them to be.
 
 ## Payments file format
 It requires a JSON file like:
@@ -94,6 +95,76 @@ This JSON file is much simpler, and you should never need to create it as you ca
     ...
 }
 ```
+
+## Transfers file format
+This JSON file defines the Axie transfers you wish to do. You define from which accounts you transfer which Axies to witch accounts. Here is an example:
+
+
+```
+    [
+    {
+        "AccountAddress": "ronin:<whohasanaxie>",
+        "Transfers": [
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            }
+            ...
+        ]
+    },
+    {
+        "AccountAddress": "ronin:<whohasanaxie>",
+        "Transfers": [
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            }
+        ]
+    },
+    ...
+    {
+        "AccountAddress": "ronin:<whohasanaxie>",
+        "Transfers": [
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            },
+            {
+                "AxieId": "<axie_id_to_transfer>",
+                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+            }
+        ]
+    }
+]
+
+```
+
+As you can see we put the account where we have the axies in `AccountAddress` and then inside `Transfers` we define the transfers we want to do from that account. In each we indicate the `AxieID` and the ronin `ReceiverAddress` to receive that Axie.
+
 
 ## Example Files
 

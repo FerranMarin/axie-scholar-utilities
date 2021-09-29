@@ -34,10 +34,16 @@ To Claim SLP from the scholar accounts in the payments.json file. You need to ru
 
 To payout from the scholar accounts, you need to run this command from the docker folder.
 
-   docker-compose run scholar-utilities payout files/payments.json files/secrets.json
+    docker-compose run scholar-utilities payout files/payments.json files/secrets.json
 
 This will execute the payments defined in payments.json. Results.log will be updated with the logs relevant to payments so you can easily copy paste them to send them to your scholars.
 
 If you do not want to confirm account by account, you can run this other command (result will be the same):
 
     docker-compose run scholar-utilities payout files/payments.json files/secrets.json -y
+
+## Axie Transfers
+
+For this command to work, remmember you will need to have in the same files folder the json file called transfers.json. The command will be as follows:
+
+    docker-compose run scholar-utilities transfer_axies files/transfers.json files/secrets.json
