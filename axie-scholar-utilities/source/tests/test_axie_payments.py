@@ -347,6 +347,37 @@ def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_bala
     mocked_check_balance.assert_called_with(scholar_acc, 1000)
     mocked_payout.assert_not_called()
 
+@patch("axie.payments.get_nonce", return_value=100)
+@patch("axie.AxiePaymentsManager.payout_account")
+@patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
+def test_payments_manager_prepare_no_payout_not_manager_payout(mocked_check_balance,
+                                                               mocked_payout,
+                                                               mocked_get_nonce,
+                                                               tmpdir,
+                                                               caplog):
+    p_file = tmpdir.join("p.json")
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
+    manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
+    dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
+                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
+                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":500,'
+                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPayout":100,'
+                  '"ManagerPayout":1}], "Donations":[{"Name":"Entity 1",'
+                  '"AccountAddress": "'+dono_acc+'","Percent":0.01}]}'))
+    s_file = tmpdir.join("s.json")
+    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    axp = AxiePaymentsManager(p_file, s_file)
+    axp.verify_inputs()
+    axp.prepare_payout()
+    assert mocked_get_nonce.call_count == 5
+    mocked_check_balance.assert_called_with(scholar_acc, 601)
+    mocked_payout.assert_not_called()
+    assert ('Fix your payments, currently after fees and donations manager is receiving a '
+            'negative payment of -5' in caplog.text)
+
+
 
 @patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
