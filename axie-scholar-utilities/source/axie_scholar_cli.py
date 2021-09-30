@@ -6,6 +6,7 @@ Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
     axie_scholar_cli.py claim <payments_file> <secrets_file>
     axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
+    axie_scholar_cli.py mass_update_secrets <csv_file> <secrets_file>
     axie_scholar_cli.py generate_QR <secrets_file>
     axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file>
     axie_scholar_cli.py -h | --help
@@ -18,6 +19,7 @@ Options:
 """
 import os
 import sys
+import csv
 import json
 import logging
 
@@ -62,6 +64,19 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
         logging.info(f"File saved at {secrets_file_path}!")
     else:
         logging.info("Secrets file already had all needed secrets!")
+
+
+def mass_update_secret_file(csv_file_path, secrets_file_path):
+    new_secrets = {}
+    with open(csv_file_path) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            new_secrets[row[0]] = row[1]
+
+    old_secrets = load_json(secrets_file_path)
+    merge = {**new_secrets, **old_secrets}
+    with open(secrets_file_path, 'w') as f:
+        json.dump(merge,  f, ensure_ascii=False, indent=4)
 
 
 def check_files(file1, file2):
@@ -123,6 +138,13 @@ def run_cli():
         if file_error:
             raise Exception("Please review your file paths and re-try.")
         generate_secrets_file(payments_file_path, secrets_file_path)
+    elif args['mass_update_secrets']:
+        # Mass update secrets
+        csv_file_path = args['<csv_file>']
+        secrets_file_path = args['<secrets_file>']
+        if check_files(csv_file_path, secrets_file_path):
+            raise Exception("Please review your file paths and re-try.")
+        mass_update_secret_file(csv_file_path, secrets_file_path)
     elif args['transfer_axies']:
         # Make Axie Transfers
         logging.info('I shall send axies around')
