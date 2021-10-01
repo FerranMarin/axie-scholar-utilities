@@ -94,7 +94,7 @@ def check_files(file1, file2):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.3')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.6.1')
     if args['payout']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
@@ -140,6 +140,7 @@ def run_cli():
         generate_secrets_file(payments_file_path, secrets_file_path)
     elif args['mass_update_secrets']:
         # Mass update secrets
+        logging.info('I shall help you mass update your secrets file')
         csv_file_path = args['<csv_file>']
         secrets_file_path = args['<secrets_file>']
         if check_files(csv_file_path, secrets_file_path):
