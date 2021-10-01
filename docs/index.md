@@ -167,7 +167,7 @@ This JSON file defines the Axie transfers you wish to do. You define from which 
 As you can see we put the account where we have the axies in `AccountAddress` and then inside `Transfers` we define the transfers we want to do from that account. In each we indicate the `AxieID` and the ronin `ReceiverAddress` to receive that Axie.
 
 ## Mass update CSV file
-This CSV file is quite straight forward. You can use excel or google docs or anything that produces a csv file. The resulting format will be something that looks like:
+This CSV file is quite straight forward. You can use excel or google docs or anything that produces a csv file. To get these results, you will need to add your public ronin on the 1st column and your private key for that account on the 2nd column. The resulting format will be something that looks like:
 
 ```
 ronin:abc1,0xsecretabc1
