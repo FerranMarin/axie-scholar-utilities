@@ -28,7 +28,7 @@ This will update the secrets.json either from an emtpy one with only {}, to one 
 
 For this command you will need a file called update.csv. It needs to be inside the files folder. Then the command is as follows:
 
-   axie-utils-mass-update update.csv secrets.json
+    axie-utils-mass-update update.csv secrets.json
 
 This will update the secrets.json and add any missing secrets that are present in update.csv and not in secrets.json yet.
 
