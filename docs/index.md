@@ -22,6 +22,7 @@ If for some reason you want to install using python and poetry, you will need to
 Depending on how you've installed the tool, to run the commands you will need to do different things, thus why I have strucuted the instructions depending on how you installed the tool. All available actions at the moment are:
 
 - **Generate Secrets**: This is a helper command so you can easily create the secrets.json file.
+- **Mass Secret Update**: This command helps mass update the secrets.json file using a csv file that contains public ronin and private keys. This is an alternate method to generate secerts.
 - **Claim SLP**: This command will claim the SLP from all the scholar accounts in the payments.json file.
 - **Payout**: This command will pay from the scholar account to Scholar, Trainer and Manager. Trainer is optional. It can be executed asking for approval for each set of transactions (each scholar account), or go in auto-mode, without asking for approval before executing transactions.
 - **Transfer Axies**: This command will help you transfer multiple axies from multiple accounts to multiple accounts.
@@ -165,6 +166,17 @@ This JSON file defines the Axie transfers you wish to do. You define from which 
 
 As you can see we put the account where we have the axies in `AccountAddress` and then inside `Transfers` we define the transfers we want to do from that account. In each we indicate the `AxieID` and the ronin `ReceiverAddress` to receive that Axie.
 
+## Mass update CSV file
+This CSV file is quite straight forward. You can use excel or google docs or anything that produces a csv file. The resulting format will be something that looks like:
+
+```
+ronin:abc1,0xsecretabc1
+ronin:abc2,0xsecretabc2
+ronin:abc3,0xsecretabc3
+ronin:abc4,0xsecretabc4
+```
+
+All these will be merged with the pre-existing ones (if any) in secrets.json
 
 ## Example Files
 

@@ -21,6 +21,14 @@ To help in generating secrets, you simply need to execute this command from the 
 
 This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
 
+## Mass Update Secrets
+
+For this command you will need a file called anything you want, for this example let's call it update.csv. It needs to be inside the source folder. Then the command is as follows:
+
+    poetry run python axie_scholar_cli.py mass_update_secrets update.csv secrets.json
+
+This will update the secrets.json and add any missing secrets that are present in update.csv and not in secrets.json yet.
+
 ## Claim SLP
 
 To Claim SLP from the scholar accounts in the payments.json file. You need to run this command from the source folder.

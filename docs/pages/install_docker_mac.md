@@ -18,6 +18,8 @@ If you go this route, I recomend also setting up these alias in your terminal to
 
     # Alias to generate secrets
         axie-utils-gen-secrets() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json}
+    # Alias to mass update secrets
+        axie-utils-mass-update() {docker run -it -v ${PWD}/${1}:/opt/app/files/update.csv -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities mass_update_secrets files/update.csv files/secrets.json}
     # Alias to execute claims
         axie-utils-claim() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/payments.json files/secrets.json}
     # Alias to execute payments

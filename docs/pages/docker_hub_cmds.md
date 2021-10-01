@@ -24,6 +24,14 @@ To help in generating secrets, you simply need to execute this command from the 
 
 This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
 
+## Mass Update Secrets
+
+For this command you will need a file called update.csv. It needs to be inside the files folder. Then the command is as follows:
+
+   axie-utils-mass-update update.csv secrets.json
+
+This will update the secrets.json and add any missing secrets that are present in update.csv and not in secrets.json yet.
+
 ## Claim SLP
 
 To Claim SLP from the scholar accounts in the payments.json file. You need to run this command from the folder where you have the previously mentioned 3 files.
