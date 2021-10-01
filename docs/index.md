@@ -184,7 +184,7 @@ If after that you still unclear on how they look like. Please go to the folder s
 
 # F.A.Q
 
-For the FAQ (Frequent Asked Questions), follow this [link]((./pages/faq.html))
+For the FAQ (Frequent Asked Questions), follow this [link](./pages/faq.html)
 
 # Caution Messages
 
