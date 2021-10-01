@@ -182,6 +182,10 @@ All these will be merged with the pre-existing ones (if any) in secrets.json
 
 If after that you still unclear on how they look like. Please go to the folder sample_data to see sample files for how the payments file and the secrets file need to look like.
 
+# F.A.Q
+
+For the FAQ (Frequent Asked Questions), follow this [link]((./pages/faq.html))
+
 # Caution Messages
 
 - In order to be able to do transactions, and claim SLP the scholar ronin account (the ones in Scholars Account ronin Addresses of the payments.json) will need to be registered on the Axie marketplace. (If you want to use this tool they should already be, but just in case!)
