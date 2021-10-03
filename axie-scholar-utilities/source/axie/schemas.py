@@ -13,17 +13,29 @@ payments_schema = {
             "type": "array",
             "items": {
                 "type": "object",
-                "required": [
-                    "Name",
-                    "AccountAddress",
-                    "ScholarPayoutAddress",
-                    "ScholarPayout",
-                    "ManagerPayout"
+                "anyOf": [
+                    {"required": [
+                        "Name",
+                        "AccountAddress",
+                        "ScholarPayoutAddress",
+                        "ScholarPayout",
+                        "ManagerPayout"
+                    ],
+                    "dependencies": {
+                        "TrainerPayoutAddress": ["TrainerPayout"],
+                        "TrainerPayout": ["TrainerPayoutAddress"]}
+                    },
+                    {"required": [
+                        "Name",
+                        "AccountAddress",
+                        "ScholarPayoutAddress",
+                        "ScholarPercent"
+                    ],
+                    "dependencies": {
+                        "TrainerPayoutAddress": ["TrainerPercent"],
+                        "TrainerPercent": ["TrainerPayoutAddress"]}
+                    }
                 ],
-                "dependencies": {
-                    "TrainerPayoutAddress": ["TrainerPayout"],
-                    "TrainerPayout": ["TrainerPayoutAddress"]
-                },
                 "properties": {
                     "Name": {
                         "type": "string"
@@ -40,6 +52,11 @@ payments_schema = {
                         "type": "number",
                         "minimum": 1
                     },
+                    "ScholarPercent": {
+                        "type": "number",
+                        "minumum": 40,
+                        "maximum": 99
+                    },
                     "TrainerPayoutAddress": {
                         "type": "string",
                         "pattern": "^ronin:"
@@ -48,11 +65,17 @@ payments_schema = {
                         "type": "number",
                         "minimum": 1
                     },
+                    "TrainerPercent": {
+                        "type": "number",
+                        "minumum": 1,
+                        "maximum": 98
+                    },
                     "ManagerPayout": {
                         "type": "number",
                         "minimum": 1
                     }
-                }
+                },
+                "additionalProperties": False
             }
         },
         "Donations": {
@@ -77,11 +100,13 @@ payments_schema = {
                         "minimum": 0.01,
                         "maximum": 1
                     }
-                }
+                },
+                "additionalProperties": False
             }
         }
     }
 }
+
 
 transfers_schema = {
     "type": "array",
