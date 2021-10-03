@@ -40,6 +40,7 @@ def test_payments_manager_verify_input_success(tmpdir):
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
     assert axp.manager_acc == manager_acc
+    assert axp.type == "amount"
     assert axp.scholar_accounts == [
         {"Name": "Scholar 1",
          "AccountAddress": scholar_acc,
@@ -52,6 +53,37 @@ def test_payments_manager_verify_input_success(tmpdir):
         {"Name": "Entity 1",
          "AccountAddress": dono_acc,
          "Percent": 0.01}]
+
+
+def test_payments_manager_verify_input_success(tmpdir):
+    p_file = tmpdir.join("p.json")
+    manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
+    dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
+                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
+                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":50,'
+                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":1}],'
+                  '"Donations":[{"Name":"Entity 1", "AccountAddress": "'+dono_acc+'","Percent":1}]}'))
+    s_file = tmpdir.join("s.json")
+    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    axp = AxiePaymentsManager(p_file, s_file)
+    axp.verify_inputs()
+    assert axp.manager_acc == manager_acc
+    assert axp.type == "percent"
+    assert axp.scholar_accounts == [
+        {"Name": "Scholar 1",
+         "AccountAddress": scholar_acc,
+         "ScholarPayoutAddress": "ronin:<scholar_address>",
+         "ScholarPercent": 50,
+         "TrainerPayoutAddress": "ronin:<trainer_address>",
+         "TrainerPercent": 1}]
+    assert axp.donations == [
+        {"Name": "Entity 1",
+         "AccountAddress": dono_acc,
+         "Percent": 1}]
+
 
 def test_payments_manager_verify_input_manager_ronin_short(tmpdir, caplog):
     p_file = tmpdir.join("p.json")

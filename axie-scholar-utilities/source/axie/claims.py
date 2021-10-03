@@ -36,8 +36,8 @@ class Claim:
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
-        response = requests.get(url, headers={"User-Agent": self.user_agent})
         try:
+            response = requests.get(url, headers={"User-Agent": self.user_agent})
             response.raise_for_status()
         except requests.exceptions.HTTPError:
             logging.critical("Failed to check if there is unclaimed SLP")
@@ -51,8 +51,8 @@ class Claim:
             "query": "mutation CreateRandomMessage{createRandomMessage}"
         }
         url = "https://graphql-gateway.axieinfinity.com/graphql"
-        response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
         try:
+            response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise Exception(f"Error! Creating random msg! Error: {e}")
@@ -78,8 +78,8 @@ class Claim:
             "{newAccount result accessToken __typename}}"
         }
         url = "https://graphql-gateway.axieinfinity.com/graphql"
-        response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
         try:
+            response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise Exception(f"Error! Getting JWT! Error: {e}")
@@ -102,8 +102,8 @@ class Claim:
             "authorization": f"Bearer {jwt}"
         }
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
-        response = requests.post(url, headers=headers, json="")
         try:
+            response = requests.post(url, headers=headers, json="")
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise Exception("Error! Executing SLP claim API call for account "
