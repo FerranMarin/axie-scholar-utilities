@@ -189,7 +189,7 @@ def run_cli():
         payments_file_path = args.get('<payments_file>')
         if (payments_file_path and check_file(payments_file_path) and check_file(csv_file_path) or 
             not payments_file_path and check_file(csv_file_path)):
-            generate_payments_file()
+            generate_payments_file(csv_file_path, payments_file_path)
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_QR']:
