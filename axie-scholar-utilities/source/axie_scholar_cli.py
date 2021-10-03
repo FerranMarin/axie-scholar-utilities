@@ -62,13 +62,15 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
         reader = csv.DictReader(csv_file)
         scholars_list = []
         for row in reader:
-            clean_row = {k: v for k, v in row.items() if v is not None}
+            clean_row = {k: v for k, v in row.items() if v is not None and v != ''}
+            integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
+            clean_row.update(integer_row)
             scholars_list.append(clean_row)
     
     payments_dict = {"Manager": manager_acc, "Scholars": scholars_list}
 
     with open(payments_file_path, 'w', encoding='utf-8') as f:
-        json.dumps(payments_dict, f, ensure_ascii=False, indent=4)
+        json.dump(payments_dict, f, ensure_ascii=False, indent=4)
     log.info(f'New payments file saved')
 
 

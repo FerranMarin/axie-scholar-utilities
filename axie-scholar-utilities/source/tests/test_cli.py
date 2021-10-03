@@ -1,5 +1,6 @@
 import sys
 import builtins
+import json
 
 from docopt import docopt, DocoptExit
 from mock import patch
@@ -269,6 +270,56 @@ def test_generate_secrets_already_there(tmpdir):
     with patch.object(builtins, 'input', lambda _: 'some_input'):
         cli.generate_secrets_file(f1.strpath, f2.strpath)
     assert f2.read() == expected_out
+
+
+def test_generate_payments_file(tmpdir):
+    f1 = tmpdir.mkdir("other_folder").join("file1.csv")
+    f1.write('Name,AccountAddress,ScholarPayoutAddress,ScholarPercent,ScholarPayout\n'
+             'Test1,ronin:abc1,ronin:abc_scholar1,50,\n'
+             'Test2,ronin:abc2,ronin:abc_scholar2,50,\n'
+             'Test3,ronin:abc3,ronin:abc_scholar3,50,\n'
+             'Test4,ronin:abc4,ronin:abc_scholar4,50,\n'
+             'Test5,ronin:abc5,ronin:abc_scholar5,50,100\n')
+    f2 = tmpdir.join("other_folder/payments.json")
+    f2.write('{}')
+    with patch.object(builtins, 'input', lambda _: 'ronin:9fa1bc784c665e683597d3f29375e45786617550'):
+        cli.generate_payments_file(f1.strpath, f2.strpath)
+    print(json.loads(f2.read()))
+    assert json.loads(f2.read()) == {
+        'Manager': 'ronin:9fa1bc784c665e683597d3f29375e45786617550',
+        'Scholars': [{
+                'Name': 'Test1',
+                'AccountAddress': 'ronin:abc1',
+                'ScholarPayoutAddress': 'ronin:abc_scholar1',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test2',
+                'AccountAddress': 'ronin:abc2',
+                'ScholarPayoutAddress': 'ronin:abc_scholar2',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test3',
+                'AccountAddress': 'ronin:abc3',
+                'ScholarPayoutAddress': 'ronin:abc_scholar3',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test4',
+                'AccountAddress': 'ronin:abc4',
+                'ScholarPayoutAddress': 'ronin:abc_scholar4',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test5',
+                'AccountAddress': 'ronin:abc5',
+                'ScholarPayoutAddress': 'ronin:abc_scholar5',
+                'ScholarPercent': 50,
+                'ScholarPayout': 100
+            }
+        ]
+    }
 
 
 def test_generate_secrets_partially_there(tmpdir):
