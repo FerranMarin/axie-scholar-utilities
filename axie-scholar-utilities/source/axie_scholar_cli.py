@@ -125,6 +125,7 @@ def run_cli():
     """ Wrapper function for testing purposes"""
     args = docopt(__doc__, version='Axie Scholar Payments CLI v1.6.1')
     if args['payout']:
+        logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
         if check_file(payments_file_path) and check_file(secrets_file_path):
@@ -134,6 +135,8 @@ def run_cli():
             apm = AxiePaymentsManager(payments_file_path, secrets_file_path, auto=args['--yes'])
             apm.verify_inputs()
             apm.prepare_payout()
+        else:
+           logging.critical("Please review your file paths and re-try.") 
     elif args['claim']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
@@ -143,25 +146,20 @@ def run_cli():
             acm = AxieClaimsManager(payments_file_path, secrets_file_path)
             acm.verify_inputs()
             acm.prepare_claims()
+        else:
+            logging.critical("Please review your file paths and re-try.")
     elif args['generate_secrets']:
         # Generate Secrets
         logging.info('I shall help you generate your secrets file')
         payments_file_path = args['<payments_file>']
         secrets_file_path = args.get('<secrets_file>')
-        file_error = False
-        if not os.path.isfile(payments_file_path):
-            logging.critical('Please provide a correct path to the Payments file. '
-                             f'Path provided: {payments_file_path}')
-            file_error = True
-        if secrets_file_path and not os.path.isfile(secrets_file_path):
-            logging.critical('Please provide a correct path to the Secrets file. '
-                             f'Path provided: {secrets_file_path}')
-            file_error = True
-        if file_error:
-            raise Exception("Please review your file paths and re-try.")
-        logging.info('If you do not know how to get your private keys, check: '
-                     'https://ferranmarin.github.io/axie-scholar-utilities/pages/faq.html')
-        generate_secrets_file(payments_file_path, secrets_file_path)
+        if (secrets_file_path and check_file(secrets_file_path) and check_file(payments_file_path) or 
+        not secrets_file_path and check_file(payments_file_path)):
+            logging.info('If you do not know how to get your private keys, check: '
+                        'https://ferranmarin.github.io/axie-scholar-utilities/pages/faq.html')
+            generate_secrets_file(payments_file_path, secrets_file_path)
+        else:
+            logging.critical("Please review your file paths and re-try.")
     elif args['mass_update_secrets']:
         # Mass update secrets
         logging.info('I shall help you mass update your secrets file')
@@ -169,22 +167,29 @@ def run_cli():
         secrets_file_path = args['<secrets_file>']
         if check_file(csv_file_path) and check_file(secrets_file_path):
             mass_update_secret_file(csv_file_path, secrets_file_path)
+        else:
+            logging.critical("Please review your file paths and re-try.")
     elif args['transfer_axies']:
         # Make Axie Transfers
         logging.info('I shall send axies around')
         transfers_file_path = args['<transfers_file>']
         secrets_file_path = args['<secrets_file>']
-        file_error = False
         if check_file(transfers_file_path) and check_file(secrets_file_path):
             atm = AxieTransferManager(transfers_file_path, secrets_file_path)
             atm.verify_inputs()
             atm.prepare_transfers()
+        else:
+            logging.critical("Please review your file paths and re-try.")
     elif args['generate_payments']:
         # Generate Payments File
         logging.info('I shall help you mass update your secrets file')
         csv_file_path = args['<csv_file>']
         payments_file_path = args.get('<payments_file>')
-        generate_payments_file()
+        if (payments_file_path and check_file(payments_file_path) and check_file(csv_file_path) or 
+            not payments_file_path and check_file(csv_file_path)):
+            generate_payments_file()
+        else:
+            logging.critical("Please review your file paths and re-try.")
     elif args['generate_QR']:
         # Generate QR codes
         logging.info('I shall generate QR codes')

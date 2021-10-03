@@ -7,7 +7,7 @@
             "ScholarPayoutAddress": "ronin:<scholar_address>",
             "ScholarPercent": 50,
             "TrainerPercent": 10,
-            "TrainerPayoutAddress": "ronin:<trainer_address>",
+            "TrainerPayoutAddress": "ronin:<trainer_address>"
         },
         {
             "Name": "Scholar 2",
