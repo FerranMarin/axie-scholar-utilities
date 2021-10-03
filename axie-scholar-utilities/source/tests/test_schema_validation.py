@@ -361,8 +361,8 @@ def test_json_validator_pass_transfers_schema_optional_params(json_input):
             "ScholarPercent": 45,
             "TrainerPayoutAddress": "ronin:abc",
             "TrainerPercent": 10,
-            "ManagerPayout": -1}]},
-            "-1 is less than the minimum of 0"),
+            "ManagerPayout": 10}]},
+            "'ManagerPayout' was unexpected"),
 ])
 def test_json_validator_payments_percent_schema_error(json_input, expected_error):
     with pytest.raises(ValidationError) as e:
@@ -454,9 +454,29 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                     "AccountAddress": "ronin:<account_s1_address>",
                     "ScholarPayoutAddress": "ronin:<scholar_address>",
                     "ScholarPercent": 60,
+                    "ScholarPayout": 100,
+                    "TrainerPayoutAddress": "ronin:<trainer_address>",
+                    "TrainerPercent": 10
+                },
+                {
+                    "Name": "Scholar 2",
+                    "AccountAddress": "ronin:<account_s2_address>",
+                    "ScholarPayoutAddress": "ronin:<scholar2_address>",
+                    "ScholarPercent": 45
+                }
+            ]}),
+         ({
+            "Manager": "ronin:<Manager address here>",
+            "Scholars": [
+                {
+                    "Name": "Scholar 1",
+                    "AccountAddress": "ronin:<account_s1_address>",
+                    "ScholarPayoutAddress": "ronin:<scholar_address>",
+                    "ScholarPercent": 60,
+                    "ScholarPayout": 100,
                     "TrainerPayoutAddress": "ronin:<trainer_address>",
                     "TrainerPercent": 10,
-                    "ManagerPayout": 90
+                    "TrainerPayout": 100,
                 },
                 {
                     "Name": "Scholar 2",

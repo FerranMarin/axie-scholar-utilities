@@ -421,8 +421,8 @@ def test_payments_manager_prepare_payout_check_correct_calcs_percent(mocked_prep
     p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":45,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10,'
-                  '"ManagerPayout":400}], "Donations":[{"Name":"Entity 1",'
+                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10}],'
+                  '"Donations":[{"Name":"Entity 1",'
                   '"AccountAddress": "'+dono_acc+'","Percent":1}]}'))
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
@@ -451,8 +451,8 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent(mocked_e
     p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
                   '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
                   '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":45,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10,'
-                  '"ManagerPayout":400}], "Donations":[{"Name":"Entity 1",'
+                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10}],'
+                  '"Donations":[{"Name":"Entity 1",'
                   '"AccountAddress": "'+dono_acc+'","Percent":1}]}'))
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
@@ -460,7 +460,7 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent(mocked_e
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_check_balance.assert_called()
-    mocked_enough_balance.assert_called_with(scholar_acc, 950)
+    mocked_enough_balance.assert_called_with(scholar_acc, 1000)
     assert mocked_get_nonce.call_count == 6
     mocked_payout.assert_called_once()
     # 1st payment
@@ -492,9 +492,40 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent(mocked_e
     assert mocked_payout.call_args[0][1][4].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][4].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][4].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][4].amount == 400 - round(1000*0.01) - round(450*0.01)
+    assert mocked_payout.call_args[0][1][4].amount == 1000 - 550 - round(1000*0.01) - round(450*0.01)
     assert mocked_payout.call_args[0][1][4].nonce == 5
     assert len(mocked_payout.call_args[0][1]) == 5
+
+
+@patch("axie.payments.check_balance", return_value=0)
+@patch("axie.payments.get_nonce", return_value=1)
+@patch("axie.AxiePaymentsManager.payout_account")
+@patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
+def test_payments_manager_prepare_payout_check_correct_payments_percent_no_balance(mocked_enough_balance,
+                                                                                   mocked_payout,
+                                                                                   mocked_get_nonce,
+                                                                                   mocked_check_balance,
+                                                                                   tmpdir):
+    p_file = tmpdir.join("p.json")
+    scholar_acc = 'ronin:12345678900987654321' + "".join([str(x) for x in range(10)]*2)
+    manager_acc = 'ronin:12345678900987000321' + "".join([str(x) for x in range(10)]*2)
+    dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
+                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
+                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":45,'
+                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10}],'
+                  '"Donations":[{"Name":"Entity 1",'
+                  '"AccountAddress": "'+dono_acc+'","Percent":1}]}'))
+    s_file = tmpdir.join("s.json")
+    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    axp = AxiePaymentsManager(p_file, s_file)
+    axp.verify_inputs()
+    axp.prepare_payout()
+    mocked_check_balance.assert_called()
+    mocked_enough_balance.assert_called_with(scholar_acc, 0)
+    assert mocked_get_nonce.call_count == 3
+    mocked_payout.assert_not_called()
 
 
 @patch("axie.payments.get_nonce", return_value=100)

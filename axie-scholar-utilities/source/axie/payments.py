@@ -294,10 +294,10 @@ class AxiePaymentsManager:
 
     def prepare_payout_percent(self):
         for acc in self.scholar_accounts:
+            acc_balance = check_balance(acc['AccountAddress'])
             total_payments = 0
             total_dono = 0
             acc_payments = []
-            acc_balance = check_balance(acc['AccountAddress'])
             # Scholar Payment
             scholar_amount = acc_balance * (acc["ScholarPercent"]/100)
             scholar_amount += acc.get("ScholarPayout", 0)
@@ -330,9 +330,7 @@ class AxiePaymentsManager:
                 ))
                 total_payments += trainer_amount
                 nonce += 1
-            manager_payout = acc.get("ManagerPayout")
-            if not manager_payout:
-                manager_payout = acc_balance - total_payments
+            manager_payout = acc_balance - total_payments
             if self.donations:
                 # Extra Donations
                 for dono in self.donations:
@@ -367,19 +365,22 @@ class AxiePaymentsManager:
                 manager_payout -= fee_amount
                 total_payments += fee_amount
                 nonce += 1
-            # Manager Payment
-            acc_payments.append(Payment(
-                f"Payment to manager of {acc['Name']}",
-                "manager",
-                acc["AccountAddress"],
-                self.secrets_file[acc["AccountAddress"]],
-                self.manager_acc,
-                manager_payout,
-                self.summary,
-                nonce
-            ))
-            total_payments += manager_payout
-            if self.check_acc_has_enough_balance(acc['AccountAddress'], total_payments):
+                # Manager Payment
+                if manager_payout > 0:
+                    acc_payments.append(Payment(
+                        f"Payment to manager of {acc['Name']}",
+                        "manager",
+                        acc["AccountAddress"],
+                        self.secrets_file[acc["AccountAddress"]],
+                        self.manager_acc,
+                        manager_payout,
+                        self.summary,
+                        nonce
+                    ))
+                    total_payments += manager_payout
+                else:
+                    logging.info("Important: Skipping manager payout as it resulted in 0 SLP.")
+            if self.check_acc_has_enough_balance(acc['AccountAddress'], total_payments) and acc_balance > 0:
                 self.payout_account(acc['Name'], acc_payments)
             else:
                 logging.info(f"Important: Skipping payments for account '{acc['Name']}'. "

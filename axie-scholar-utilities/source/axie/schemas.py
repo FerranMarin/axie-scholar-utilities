@@ -145,10 +145,6 @@ payments_percent_schema = {
                         "type": "number",
                         "minimum": 0,
                         "maximum": 98
-                    },
-                    "ManagerPayout": {
-                        "type": "number",
-                        "minimum": 0
                     }
                 },
                 "additionalProperties": False
