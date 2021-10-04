@@ -7,7 +7,9 @@ When you have installed this tool using poetry. You will need to add a 2 files i
 
 Check the format on the index page of this wiki, but in general what I recommend you do is:
 
-1. Download the payments file from [here](https://axie.management/tracker/payments). I recomend re-naming the file to payments.json. If you do not get it from there, you will need to build it yourself.
+1. Download the payments file from [here](https://axie.management/tracker/payments). I recomend re-naming the file to payments.json. If you do not get it from there, you will need to build it yourself. If you are planning to use percent payments, in that case, please just have a payments.json that only contains this inside:
+
+        { }
 
 2. Have a secrets.json file that only contains this inside:
 
@@ -20,6 +22,14 @@ To help in generating secrets, you simply need to execute this command from the 
     poetry run python axie_scholar_cli.py generate_secrets payments.json secrets.json
 
 This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
+
+## Payments Generation
+
+To help in generating payments json, you simply need to execute this command from the source folder.
+
+    poetry run python axie_scholar_cli.py generate_payments payments.csv payments.json
+
+This will ask for your manager ronin and then create a payments file according to what you setup in payments.csv. It can be named anything, just have it in the files folder and use the same name in the command.
 
 ## Mass Update Secrets
 
