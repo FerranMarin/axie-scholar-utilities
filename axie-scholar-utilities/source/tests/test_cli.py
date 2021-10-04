@@ -1,5 +1,6 @@
 import sys
 import builtins
+import json
 
 from docopt import docopt, DocoptExit
 from mock import patch
@@ -23,6 +24,7 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": True}),
                             (["payout", "file1", "file2", "-y"],
                              {"--help": False,
@@ -37,6 +39,7 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": True}),
                             (["payout", "file1", "file2", "--yes"],
                              {"--help": False,
@@ -51,6 +54,7 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": True}),
                             (["claim", "file1", "file2"],
                              {"--help": False,
@@ -65,6 +69,7 @@ import axie_scholar_cli as cli
                               "claim": True,
                               "generate_QR": False,
                               "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": False}),
                             (["generate_QR", "file1"],
                              {"--help": False,
@@ -79,6 +84,7 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": True,
                               "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": False}),
                             (["generate_secrets", "file1"],
                              {"--help": False,
@@ -93,6 +99,7 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": True,
+                              'generate_payments': False,
                               "payout": False}),
                             (["generate_secrets", "file1", "file2"],
                              {"--help": False,
@@ -107,6 +114,7 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": True,
+                              'generate_payments': False,
                               "payout": False}),
                             (["transfer_axies", "file1", "file2"],
                              {"--help": False,
@@ -121,6 +129,7 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": False}),
                             (["mass_update_secrets", "file1", "file2"],
                              {"--help": False,
@@ -135,6 +144,37 @@ import axie_scholar_cli as cli
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["generate_payments", "file1", "file2"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "<payments_file>": "file2",
+                              "<secrets_file>": None,
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': "file1",
+                              'mass_update_secrets': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              'generate_payments': True,
+                              "payout": False}),
+                            (["generate_payments", "file1"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "<payments_file>": None,
+                              "<secrets_file>": None,
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': "file1",
+                              'mass_update_secrets': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              'generate_payments': True,
                               "payout": False})
                          ])
 def test_parses_params(params, expected_result):
@@ -157,41 +197,34 @@ def test_parses_params(params, expected_result):
                             (["claim", "file1"]),
                             (["payout"]),
                             (["payout", "file1"]),
-                            (["payout", "file1", "file2", "file3"])
+                            (["payout", "file1", "file2", "file3"]),
+                            (["generate_payments", "file1", "file2", "file3"]),
+                            (["generate_payments"]),
                          ])
 def test_wrong_inputs(params):
     with pytest.raises(DocoptExit):
         docopt(cli.__doc__, params)
 
 
-def test_payout_file_check_fail(capsys):
-    with pytest.raises(Exception) as e:
-        with patch.object(sys, 'argv', ["", "payout", "p_file.json", "s_file.json"]):
-            cli.run_cli()
-            out, _ = capsys.readouterr()
-            assert "CRITICAL: Please provide a correct path to the Payments file. Path provided: p_file.json" in out
-            assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
-    assert str(e.value) == "Please review your file paths and re-try."
+def test_payout_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "payout", "p_file.json", "s_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: p_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
 
 
-def test_secret_gen_file_check_fail(capsys):
-    with pytest.raises(Exception) as e:
-        with patch.object(sys, 'argv', ["", "generate_secrets", "p_file.json", "s_file.json"]):
-            cli.run_cli()
-            out, _ = capsys.readouterr()
-            assert "CRITICAL: Please provide a correct path to the Payments file. Path provided: p_file.json" in out
-            assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
-    assert str(e.value) == "Please review your file paths and re-try."
+def test_secret_gen_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "generate_secrets", "p_file.json", "s_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: s_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
 
 
-def test_secret_gen_file_check_fail_only_payment_file(capsys):
-    with pytest.raises(Exception) as e:
-        with patch.object(sys, 'argv', ["", "generate_secrets", "p_file.json"]):
-            cli.run_cli()
-            out, _ = capsys.readouterr()
-            assert "CRITICAL: Please provide a correct path to the Payments file. Path provided: p_file.json" in out
-            assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" not in out
-    assert str(e.value) == "Please review your file paths and re-try."
+def test_secret_gen_file_check_fail_only_payment_file(caplog):
+    with patch.object(sys, 'argv', ["", "generate_secrets", "p_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: p_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
 
 
 @pytest.mark.parametrize("params",
@@ -237,6 +270,56 @@ def test_generate_secrets_already_there(tmpdir):
     with patch.object(builtins, 'input', lambda _: 'some_input'):
         cli.generate_secrets_file(f1.strpath, f2.strpath)
     assert f2.read() == expected_out
+
+
+def test_generate_payments_file(tmpdir):
+    f1 = tmpdir.mkdir("other_folder").join("file1.csv")
+    f1.write('Name,AccountAddress,ScholarPayoutAddress,ScholarPercent,ScholarPayout\n'
+             'Test1,ronin:abc1,ronin:abc_scholar1,50,\n'
+             'Test2,ronin:abc2,ronin:abc_scholar2,50,\n'
+             'Test3,ronin:abc3,ronin:abc_scholar3,50,\n'
+             'Test4,ronin:abc4,ronin:abc_scholar4,50,\n'
+             'Test5,ronin:abc5,ronin:abc_scholar5,50,100\n')
+    f2 = tmpdir.join("other_folder/payments.json")
+    f2.write('{}')
+    with patch.object(builtins, 'input', lambda _: 'ronin:9fa1bc784c665e683597d3f29375e45786617550'):
+        cli.generate_payments_file(f1.strpath, f2.strpath)
+    print(json.loads(f2.read()))
+    assert json.loads(f2.read()) == {
+        'Manager': 'ronin:9fa1bc784c665e683597d3f29375e45786617550',
+        'Scholars': [{
+                'Name': 'Test1',
+                'AccountAddress': 'ronin:abc1',
+                'ScholarPayoutAddress': 'ronin:abc_scholar1',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test2',
+                'AccountAddress': 'ronin:abc2',
+                'ScholarPayoutAddress': 'ronin:abc_scholar2',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test3',
+                'AccountAddress': 'ronin:abc3',
+                'ScholarPayoutAddress': 'ronin:abc_scholar3',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test4',
+                'AccountAddress': 'ronin:abc4',
+                'ScholarPayoutAddress': 'ronin:abc_scholar4',
+                'ScholarPercent': 50
+            },
+            {
+                'Name': 'Test5',
+                'AccountAddress': 'ronin:abc5',
+                'ScholarPayoutAddress': 'ronin:abc_scholar5',
+                'ScholarPercent': 50,
+                'ScholarPayout': 100
+            }
+        ]
+    }
 
 
 def test_generate_secrets_partially_there(tmpdir):
@@ -296,24 +379,18 @@ def test_claim(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, tmpd
     mock_claimsmanager.assert_called_with(str(f1), str(f2))
 
 
-def test_claim_file_check_fail(capsys):
-    with pytest.raises(Exception) as e:
-        with patch.object(sys, 'argv', ["", "claim", "p_file.json", "s_file.json"]):
-            cli.run_cli()
-            out, _ = capsys.readouterr()
-            assert "CRITICAL: Please provide a correct path to the Payments file. Path provided: p_file.json" in out
-            assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
-    assert str(e.value) == "Please review your file paths and re-try."
+def test_claim_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "claim", "p_file.json", "s_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: p_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
 
 
-def test_transfer_file_check_fail(capsys):
-    with pytest.raises(Exception) as e:
-        with patch.object(sys, 'argv', ["", "transfer_axies", "t_file.json", "s_file.json"]):
-            cli.run_cli()
-            out, _ = capsys.readouterr()
-            assert "CRITICAL: Please provide a correct path to the Payments file. Path provided: t_file.json" in out
-            assert "CRITICAL: Please provide a correct path to the Secrets file. Path provided: s_file.json" in out
-    assert str(e.value) == "Please review your file paths and re-try."
+def test_transfer_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "transfer_axies", "t_file.json", "s_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: t_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
 
 
 @patch("axie.AxieTransferManager.__init__", return_value=None)

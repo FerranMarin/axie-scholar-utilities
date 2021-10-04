@@ -52,7 +52,8 @@ payments_schema = {
                         "type": "number",
                         "minimum": 1
                     }
-                }
+                },
+                "additionalProperties": False
             }
         },
         "Donations": {
@@ -77,11 +78,108 @@ payments_schema = {
                         "minimum": 0.01,
                         "maximum": 1
                     }
-                }
+                },
+                "additionalProperties": False
             }
         }
-    }
+    },
+    "additionalProperties": False
 }
+
+
+payments_percent_schema = {
+    "type": "object",
+    "required": [
+        "Manager",
+        "Scholars"
+    ],
+    "properties": {
+        "Manager": {
+            "type": "string",
+            "pattern": "^ronin:"
+        },
+        "Scholars": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "Name",
+                    "AccountAddress",
+                    "ScholarPayoutAddress",
+                    "ScholarPercent"
+                ],
+                "dependencies": {
+                    "TrainerPayoutAddress": ["TrainerPercent"],
+                    "TrainerPercent": ["TrainerPayoutAddress"]
+                },
+                "properties": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "AccountAddress": {
+                        "type": "string",
+                        "pattern": "^ronin:"
+                    },
+                    "ScholarPayoutAddress": {
+                        "type": "string",
+                        "pattern": "^ronin:"
+                    },
+                    "ScholarPayout": {
+                        "type": "number",
+                        "minimum": 1
+                    },
+                    "ScholarPercent": {
+                        "type": "number",
+                        "minimum": 40,
+                        "maximum": 99
+                    },
+                    "TrainerPayoutAddress": {
+                        "type": "string",
+                        "pattern": "^ronin:"
+                    },
+                    "TrainerPayout": {
+                        "type": "number",
+                        "minimum": 1
+                    },
+                    "TrainerPercent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 98
+                    }
+                },
+                "additionalProperties": False
+            }
+        },
+        "Donations": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "Name",
+                    "AccountAddress",
+                    "Percent"
+                ],
+                "properties": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "AccountAddress": {
+                        "type": "string",
+                        "pattern": "^ronin:"
+                    },
+                    "Percent": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 100
+                    }
+                },
+                "additionalProperties": False
+            }
+        }
+    },
+    "additionalProperties": False
+}
+
 
 transfers_schema = {
     "type": "array",

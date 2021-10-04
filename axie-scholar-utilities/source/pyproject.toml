@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Axie Scholar Utilities"
-version = "1.6.1"
+version = "1.7.0"
 description = "Package to automate activites related to manage Axie Infinity Scholars. Specially aimed at managers with large scholar roasters."
 authors = ["Ferran Marin <ferran.marin.llobet@gmail.com>"]
 license = "GPL-3.0"
