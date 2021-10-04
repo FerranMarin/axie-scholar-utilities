@@ -524,7 +524,7 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent_no_balan
     axp.prepare_payout()
     mocked_check_balance.assert_called()
     mocked_enough_balance.assert_called_with(scholar_acc, 0)
-    assert mocked_get_nonce.call_count == 3
+    assert mocked_get_nonce.call_count == 2
     mocked_payout.assert_not_called()
 
 
