@@ -318,18 +318,19 @@ class AxiePaymentsManager:
                 trainer_amount = acc_balance * (acc["TrainerPercent"]/100)
                 trainer_amount += acc.get("TrainerPayout", 0)
                 trainer_amount = round(trainer_amount)
-                acc_payments.append(Payment(
-                    f"Payment to trainer of {acc['Name']}",
-                    "trainer",
-                    acc["AccountAddress"],
-                    self.secrets_file[acc["AccountAddress"]],
-                    acc["TrainerPayoutAddress"],
-                    trainer_amount,
-                    self.summary,
-                    nonce
-                ))
-                total_payments += trainer_amount
-                nonce += 1
+                if trainer_amount > 0:
+                    acc_payments.append(Payment(
+                        f"Payment to trainer of {acc['Name']}",
+                        "trainer",
+                        acc["AccountAddress"],
+                        self.secrets_file[acc["AccountAddress"]],
+                        acc["TrainerPayoutAddress"],
+                        trainer_amount,
+                        self.summary,
+                        nonce
+                    ))
+                    total_payments += trainer_amount
+                    nonce += 1
             manager_payout = acc_balance - total_payments
             if self.donations:
                 # Extra Donations
