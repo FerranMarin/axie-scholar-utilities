@@ -352,7 +352,7 @@ class AxiePaymentsManager:
                         nonce += 1
             # Fee Payments
             fee_amount = round(acc_balance * 0.01)
-            if fee_amount > 1:
+            if fee_amount > 0:
                 acc_payments.append(Payment(
                             f"Donation to software creator for {acc['Name']}",
                             "donation",
