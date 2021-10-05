@@ -53,11 +53,11 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
             try:
                 int(msg[6:], 16)
             except ValueError:
-                continue    
+                continue
             manager_acc = msg
         else:
             logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
-    
+
     with open(csv_file_path) as csv_file:
         reader = csv.DictReader(csv_file)
         scholars_list = []
@@ -66,12 +66,12 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
             integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
             clean_row.update(integer_row)
             scholars_list.append(clean_row)
-    
+
     payments_dict = {"Manager": manager_acc, "Scholars": scholars_list}
 
     with open(payments_file_path, 'w', encoding='utf-8') as f:
         json.dump(payments_dict, f, ensure_ascii=False, indent=4)
-    log.info(f'New payments file saved')
+    log.info('New payments file saved')
 
 
 def generate_secrets_file(payments_file_path, secrets_file_path=None):
@@ -94,10 +94,10 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
                 new_secret = input(msg)
             secrets[acc['AccountAddress']] = new_secret
     if changed:
-        logging.info(f'Saving secrets file')
+        logging.info('Saving secrets file')
         with open(secrets_file_path, 'w', encoding='utf-8') as f:
             json.dump(secrets, f, ensure_ascii=False, indent=4)
-        logging.info(f'File saved!')
+        logging.info('File saved!')
     else:
         logging.info('Secrets file already had all needed secrets!')
 
@@ -138,7 +138,7 @@ def run_cli():
             apm.verify_inputs()
             apm.prepare_payout()
         else:
-           logging.critical("Please review your file paths and re-try.") 
+            logging.critical("Please review your file paths and re-try.")
     elif args['claim']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
@@ -155,10 +155,10 @@ def run_cli():
         logging.info('I shall help you generate your secrets file')
         payments_file_path = args['<payments_file>']
         secrets_file_path = args.get('<secrets_file>')
-        if (secrets_file_path and check_file(secrets_file_path) and check_file(payments_file_path) or 
-        not secrets_file_path and check_file(payments_file_path)):
+        if (secrets_file_path and check_file(secrets_file_path) and check_file(payments_file_path) or
+           not secrets_file_path and check_file(payments_file_path)):
             logging.info('If you do not know how to get your private keys, check: '
-                        'https://ferranmarin.github.io/axie-scholar-utilities/pages/faq.html')
+                         'https://ferranmarin.github.io/axie-scholar-utilities/pages/faq.html')
             generate_secrets_file(payments_file_path, secrets_file_path)
         else:
             logging.critical("Please review your file paths and re-try.")
@@ -184,11 +184,11 @@ def run_cli():
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_payments']:
         # Generate Payments File
-        logging.info('I shall help you mass update your secrets file')
+        logging.info('I shall help you generate your payments file')
         csv_file_path = args['<csv_file>']
         payments_file_path = args.get('<payments_file>')
-        if (payments_file_path and check_file(payments_file_path) and check_file(csv_file_path) or 
-            not payments_file_path and check_file(csv_file_path)):
+        if (payments_file_path and check_file(payments_file_path) and
+           check_file(csv_file_path) or not payments_file_path and check_file(csv_file_path)):
             generate_payments_file(csv_file_path, payments_file_path)
         else:
             logging.critical("Please review your file paths and re-try.")
