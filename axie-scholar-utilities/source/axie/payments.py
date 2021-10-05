@@ -366,21 +366,21 @@ class AxiePaymentsManager:
                 manager_payout -= fee_amount
                 total_payments += fee_amount
                 nonce += 1
-                # Manager Payment
-                if manager_payout > 0:
-                    acc_payments.append(Payment(
-                        f"Payment to manager of {acc['Name']}",
-                        "manager",
-                        acc["AccountAddress"],
-                        self.secrets_file[acc["AccountAddress"]],
-                        self.manager_acc,
-                        manager_payout,
-                        self.summary,
-                        nonce
-                    ))
-                    total_payments += manager_payout
-                else:
-                    logging.info("Important: Skipping manager payout as it resulted in 0 SLP.")
+            # Manager Payment
+            if manager_payout > 0:
+                acc_payments.append(Payment(
+                    f"Payment to manager of {acc['Name']}",
+                    "manager",
+                    acc["AccountAddress"],
+                    self.secrets_file[acc["AccountAddress"]],
+                    self.manager_acc,
+                    manager_payout,
+                    self.summary,
+                    nonce
+                ))
+                total_payments += manager_payout
+            else:
+                logging.info("Important: Skipping manager payout as it resulted in 0 SLP.")
             if self.check_acc_has_enough_balance(acc['AccountAddress'], total_payments) and acc_balance > 0:
                 self.payout_account(acc['Name'], acc_payments)
             else:
