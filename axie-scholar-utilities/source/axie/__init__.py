@@ -1,4 +1,4 @@
-__version__ = '1.7.0'
+__version__ = '1.7.1'
 __all__ = ['AxiePaymentsManager', 'AxieClaimsManager', 'AxieTransferManager']
 
 from axie.payments import AxiePaymentsManager
