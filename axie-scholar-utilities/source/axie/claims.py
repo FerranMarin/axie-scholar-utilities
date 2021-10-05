@@ -83,8 +83,8 @@ class Claim:
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise Exception(f"Error! Getting JWT! Error: {e}")
-        if (not response.json()['data'].get('createAccessTokenWithSignature') or 
-            not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
+        if (not response.json()['data'].get('createAccessTokenWithSignature') or
+           not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
             raise Exception("Could not retreive JWT, probably your private key for this account is wrong. "
                             f"Account: {self.account}")
         return response.json()['data']['createAccessTokenWithSignature']['accessToken']
@@ -95,7 +95,7 @@ class Claim:
             logging.info(f"Important: Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
             return
         logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
-                      f"{unclaimed} unclaimed SLP")
+                     f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         headers = {
             "User-Agent": self.user_agent,
