@@ -68,7 +68,7 @@ def test_transfer_manager_prepare_transfers(mocked_execute_transfers,
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.contract")
-@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.wait_for_transaction_receipt", return_value={'status': 1})
 async def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             mock_contract,
                                             mock_keccak,

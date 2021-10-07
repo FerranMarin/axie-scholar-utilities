@@ -131,7 +131,7 @@ class Claim:
         # Wait for transaction to finish
         while True:
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.wait_for_transaction_receipt(hash)
                 if recepit["status"] == 1:
                     success = True
                 else:

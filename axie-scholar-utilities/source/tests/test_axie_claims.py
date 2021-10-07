@@ -400,7 +400,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
 @pytest.mark.asyncio
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
-@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.wait_for_transaction_receipt", return_value={'status': 1})
 @patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
 @patch("web3.eth.Eth.account.sign_transaction")
 @patch("axie.claims.get_nonce", return_value=1)
@@ -470,7 +470,7 @@ async def test_execution(mocked_provider,
 @pytest.mark.asyncio
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
-@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
+@patch("web3.eth.Eth.wait_for_transaction_receipt", return_value={'status': 1})
 @patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
 @patch("web3.eth.Eth.account.sign_transaction")
 @patch("axie.claims.get_nonce", return_value=1)
