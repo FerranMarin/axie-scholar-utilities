@@ -71,7 +71,7 @@ class Transfer:
                 success = True
             else:
                 success = False
-        except exceptions.TransactionNotFound:
+        except exceptions.TimeExhausted:
             logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{self.nonce})...")
             # Sleep 5 seconds not to constantly send requests!
             await asyncio.sleep(5)

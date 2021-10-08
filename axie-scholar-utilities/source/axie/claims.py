@@ -135,7 +135,7 @@ class Claim:
                 success = True
             else:
                 success = False
-        except exceptions.TransactionNotFound:
+        except exceptions.TimeExhausted:
             logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
                               f"(Nonce:{nonce}) (Hash: {hash})...")
                 # Sleep 5 seconds not to constantly send requests!
