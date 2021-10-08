@@ -77,7 +77,6 @@ class Payment:
                 success = True
             else:
                 success = False
-            break
         except exceptions.TransactionNotFound:
             logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{self.nonce})...")
             # Sleep 5 seconds not to constantly send requests!

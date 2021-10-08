@@ -135,7 +135,6 @@ class Claim:
                 success = True
             else:
                 success = False
-            break
         except exceptions.TransactionNotFound:
             logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
                               f"(Nonce:{nonce}) (Hash: {hash})...")
