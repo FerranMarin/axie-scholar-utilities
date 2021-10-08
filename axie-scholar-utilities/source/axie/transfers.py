@@ -65,18 +65,17 @@ class Transfer:
         # get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
         # Wait for transaction to finish
-        while True:
-            try:
-                recepit = self.w3.eth.wait_for_transaction_receipt(hash)
-                if recepit["status"] == 1:
-                    success = True
-                else:
-                    success = False
-                break
-            except exceptions.TransactionNotFound:
-                logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{self.nonce})...")
-                # Sleep 5 seconds not to constantly send requests!
-                await asyncio.sleep(5)
+        try:
+            recepit = self.w3.eth.wait_for_transaction_receipt(hash)
+            if recepit["status"] == 1:
+                success = True
+            else:
+                success = False
+            break
+        except exceptions.TransactionNotFound:
+            logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{self.nonce})...")
+            # Sleep 5 seconds not to constantly send requests!
+            await asyncio.sleep(5)
         if success:
              logging.info(f"Important: {self} completed! Hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
         else:

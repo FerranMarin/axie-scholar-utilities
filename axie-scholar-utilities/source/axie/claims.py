@@ -129,19 +129,18 @@ class Claim:
         # Get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
         # Wait for transaction to finish
-        while True:
-            try:
-                recepit = self.w3.eth.wait_for_transaction_receipt(hash)
-                if recepit["status"] == 1:
-                    success = True
-                else:
-                    success = False
-                break
-            except exceptions.TransactionNotFound:
-                logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
+        try:
+            recepit = self.w3.eth.wait_for_transaction_receipt(hash)
+            if recepit["status"] == 1:
+                success = True
+            else:
+                success = False
+            break
+        except exceptions.TransactionNotFound:
+            logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
                               f"(Nonce:{nonce}) (Hash: {hash})...")
                 # Sleep 5 seconds not to constantly send requests!
-                await asyncio.sleep(5)
+            await asyncio.sleep(5)
         if success:
             logging.info(f"Important: SLP Claimed! New balance for account ({self.account.replace('0x', 'ronin:')}) is:"
                          f" {check_balance(self.account)}")
