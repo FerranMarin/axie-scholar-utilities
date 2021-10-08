@@ -1,6 +1,6 @@
 """ Axie Scholar Utilities CLI.
 This tool will help you perform various actions.
-They are: payout, claim, generate_secrets, generate_QR
+They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR, transfer_axies
 
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
