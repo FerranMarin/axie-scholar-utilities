@@ -105,7 +105,7 @@ class AxieTransferManager:
         # Check we have private keys for all accounts
         for acc in self.transfers_file:
             if acc["AccountAddress"] not in self.secrets_file:
-                logging.critical(f"Account '{acc['Name']}' is not present in secret file, please add it.")
+                logging.critical(f"Account '{acc['AccountAddress']}' is not present in secret file, please add it.")
                 validation_success = False
         for sf in self.secrets_file:
             if len(self.secrets_file[sf]) != 66 or self.secrets_file[sf][:2] != "0x":
