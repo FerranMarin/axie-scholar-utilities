@@ -21,7 +21,7 @@ logger.addHandler(file_handler)
 
 
 class Claim:
-    def __init__(self, account, private_key):
+    def __init__(self, account, private_key, acc_name):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         with open("axie/slp_abi.json") as f:
             slp_abi = json.load(f)
@@ -31,6 +31,7 @@ class Claim:
         )
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
+        self.acc_name = acc_name
         self.user_agent = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) "
                            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36")
 
@@ -40,7 +41,8 @@ class Claim:
             response = requests.get(url, headers={"User-Agent": self.user_agent})
             response.raise_for_status()
         except requests.exceptions.HTTPError:
-            logging.critical("Failed to check if there is unclaimed SLP")
+            logging.critical(f"Failed to check if there is unclaimed SLP for acc {self.acc_name} "
+                             f"({self.account.replace('0x','ronin:')})")
             return None
         return int(response.json()['total'])
 
@@ -86,13 +88,14 @@ class Claim:
         if (not response.json()['data'].get('createAccessTokenWithSignature') or
            not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
             raise Exception("Could not retreive JWT, probably your private key for this account is wrong. "
-                            f"Account: {self.account}")
+                            f"Account: {self.account.replace('0x','ronin:')} \n AccountName: {self.acc_name}")
         return response.json()['data']['createAccessTokenWithSignature']['accessToken']
 
     async def execute(self):
         unclaimed = self.has_unclaimed_slp()
         if not unclaimed:
-            logging.info(f"Important: Account {self.account.replace('0x', 'ronin:')} has no claimable SLP")
+            logging.info(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+                         "has no claimable SLP")
             return
         logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
                      f"{unclaimed} unclaimed SLP")
@@ -106,11 +109,12 @@ class Claim:
             response = requests.post(url, headers=headers, json="")
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            raise Exception("Error! Executing SLP claim API call for account "
-                            f"{self.account.replace('0x', 'ronin:')}. Error {e}")
+            raise Exception(f"Error! Executing SLP claim API call for account {self.acc_name}"
+                            f"({self.account.replace('0x', 'ronin:')}). Error {e}")
         signature = response.json()["blockchain_related"].get("signature")
         if not signature or not signature["signature"]:
-            raise Exception(f"Account {self.account.replace('0x', 'ronin:')} had no signature in blockchain_related")
+            raise Exception(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
+                            "in blockchain_related")
         nonce = get_nonce(self.account)
         # Build claim
         claim = self.slp_contract.functions.checkpoint(
@@ -138,29 +142,32 @@ class Claim:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.debug(f"Waiting for claim for '{self.account.replace('0x', 'ronin:')}' to finish "
-                              f"(Nonce:{nonce}) (Hash: {hash})...")
+                logging.debug(f"Waiting for claim for {self.acc_name} ({self.account.replace('0x', 'ronin:')}) to "
+                              f"finish (Nonce:{nonce}) (Hash: {hash})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:
-            logging.info(f"Important: SLP Claimed! New balance for account ({self.account.replace('0x', 'ronin:')}) is:"
-                         f" {check_balance(self.account)}")
+            logging.info(f"Important: SLP Claimed! New balance for account {self.acc_name} "
+                         f"({self.account.replace('0x', 'ronin:')}) is: {check_balance(self.account)}")
         else:
-            logging.info(f"Important: Claim for account ({self.account.replace('0x', 'ronin:')}) failed")
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+                         "failed")
 
 
 class AxieClaimsManager:
     def __init__(self, payments_file, secrets_file):
-        self.secrets_file = self.load_secrets(secrets_file, payments_file)
+        self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(secrets_file, payments_file)
 
-    def load_secrets(self, secrets_file, payments_file):
+    def load_secrets_and_acc_name(self, secrets_file, payments_file):
         secrets = load_json(secrets_file)
         payments = load_json(payments_file)
         refined_secrets = {}
+        acc_names = {}
         for scholar in payments['Scholars']:
             key = scholar['AccountAddress']
             refined_secrets[key] = secrets[key]
-        return refined_secrets
+            acc_names[key] = scholar['Name']
+        return refined_secrets, acc_names
 
     def verify_inputs(self):
         validation_success = True
@@ -181,7 +188,7 @@ class AxieClaimsManager:
         logging.info("Secret file correctly validated")
 
     def prepare_claims(self):
-        claims_list = [Claim(acc, self.secrets_file[acc]) for acc in self.secrets_file]
+        claims_list = [Claim(acc, self.secrets_file[acc], self.acc_names[acc]) for acc in self.secrets_file]
         logging.info("Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))

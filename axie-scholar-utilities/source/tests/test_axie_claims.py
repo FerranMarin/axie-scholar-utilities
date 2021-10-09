@@ -14,12 +14,12 @@ from axie.claims import Claim, RONIN_PROVIDER_FREE, SLP_CONTRACT
 from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 
 
-@patch("axie.AxieClaimsManager.load_secrets")
-def test_claims_manager_init(mocked_load_secrets):
+@patch("axie.AxieClaimsManager.load_secrets_and_acc_name", return_value=("foo", "bar"))
+def test_claims_manager_init(mocked_load_secrets_and_acc_name):
     secrets_file = "sample_secrets_file.json"
     payments_file = "sample_payments_file.json"
     AxieClaimsManager(payments_file, secrets_file)
-    mocked_load_secrets.assert_called_with(secrets_file, payments_file)
+    mocked_load_secrets_and_acc_name.assert_called_with(secrets_file, payments_file)
 
 
 def test_claims_manager_verify_input_success(tmpdir):
@@ -193,12 +193,13 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):
-        c = Claim("ronin:foo", "bar")
+        c = Claim("ronin:foo", "bar", "test_acc")
     mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     assert c.private_key == "bar"
     assert c.account == "0xfoo"
+    assert c.acc_name == "test_acc"
 
 
 @patch("web3.eth.Eth.contract")
@@ -214,7 +215,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='{"foo": "bar"}')):
-            c = Claim("ronin:foo", "0xbar")
+            c = Claim("ronin:foo", "0xbar", "test_acc")
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed == 12
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
@@ -232,7 +233,7 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='{"foo": "bar"}')):
-            c = Claim("ronin:foo", "0xbar")
+            c = Claim("ronin:foo", "0xbar", "test_acc")
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed is None
             assert "Failed to check if there is unclaimed SLP" in caplog.text
@@ -245,7 +246,7 @@ def test_create_random_msg():
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createRandomMessage": "random_msg"}})
-        resp = Claim("ronin:foo", "0xbar").create_random_msg()
+        resp = Claim("ronin:foo", "0xbar", "test_acc").create_random_msg()
         assert resp == "random_msg"
 
 
@@ -254,7 +255,7 @@ def test_create_random_msg_fail_req():
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         status_code=500)
         with pytest.raises(Exception) as ex:
-            Claim("ronin:foo", "0xbar").create_random_msg()
+            Claim("ronin:foo", "0xbar", "test_acc").create_random_msg()
         assert str(ex.value) == ("Error! Creating random msg! "
                                  "Error: 500 Server Error: None for url: "
                                  "https://graphql-gateway.axieinfinity.com/graphql")
@@ -269,7 +270,7 @@ def test_get_jwt(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createAccessTokenWithSignature": {"accessToken": "test-token"}}})
-        c = Claim("ronin:foo", "0xbar")
+        c = Claim("ronin:foo", "0xbar", "test_acc")
         resp = c.get_jwt()
         assert resp == "test-token"
         expected_payload = {
@@ -302,7 +303,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         status_code=500)
-        c = Claim("ronin:foo", "0xbar")
+        c = Claim("ronin:foo", "0xbar", "test_acc")
         with pytest.raises(Exception) as e:
             c.get_jwt()
             expected_payload = {
@@ -336,7 +337,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
 def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _):
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", json={"data": {}})
-            c = Claim("ronin:foo", "0xbar")
+            c = Claim("ronin:foo", "0xbar", "test_acc")
             with pytest.raises(Exception) as e:
                 c.get_jwt()
                 expected_payload = {
@@ -355,7 +356,7 @@ def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_ms
                 }
                 assert req_mocker.request_history[0].json() == expected_payload
         assert str(e.value) == ("Could not retreive JWT, probably your private key for this account is wrong. "
-                                f"Account: {c.account}")
+                                f"Account: {c.account.replace('0x', 'ronin:')} \n AccountName: test_acc")
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -371,7 +372,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
         with requests_mock.Mocker() as req_mocker:
             req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", 
                             json={"data": {"createAccessTokenWithSignature": {}}})
-            c = Claim("ronin:foo", "0xbar")
+            c = Claim("ronin:foo", "0xbar", "test_acc")
             with pytest.raises(Exception) as e:
                 c.get_jwt()
                 expected_payload = {
@@ -390,7 +391,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
                 }
                 assert req_mocker.request_history[0].json() == expected_payload
         assert str(e.value) == ("Could not retreive JWT, probably your private key for this account is wrong. "
-                                f"Account: {c.account}")
+                                f"Account: {c.account.replace('0x', 'ronin:')} \n AccountName: test_acc")
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -441,7 +442,7 @@ async def test_execution(mocked_provider,
                     }
                 }
             )
-            c = Claim("ronin:foo", "0x00003A01C01173D676B64123")
+            c = Claim("ronin:foo", "0x00003A01C01173D676B64123", "test_acc")
             await c.execute()
     mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
@@ -459,11 +460,11 @@ async def test_execution(mocked_provider,
     mock_to_hex.assert_called_with("result_of_keccak")
     assert "Account ronin:foo has 456 unclaimed SLP" in caplog.text
     print(caplog.text)
-    assert "SLP Claimed! New balance for account (ronin:foo) is: 123" in caplog.text
+    assert "SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in caplog.text
     with open(LOG_FILE_PATH) as f:
         log_file = f.readlines()
         assert len(log_file) == 1
-    assert "Important: SLP Claimed! New balance for account (ronin:foo) is: 123" in log_file[0]
+    assert "Important: SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in log_file[0]
     await cleanup_log_file()
 
 
@@ -509,10 +510,10 @@ async def test_execution_failed_get_blockchain(mocked_provider,
                     }
                 }
             )
-            c = Claim("ronin:foo", "0x00003A01C01173D676B64123")
+            c = Claim("ronin:foo", "0x00003A01C01173D676B64123", "test_acc")
             with pytest.raises(Exception) as e:
                 await c.execute()
-            assert str(e.value) == "Account ronin:foo had no signature in blockchain_related"
+            assert str(e.value) == "Account test_acc (ronin:foo) had no signature in blockchain_related"
     mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
