@@ -2,7 +2,6 @@ import sys
 import asyncio
 import logging
 import json
-from time import sleep
 
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -78,12 +77,14 @@ class Transfer:
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:
-             logging.info(f"Important: {self} completed! Hash: {hash} - Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+             logging.info(f"Important: {self} completed! Hash: {hash} - "
+                          f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
         else:
              logging.info(f"Important: {self} failed")
 
     def __str__(self):
-        return f"Axie Transfer of axie ({self.axie_id}) from account ({self.from_acc.replace('0x', 'ronin:')}) to account ({self.to_acc.replace('0x', 'ronin:')})"
+        return (f"Axie Transfer of axie ({self.axie_id}) from account ({self.from_acc.replace('0x', 'ronin:')}) "
+                f"to account ({self.to_acc.replace('0x', 'ronin:')})")
 
 
 class AxieTransferManager:

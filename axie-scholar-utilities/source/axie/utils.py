@@ -3,10 +3,18 @@ import json
 import logging
 
 from web3 import Web3
+from requests.packages.urllib3.util.retry import Retry
+
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
 RONIN_PROVIDER = "https://api.roninchain.com/rpc"
+RETRIES = Retry(
+    total=5,
+    backoff_factor=2,
+    status_forcelist=[500, 502, 503, 504],
+    allowed_methods=frozenset(['GET', 'POST'])
+)
 
 
 class ImportantLogsFilter(logging.Filter):
