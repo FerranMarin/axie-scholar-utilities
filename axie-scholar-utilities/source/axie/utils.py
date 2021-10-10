@@ -13,8 +13,7 @@ RETRIES = Retry(
     total=5,
     backoff_factor=2,
     status_forcelist=[500, 502, 503, 504],
-    allowed_methods=frozenset(['GET', 'POST']),
-    raise_on_status=True
+    allowed_methods=frozenset(['GET', 'POST'])
 )
 
 

@@ -52,6 +52,7 @@ class Claim:
         except RetryError:
             logging.critical(f"Failed to check if there is unclaimed SLP for acc {self.acc_name} "
                              f"({self.account.replace('0x','ronin:')})")
+            return None
         if 200 <= response.status_code <= 299:
             return int(response.json()['total'])
         else:
@@ -68,6 +69,7 @@ class Claim:
             response = self.request.post(url, headers={"User-Agent": self.user_agent}, json=payload)
         except RetryError as e:
             logging.critical(f"Error! Creating random msg! Error: {e}")
+            return None
         if 200 <= response.status_code <= 299:
             return response.json()['data']['createRandomMessage']
         else:
@@ -99,7 +101,7 @@ class Claim:
             response =  self.request.post(url, headers={"User-Agent": self.user_agent}, json=payload)
         except RetryError as e:
             logging.critical(f"Error! Getting JWT! Error: {e}")
-
+            return None
         if 200 <= response.status_code <= 299:
             if (not response.json()['data'].get('createAccessTokenWithSignature') or
             not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
@@ -131,6 +133,7 @@ class Claim:
         except RetryError as e:
             logging.critical(f"Error! Executing SLP claim API call for account {self.acc_name}"
                             f"({self.account.replace('0x', 'ronin:')}). Error {e}")
+            return
         if 200 <= response.status_code <= 299:
             signature = response.json()["blockchain_related"].get("signature")
             if not signature or not signature["signature"]:
