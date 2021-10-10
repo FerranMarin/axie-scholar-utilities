@@ -4,10 +4,18 @@ import json
 import logging
 
 from eth_account.messages import encode_defunct
+from requests.adapters import HTTPAdapter
+from requests.exceptions import RetryError
 from web3 import Web3, exceptions
 import requests
 
-from axie.utils import check_balance, get_nonce, load_json, ImportantLogsFilter
+from axie.utils import (
+    check_balance,
+    get_nonce,
+    load_json,
+    ImportantLogsFilter,
+    RETRIES
+)
 
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
 RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
@@ -32,19 +40,22 @@ class Claim:
         self.account = account.replace("ronin:", "0x")
         self.private_key = private_key
         self.acc_name = acc_name
+        self.request = requests.Session()
+        self.request.mount('https://', HTTPAdapter(max_retries=RETRIES))
         self.user_agent = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) "
                            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36")
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
         try:
-            response = requests.get(url, headers={"User-Agent": self.user_agent})
-            response.raise_for_status()
-        except requests.exceptions.HTTPError:
+            response = self.request.get(url, headers={"User-Agent": self.user_agent})
+        except RetryError:
             logging.critical(f"Failed to check if there is unclaimed SLP for acc {self.acc_name} "
                              f"({self.account.replace('0x','ronin:')})")
+        if 200 <= response.status_code <= 299:
+            return int(response.json()['total'])
+        else:
             return None
-        return int(response.json()['total'])
 
     def create_random_msg(self):
         payload = {
@@ -54,14 +65,18 @@ class Claim:
         }
         url = "https://graphql-gateway.axieinfinity.com/graphql"
         try:
-            response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise Exception(f"Error! Creating random msg! Error: {e}")
-        return response.json()['data']['createRandomMessage']
+            response = self.request.post(url, headers={"User-Agent": self.user_agent}, json=payload)
+        except RetryError as e:
+            logging.critical(f"Error! Creating random msg! Error: {e}")
+        if 200 <= response.status_code <= 299:
+            return response.json()['data']['createRandomMessage']
+        else:
+            return None
 
     def get_jwt(self):
         msg = self.create_random_msg()
+        if not msg:
+            return None
         signed_msg = Web3().eth.account.sign_message(encode_defunct(text=msg),
                                                      private_key=self.private_key)
         hex_msg = signed_msg['signature'].hex()
@@ -81,15 +96,18 @@ class Claim:
         }
         url = "https://graphql-gateway.axieinfinity.com/graphql"
         try:
-            response = requests.post(url, headers={"User-Agent": self.user_agent}, json=payload)
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise Exception(f"Error! Getting JWT! Error: {e}")
-        if (not response.json()['data'].get('createAccessTokenWithSignature') or
-           not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
-            raise Exception("Could not retreive JWT, probably your private key for this account is wrong. "
-                            f"Account: {self.account.replace('0x','ronin:')} \n AccountName: {self.acc_name}")
-        return response.json()['data']['createAccessTokenWithSignature']['accessToken']
+            response =  self.request.post(url, headers={"User-Agent": self.user_agent}, json=payload)
+        except RetryError as e:
+            logging.critical(f"Error! Getting JWT! Error: {e}")
+
+        if 200 <= response.status_code <= 299:
+            if (not response.json()['data'].get('createAccessTokenWithSignature') or
+            not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
+                logging.critical("Could not retreive JWT, probably your private key for this account is wrong. "
+                                f"Account: {self.account.replace('0x','ronin:')} \n AccountName: {self.acc_name}")
+                return None
+            return response.json()['data']['createAccessTokenWithSignature']['accessToken']
+        return None
 
     async def execute(self):
         unclaimed = self.has_unclaimed_slp()
@@ -97,24 +115,32 @@ class Claim:
             logging.info(f"Important: Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "has no claimable SLP")
             return
-        logging.info(f"Account {self.account.replace('0x', 'ronin:')} has "
+        logging.info(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) has "
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
+        if not jwt:
+            logging.critical(f"Important: Skipping claiming, we could not get the JWT for account {self.account}")
+            return
         headers = {
             "User-Agent": self.user_agent,
             "authorization": f"Bearer {jwt}"
         }
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1/claim"
         try:
-            response = requests.post(url, headers=headers, json="")
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise Exception(f"Error! Executing SLP claim API call for account {self.acc_name}"
+            response = self.request.post(url, headers=headers, json="")
+        except RetryError as e:
+            logging.critical(f"Error! Executing SLP claim API call for account {self.acc_name}"
                             f"({self.account.replace('0x', 'ronin:')}). Error {e}")
-        signature = response.json()["blockchain_related"].get("signature")
-        if not signature or not signature["signature"]:
-            raise Exception(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
-                            "in blockchain_related")
+        if 200 <= response.status_code <= 299:
+            signature = response.json()["blockchain_related"].get("signature")
+            if not signature or not signature["signature"]:
+                logging.critical(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
+                                "in blockchain_related")
+                return
+        else:
+            logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
+                         "had to be skipped")
+            return
         nonce = get_nonce(self.account)
         # Build claim
         claim = self.slp_contract.functions.checkpoint(
