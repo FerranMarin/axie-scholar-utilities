@@ -35,7 +35,7 @@ To read the instructions on how to run these commands:
 
 
 # File Format
-This tool depends on various files. To learn more about them follow this [link](./pages/file_formats.md).
+This tool depends on various files. To learn more about them follow this [link](./pages/file_formats.html).
 
 # F.A.Q
 

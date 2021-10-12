@@ -13,12 +13,12 @@ from axie.utils import (
     get_nonce,
     load_json,
     Singleton,
-    ImportantLogsFilter
+    ImportantLogsFilter,
+    SLP_CONTRACT,
+    RONIN_PROVIDER_FREE
 )
 
 CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
-SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
-RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
