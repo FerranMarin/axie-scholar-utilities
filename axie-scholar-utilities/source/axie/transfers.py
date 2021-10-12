@@ -8,10 +8,8 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
 from axie.schemas import transfers_schema
-from axie.utils import get_nonce, load_json, ImportantLogsFilter
+from axie.utils import get_nonce, load_json, ImportantLogsFilter, RONIN_PROVIDER_FREE, AXIE_CONTRACT
 
-RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
-AXIE_CONTRACT = "0x32950db2a7164ae833121501c797d79e7b79d74c"
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
