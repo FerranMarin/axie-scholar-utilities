@@ -3,7 +3,7 @@ import builtins
 import json
 
 from docopt import docopt, DocoptExit
-from mock import patch
+from mock import patch, call
 import pytest
 
 import axie_scholar_cli as cli
@@ -197,6 +197,23 @@ import axie_scholar_cli as cli
                               "generate_QR": False,
                               "generate_secrets": False,
                               'generate_payments': True,
+                              "payout": False}),
+                            (["axie_morphing", "file1", "a,b,c"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              '<list_of_accounts>': "a,b,c", 
+                              'axie_morphing': True,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file1",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": False})
                          ])
 def test_parses_params(params, expected_result):
@@ -222,6 +239,9 @@ def test_parses_params(params, expected_result):
                             (["payout", "file1", "file2", "file3"]),
                             (["generate_payments", "file1", "file2", "file3"]),
                             (["generate_payments"]),
+                            (["axie_morphing"]),
+                            (["axie_morphing", "file1"]),
+                            (["axie_morphing", "file1", "foo", "bar"]),
                          ])
 def test_wrong_inputs(params):
     with pytest.raises(DocoptExit):
@@ -428,3 +448,25 @@ def test_transfer(mock_verify_inputs, mock_prepare_transfers, mock_transfersmana
     mock_verify_inputs.assert_called_with()
     mock_prepare_transfers.assert_called_with()
     mock_transfersmanager.assert_called_with(str(f1), str(f2))
+
+
+def test_axie_morphing_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "axie_morphing", "s_file.json", "foo,bar"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: s_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
+
+
+@patch("axie.MorphingManager.__init__", return_value=None)
+@patch("axie.Axies.__init__", return_value=None)
+@patch("axie.Axies.find_axies_to_morph", return_value=[1,2,3])
+@patch("axie.MorphingManager.execute")
+def test_axie_morphing(mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir):
+    f = tmpdir.join("file2.json")
+    f.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "axie_morphing", str(f), "foo,bar"]):
+        cli.run_cli()
+    mock_axies_init.assert_has_calls([call('foo'), call('bar')])    
+    mock_morphingmanager.assert_has_calls([call([1,2,3], "foo", str(f)), call([1,2,3], "bar", str(f))])
+    assert mock_find_axies.call_count == 2
+    assert mock_morphing_execute.call_count == 2
