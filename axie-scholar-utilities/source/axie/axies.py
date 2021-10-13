@@ -1,12 +1,11 @@
 import json
 from datetime import datetime, timedelta
 
-from web3 import Web3, exceptions
+from web3 import Web3
 import requests
 
+from axie.utils import RONIN_PROVIDER, AXIE_CONTRACT
 
-RONIN_PROVIDER = "https://api.roninchain.com/rpc"
-AXIE_CONTRACT = "0x32950db2a7164ae833121501c797d79e7b79d74c"
 
 class Axies:
     def __init__(self, account):

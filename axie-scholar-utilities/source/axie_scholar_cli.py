@@ -1,6 +1,6 @@
 """ Axie Scholar Utilities CLI.
 This tool will help you perform various actions.
-They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR, transfer_axies
+They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR, transfer_axies, axie_morphing
 
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
@@ -9,6 +9,7 @@ Usage:
     axie_scholar_cli.py mass_update_secrets <csv_file> <secrets_file>
     axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
     axie_scholar_cli.py generate_QR <secrets_file>
+    axie_scholar_cli.py axie_morphing <secrets_file> <list_of_accounts>
     axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file>
     axie_scholar_cli.py -h | --help
     axie_scholar_cli.py --version
@@ -26,7 +27,7 @@ import logging
 
 from docopt import docopt
 
-from axie import AxiePaymentsManager, AxieClaimsManager, AxieTransferManager
+from axie import AxiePaymentsManager, AxieClaimsManager, AxieTransferManager, Axies, MorphingManager
 from axie.utils import load_json
 
 # Setup logger
@@ -190,6 +191,18 @@ def run_cli():
         if (payments_file_path and check_file(payments_file_path) and
            check_file(csv_file_path) or not payments_file_path and check_file(csv_file_path)):
             generate_payments_file(csv_file_path, payments_file_path)
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['axie_morphing']:
+        # Morph axies from all accounts given
+        logging.info('I shall morph all axies I can!')
+        accs = args['<list_of_accounts>']
+        secrets_file_path = args['<secrets_file>']
+        if check_file(secrets_file_path):
+            accs_list = accs.split(',')
+            for acc in accs_list:
+                axies_to_morph = Axies(acc).find_axies_to_morph()
+                MorphingManager(axies_to_morph, acc, secrets_file_path).execute()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_QR']:

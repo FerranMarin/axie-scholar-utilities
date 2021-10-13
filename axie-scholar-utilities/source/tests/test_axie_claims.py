@@ -193,7 +193,7 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):
-        c = Claim("ronin:foo", "bar", "test_acc")
+        c = Claim(account="ronin:foo", private_key="bar", acc_name="test_acc")
     mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -215,7 +215,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='{"foo": "bar"}')):
-            c = Claim("ronin:foo", "0xbar", "test_acc")
+            c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed == 12
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
@@ -233,7 +233,7 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
         with patch.object(builtins,
                           "open",
                           mock_open(read_data='{"foo": "bar"}')):
-            c = Claim("ronin:foo", "0xbar", "test_acc")
+            c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed is None
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
@@ -245,7 +245,7 @@ def test_create_random_msg():
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createRandomMessage": "random_msg"}})
-        resp = Claim("ronin:foo", "0xbar", "test_acc").create_random_msg()
+        resp = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc").create_random_msg()
         assert resp == "random_msg"
 
 
@@ -253,7 +253,7 @@ def test_create_random_msg_fail_req():
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         status_code=500)
-        c = Claim("ronin:foo", "0xbar", "test_acc")
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         random_msg = c.create_random_msg()
         assert random_msg == None
 
@@ -267,7 +267,7 @@ def test_get_jwt(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createAccessTokenWithSignature": {"accessToken": "test-token"}}})
-        c = Claim("ronin:foo", "0xbar", "test_acc")
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         resp = c.get_jwt()
         assert resp == "test-token"
         expected_payload = {
@@ -300,7 +300,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         status_code=500)
-        c = Claim("ronin:foo", "0xbar", "test_acc")
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         jwt = c.get_jwt()
         assert jwt == None
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
@@ -332,7 +332,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
 def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", json={"data": {}})
-        c = Claim("ronin:foo", "0xbar", "test_acc")
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         jwt = c.get_jwt()
         expected_payload = {
             "operationName": "CreateAccessTokenWithSignature",
@@ -365,7 +365,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", 
                         json={"data": {"createAccessTokenWithSignature": {}}})
-        c = Claim("ronin:foo", "0xbar", "test_acc")
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         jwt = c.get_jwt()
         expected_payload = {
             "operationName": "CreateAccessTokenWithSignature",
@@ -433,7 +433,7 @@ async def test_execution(mocked_provider,
                     }
                 }
             )
-            c = Claim("ronin:foo", "0x00003A01C01173D676B64123", "test_acc")
+            c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
             await c.execute()
     mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
@@ -501,7 +501,7 @@ async def test_execution_failed_get_blockchain(mocked_provider,
                     }
                 }
             )
-            c = Claim("ronin:foo", "0x00003A01C01173D676B64123", "test_acc")
+            c = Claim(account="ronin:foo", private_key="0x00003A01C01173D676B64123", acc_name="test_acc")
             await c.execute()
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')

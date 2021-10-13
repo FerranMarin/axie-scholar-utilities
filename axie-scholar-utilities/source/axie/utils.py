@@ -2,8 +2,13 @@ import os
 import json
 import logging
 
-from web3 import Web3
+from eth_account.messages import encode_defunct
+import requests
+from requests.adapters import HTTPAdapter
+from requests.exceptions import RetryError
 from requests.packages.urllib3.util.retry import Retry
+from eth_account.messages import encode_defunct
+from web3 import Web3
 
 
 AXIE_CONTRACT = "0x32950db2a7164ae833121501c797d79e7b79d74c"
@@ -41,30 +46,6 @@ BALANCE_ABI = [
       "type": "function"
     }
 ]
-
-
-class ImportantLogsFilter(logging.Filter):
-    """ Logging filter used to only keep important messages which will be
-    written to the log file """
-    def filter(self, record):
-        return record.getMessage().startswith('Important:')
-
-
-class Singleton:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(Singleton, cls).__new__(
-                                cls, *args, **kwargs)
-        return cls._instance
-
-    def clear(cls):
-        # We need this for testing purposes!
-        try:
-            del Singleton._instance
-        except AttributeError:
-            pass
 
 
 def check_balance(account, token='slp'):
@@ -114,9 +95,89 @@ def load_json(json_file):
     return data
 
 
-if __name__ == "__main__":
-    slp = check_balance("ronin:9fa1bc784c665e683597d3f29375e45786617550")
-    axs = check_balance("ronin:9fa1bc784c665e683597d3f29375e45786617550", "axs")
-    axies = check_balance("ronin:9fa1bc784c665e683597d3f29375e45786617550", "axies")
-    weth = check_balance("ronin:9fa1bc784c665e683597d3f29375e45786617550", "weth")
-    print(f"SLP: {slp}, AXS: {axs}, AXIES: {axies}, WETH: {weth}")
+class ImportantLogsFilter(logging.Filter):
+    """ Logging filter used to only keep important messages which will be
+    written to the log file """
+    def filter(self, record):
+        return record.getMessage().startswith('Important:')
+
+
+class Singleton:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Singleton, cls).__new__(
+                                cls, *args, **kwargs)
+        return cls._instance
+
+    def clear(cls):
+        # We need this for testing purposes!
+        try:
+            del Singleton._instance
+        except AttributeError:
+            pass
+
+
+class AxieGraphQL:
+    
+    def __init__(self, **kwargs):
+        self.account = kwargs.get('account').replace("ronin:", "0x")
+        self.private_key = kwargs.get('private_key')
+        self.request = requests.Session()
+        self.request.mount('https://', HTTPAdapter(max_retries=RETRIES))
+        self.user_agent = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) "
+                           "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36")
+
+
+    def create_random_msg(self):
+        payload = {
+            "operationName": "CreateRandomMessage",
+            "variables": {},
+            "query": "mutation CreateRandomMessage{createRandomMessage}"
+        }
+        url = "https://graphql-gateway.axieinfinity.com/graphql"
+        try:
+            response = self.request.post(url, json=payload)
+        except RetryError as e:
+            logging.critical(f"Error! Creating random msg! Error: {e}")
+            return None
+        if 200 <= response.status_code <= 299:      
+            return response.json()['data']['createRandomMessage']
+        return None
+
+    def get_jwt(self):
+        msg = self.create_random_msg()
+        if not msg:
+            return None
+        signed_msg = Web3().eth.account.sign_message(encode_defunct(text=msg),
+                                                     private_key=self.private_key)
+        hex_msg = signed_msg['signature'].hex()
+        payload = {
+            "operationName": "CreateAccessTokenWithSignature",
+            "variables": {
+                "input": {
+                    "mainnet": "ronin",
+                    "owner": f"{self.account}",
+                    "message": f"{msg}",
+                    "signature": f"{hex_msg}"
+                }
+            },
+            "query": "mutation CreateAccessTokenWithSignature($input: SignatureInput!)"
+            "{createAccessTokenWithSignature(input: $input) "
+            "{newAccount result accessToken __typename}}"
+        }
+        url = "https://graphql-gateway.axieinfinity.com/graphql"
+        try:
+            response =  self.request.post(url, headers={"User-Agent": self.user_agent}, json=payload)
+        except RetryError as e:
+            logging.critical(f"Error! Getting JWT! Error: {e}")
+            return None
+        if 200 <= response.status_code <= 299:
+            if (not response.json()['data'].get('createAccessTokenWithSignature') or
+            not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
+                logging.critical("Could not retreive JWT, probably your private key for this account is wrong. "
+                                f"Account: {self.account.replace('0x','ronin:')} \n AccountName: {self.acc_name}")
+                return None
+            return response.json()['data']['createAccessTokenWithSignature']['accessToken']
+        return None

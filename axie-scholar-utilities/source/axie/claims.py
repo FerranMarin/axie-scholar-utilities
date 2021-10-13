@@ -3,8 +3,7 @@ import asyncio
 import json
 import logging
 
-from eth_account.messages import encode_defunct
-from requests.adapters import HTTPAdapter
+
 from requests.exceptions import RetryError
 from web3 import Web3, exceptions
 import requests
@@ -14,9 +13,9 @@ from axie.utils import (
     get_nonce,
     load_json,
     ImportantLogsFilter,
-    RETRIES,
     SLP_CONTRACT,
-    RONIN_PROVIDER_FREE
+    RONIN_PROVIDER_FREE,
+    AxieGraphQL
 )
 
 
@@ -28,8 +27,9 @@ file_handler.addFilter(ImportantLogsFilter())
 logger.addHandler(file_handler)
 
 
-class Claim:
-    def __init__(self, account, private_key, acc_name):
+class Claim(AxieGraphQL):
+    def __init__(self, acc_name, **kwargs):
+        super(Claim, self).__init__(**kwargs)
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         with open("axie/slp_abi.json") as f:
             slp_abi = json.load(f)
@@ -37,14 +37,9 @@ class Claim:
             address=Web3.toChecksumAddress(SLP_CONTRACT),
             abi=slp_abi
         )
-        self.account = account.replace("ronin:", "0x")
-        self.private_key = private_key
         self.acc_name = acc_name
         self.request = requests.Session()
-        self.request.mount('https://', HTTPAdapter(max_retries=RETRIES))
-        self.user_agent = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) "
-                           "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36")
-
+        
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
         try:
@@ -55,60 +50,6 @@ class Claim:
             return None
         if 200 <= response.status_code <= 299:
             return int(response.json()['total'])
-        else:
-            return None
-
-    def create_random_msg(self):
-        payload = {
-            "operationName": "CreateRandomMessage",
-            "variables": {},
-            "query": "mutation CreateRandomMessage{createRandomMessage}"
-        }
-        url = "https://graphql-gateway.axieinfinity.com/graphql"
-        try:
-            response = self.request.post(url, headers={"User-Agent": self.user_agent}, json=payload)
-        except RetryError as e:
-            logging.critical(f"Error! Creating random msg! Error: {e}")
-            return None
-        if 200 <= response.status_code <= 299:
-            return response.json()['data']['createRandomMessage']
-        else:
-            return None
-
-    def get_jwt(self):
-        msg = self.create_random_msg()
-        if not msg:
-            return None
-        signed_msg = Web3().eth.account.sign_message(encode_defunct(text=msg),
-                                                     private_key=self.private_key)
-        hex_msg = signed_msg['signature'].hex()
-        payload = {
-            "operationName": "CreateAccessTokenWithSignature",
-            "variables": {
-                "input": {
-                    "mainnet": "ronin",
-                    "owner": f"{self.account}",
-                    "message": f"{msg}",
-                    "signature": f"{hex_msg}"
-                }
-            },
-            "query": "mutation CreateAccessTokenWithSignature($input: SignatureInput!)"
-            "{createAccessTokenWithSignature(input: $input) "
-            "{newAccount result accessToken __typename}}"
-        }
-        url = "https://graphql-gateway.axieinfinity.com/graphql"
-        try:
-            response =  self.request.post(url, headers={"User-Agent": self.user_agent}, json=payload)
-        except RetryError as e:
-            logging.critical(f"Error! Getting JWT! Error: {e}")
-            return None
-        if 200 <= response.status_code <= 299:
-            if (not response.json()['data'].get('createAccessTokenWithSignature') or
-            not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
-                logging.critical("Could not retreive JWT, probably your private key for this account is wrong. "
-                                f"Account: {self.account.replace('0x','ronin:')} \n AccountName: {self.acc_name}")
-                return None
-            return response.json()['data']['createAccessTokenWithSignature']['accessToken']
         return None
 
     async def execute(self):
@@ -217,7 +158,11 @@ class AxieClaimsManager:
         logging.info("Secret file correctly validated")
 
     def prepare_claims(self):
-        claims_list = [Claim(acc, self.secrets_file[acc], self.acc_names[acc]) for acc in self.secrets_file]
+        claims_list = [
+            Claim(
+                account=acc,
+                private_key=self.secrets_file[acc],
+                acc_name=self.acc_names[acc]) for acc in self.secrets_file]
         logging.info("Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))
