@@ -345,7 +345,7 @@ def test_json_validator_pass_transfers_schema_optional_params(json_input):
             "ScholarPercent": 10,
             "TrainerPayoutAddress": "ronin:abc",
             "TrainerPercent": 0}]},
-            "10 is less than the minimum of 40"),
+            "10 is less than the minimum of 30"),
         ({"Manager": "ronin:abc", "Scholars": [{
             "Name": "foo",
             "AccountAddress": "ronin:abc",

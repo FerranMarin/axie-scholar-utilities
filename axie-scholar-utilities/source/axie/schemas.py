@@ -130,7 +130,7 @@ payments_percent_schema = {
                     },
                     "ScholarPercent": {
                         "type": "number",
-                        "minimum": 40,
+                        "minimum": 30,
                         "maximum": 99
                     },
                     "TrainerPayoutAddress": {
