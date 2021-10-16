@@ -45,7 +45,7 @@ class Payment:
 
     async def execute(self):
         # Prepare transaction
-        with open("axie/slp_abi.json") as f:
+        with open("axie/slp_abi.json", encoding='utf-8') as f:
             slb_abi = json.load(f)
         slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),

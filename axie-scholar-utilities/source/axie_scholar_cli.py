@@ -43,7 +43,7 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
         # Put payments file in same folder where the csv is
         folder = os.path.dirname(payments_file_path)
         payments_file_path = os.path.join(folder, 'payments.json')
-        with open(payments_file_path, 'w') as f:
+        with open(payments_file_path, 'w', encoding='utf-8') as f:
             f.write("{}")
     manager_acc = ''
     while manager_acc == '':
@@ -58,7 +58,7 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
         else:
             logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
 
-    with open(csv_file_path) as csv_file:
+    with open(csv_file_path, encoding='utf-8') as csv_file:
         reader = csv.DictReader(csv_file)
         scholars_list = []
         for row in reader:
@@ -79,7 +79,7 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
         # Put secrets file in same folder where payments_file is
         folder = os.path.dirname(payments_file_path)
         secrets_file_path = os.path.join(folder, 'secrets.json')
-        with open(secrets_file_path, 'w') as f:
+        with open(secrets_file_path, 'w', encoding='utf-8') as f:
             f.write('{}')
     payments = load_json(payments_file_path)
     secrets = load_json(secrets_file_path)
@@ -104,14 +104,14 @@ def generate_secrets_file(payments_file_path, secrets_file_path=None):
 
 def mass_update_secret_file(csv_file_path, secrets_file_path):
     new_secrets = {}
-    with open(csv_file_path) as csv_file:
+    with open(csv_file_path, encoding='utf-8') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             new_secrets[row[0]] = row[1]
 
     old_secrets = load_json(secrets_file_path)
     merge = {**new_secrets, **old_secrets}
-    with open(secrets_file_path, 'w') as f:
+    with open(secrets_file_path, 'w', encoding='utf-8') as f:
         json.dump(merge,  f, ensure_ascii=False, indent=4)
 
 

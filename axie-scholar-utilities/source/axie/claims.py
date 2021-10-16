@@ -31,7 +31,7 @@ logger.addHandler(file_handler)
 class Claim:
     def __init__(self, account, private_key, acc_name):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
-        with open("axie/slp_abi.json") as f:
+        with open("axie/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),
