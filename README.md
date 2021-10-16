@@ -2,7 +2,6 @@
 [![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
 [![Docker Image](https://img.shields.io/badge/docker%20image-available-blue)](https://hub.docker.com/r/epith/axie-scholar-utilities)
 
-
 This software's intent is to automate all activities related to manage Scholars. It is specially aimed to mangers with large scholar roasters.
 As of now it has the following commands:
 
@@ -33,6 +32,10 @@ Feel free to open issues requesting features. I will consider all of them and ma
 If you want to donate to thank me, feel free to do so at this ronin address:
 
     ronin:9fa1bc784c665e683597d3f29375e45786617550
+
+If you prefer you can:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G36LZ2A)
     
 # Discord
 
