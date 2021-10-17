@@ -239,7 +239,7 @@ Please, this file cannot have any other headers other than the following.
 - **Name**: This is only the name, is a for identification purposes
 - **AccountAddress**: Account that is played and we will claim and payout from
 - **ScholarPayoutAddress**: Account of the scholar to be paid to
-- **ScholarPercent**: Percentaje to pay that scholar. Minimum of 40%
+- **ScholarPercent**: Percentaje to pay that scholar. Minimum of 30%
 - **ScholarPayout**: (Optional) If present, will make sure that scholar gets additional SLP on top of the ScholarPercent
 - **TrainerPayoutAddress**: (Optional) Account of the trainer to be paid to
 - **TrainerPercent**: (Optional) Persentaje to pay to a trainer (it can be 0)
