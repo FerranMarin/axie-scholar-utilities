@@ -43,7 +43,7 @@ You can breen using multiple accounts and pay the fee with another one. More ins
 
 - Add capability to payout from accounts with Trezor (needs investigation)
 - Release a desktop app (even more convenient)
-- Integrate with Discord (via a bot, maybe?)
+- Integrate with Discord (via a self-hosted bot, it will be 100% yours!)
 - ...
 - Feel free to suggest what's next on Discord! :)
 
