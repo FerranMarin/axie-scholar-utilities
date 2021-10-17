@@ -3,7 +3,7 @@ __all__ = [
     'AxiePaymentsManager',
     'AxieClaimsManager',
     'AxieTransferManager',
-    'MorphingManager',
+    'AxieMorphingManager',
     'Axies',
     'BreedManager',
     'QRCodeManager'
@@ -12,7 +12,7 @@ __all__ = [
 from axie.payments import AxiePaymentsManager
 from axie.claims import AxieClaimsManager
 from axie.transfers import AxieTransferManager
-from axie.morphing import MorphingManager
+from axie.morphing import AxieMorphingManager
 from axie.axies import Axies
 from axie.breeding import BreedManager
 from axie.qr_code import QRCodeManager

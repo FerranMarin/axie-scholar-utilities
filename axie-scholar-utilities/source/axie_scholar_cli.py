@@ -33,7 +33,7 @@ from axie import (
     AxieClaimsManager,
     AxieTransferManager,
     Axies,
-    MorphingManager,
+    AxieMorphingManager,
     BreedManager,
     QRCodeManager
 )
@@ -211,7 +211,9 @@ def run_cli():
             accs_list = accs.split(',')
             for acc in accs_list:
                 axies_to_morph = Axies(acc).find_axies_to_morph()
-                MorphingManager(axies_to_morph, acc, secrets_file_path).execute()
+                axm = AxieMorphingManager(axies_to_morph, acc, secrets_file_path)
+                axm.verify_inputs()
+                axm.execute()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['axie_breeding']:

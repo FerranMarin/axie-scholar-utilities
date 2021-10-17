@@ -48,14 +48,15 @@ class Morph(AxieGraphQL):
         else:
             logging.critical(f"Important! Axie {self.axie} in {self.account} is not ready to be morphed!")
 
-class MorphingManager:
+
+class AxieMorphingManager:
 
     def __init__(self, axie_list, account, secrets_file):
         self.axie_list = axie_list
         self.account = account
         self.secrets = load_json(secrets_file)
     
-    def validate_input(self):
+    def verify_inputs(self):
         if self.account not in self.secrets:
             logging.critical(f"Account '{self.account}' is not present in secret file, please add it.")
             sys.exit()
@@ -63,6 +64,6 @@ class MorphingManager:
     def execute(self):
         logging.info(f"About to start morphing axies for account {self.account}")
         for axie in self.axie_list:
-            m = Morph(axie=axie, account=self.account, private_key=self.secrets[axie['account']])
+            m = Morph(axie=axie, account=self.account, private_key=self.secrets[self.account])
             m.execute()
         logging.info(f"Done morphing axies for account {self.account}")
