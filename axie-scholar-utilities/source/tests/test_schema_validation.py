@@ -386,7 +386,7 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                     "Name": "Scholar 2",
                     "AccountAddress": "ronin:<account_s2_address>",
                     "ScholarPayoutAddress": "ronin:<scholar2_address>",
-                    "ScholarPercent": 40,
+                    "ScholarPercent": 30,
                     "TrainerPayoutAddress": "ronin:<trainer_address>",
                     "TrainerPercent": 14
                 }

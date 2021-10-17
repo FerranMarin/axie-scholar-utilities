@@ -6,7 +6,8 @@ import pytest
 from mock import patch, call, mock_open
 
 from axie import AxiePaymentsManager
-from axie.payments import Payment, SLP_CONTRACT, PaymentsSummary
+from axie.payments import Payment, PaymentsSummary
+from axie.utils import SLP_CONTRACT
 from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 
 
@@ -18,9 +19,9 @@ def test_payments_manager_init(mocked_load_json):
     mocked_load_json.assert_has_calls(
         calls=[call(payments_file), call(secrets_file)]
     )
-    axp.auto = False
+    assert axp.auto == False
     axp2 = AxiePaymentsManager(payments_file, secrets_file, auto=True)
-    axp2.auto = True
+    assert axp2.auto == True
 
 
 def test_payments_manager_verify_input_success(tmpdir):
@@ -157,7 +158,7 @@ def test_payments_manager_verify_input_donations_exceed_max(tmpdir, caplog):
     mocked_sys.assert_called_once()
     assert "Payments file donations exeeds 100%, please review it" in caplog.text
 
-def test_payments_manager_verify_input_correct_dono_(tmpdir, caplog):
+def test_payments_manager_verify_input_correct_dono(tmpdir, caplog):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
