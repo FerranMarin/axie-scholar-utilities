@@ -1,6 +1,6 @@
 """ Axie Scholar Utilities CLI.
 This tool will help you perform various actions.
-They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR, transfer_axies, axie_morphing
+They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR, transfer_axies, axie_morphing, axie_breeding
 
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
@@ -8,8 +8,9 @@ Usage:
     axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
     axie_scholar_cli.py mass_update_secrets <csv_file> <secrets_file>
     axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
-    axie_scholar_cli.py generate_QR <secrets_file>
+    axie_scholar_cli.py generate_QR <payments_file> <secrets_file>
     axie_scholar_cli.py axie_morphing <secrets_file> <list_of_accounts>
+    axie_scholar_cli.py axie_breeding <breedings_file> <secrets_file>
     axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file>
     axie_scholar_cli.py -h | --help
     axie_scholar_cli.py --version
@@ -27,7 +28,15 @@ import logging
 
 from docopt import docopt
 
-from axie import AxiePaymentsManager, AxieClaimsManager, AxieTransferManager, Axies, MorphingManager
+from axie import (
+    AxiePaymentsManager,
+    AxieClaimsManager,
+    AxieTransferManager,
+    Axies,
+    MorphingManager,
+    BreedManager,
+    QRCodeManager
+)
 from axie.utils import load_json
 
 # Setup logger
@@ -126,7 +135,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.8.0')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.9.0')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
@@ -205,10 +214,39 @@ def run_cli():
                 MorphingManager(axies_to_morph, acc, secrets_file_path).execute()
         else:
             logging.critical("Please review your file paths and re-try.")
+    elif args['axie_breeding']:
+        # Breed axies
+        logging.info('I shall breed your axies')
+        breedings_file_path = args['<breedings_file>']
+        secrets_file_path = args['<secrets_file>']
+        if check_file(breedings_file_path) and check_file(secrets_file_path):
+            payment_account = ''
+            while payment_account == '':
+                msg = input("Provide ronin account that will pay the fee for breeding: ")
+                if len(msg) == 46 and msg.startswith('ronin:'):
+                    # Make sure is a valid Hex
+                    try:
+                        int(msg[6:], 16)
+                    except ValueError:
+                        continue
+                    payment_account = msg
+                else:
+                    logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
+            bm = BreedManager(breedings_file_path, secrets_file_path, payment_account)
+            bm.verify_inputs()
+            bm.execute()
+        else:
+            logging.critical("Please review your file paths and re-try.")
     elif args['generate_QR']:
         # Generate QR codes
         logging.info('I shall generate QR codes')
-        raise NotImplementedError('Sorry, I have yet to implement this command')
+        payments_file_path = args['<payments_file>']
+        secrets_file_path = args['<secrets_file>']
+        if check_file(payments_file_path) and check_file(secrets_file_path):
+            qr = QRCodeManager(payments_file_path, secrets_file_path)
+            qr.execute()
+        else:
+            logging.critical("Please review your file paths and re-try.")
 
 
 if __name__ == '__main__':

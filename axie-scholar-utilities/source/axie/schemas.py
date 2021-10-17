@@ -216,3 +216,30 @@ transfers_schema = {
         }
     }
 }
+
+
+breeding_schema = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "AccountAddress",
+            "Sire",
+            "Matron"
+        ],
+        "properties": {
+            "AccountAddress": {
+                "type": "string",
+                "pattern": "^ronin:"
+            },
+            "Sire": {
+                "type": "number",
+                "minimum": 0
+            },
+            "Matron": {
+                "type": "number",
+                "minimum": 0
+            }
+        }
+    }
+}

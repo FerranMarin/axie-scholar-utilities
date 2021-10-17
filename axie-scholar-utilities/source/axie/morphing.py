@@ -1,3 +1,4 @@
+import sys
 import logging
 
 from eth_account.messages import encode_defunct
@@ -54,8 +55,14 @@ class MorphingManager:
         self.account = account
         self.secrets = load_json(secrets_file)
     
+    def validate_input(self):
+        if self.account not in self.secrets:
+            logging.critical(f"Account '{self.account}' is not present in secret file, please add it.")
+            sys.exit()
+
     def execute(self):
         logging.info(f"About to start morphing axies for account {self.account}")
         for axie in self.axie_list:
-            Morph(axie=axie, account=self.account, private_key=self.secrets[axie['account']])
+            m = Morph(axie=axie, account=self.account, private_key=self.secrets[axie['account']])
+            m.execute()
         logging.info(f"Done morphing axies for account {self.account}")

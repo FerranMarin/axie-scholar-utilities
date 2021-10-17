@@ -131,19 +131,19 @@ This JSON file defines the Axie transfers you wish to do. You define from which 
         "AccountAddress": "ronin:<whohasanaxie>",
         "Transfers": [
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             }
             ...
@@ -153,15 +153,15 @@ This JSON file defines the Axie transfers you wish to do. You define from which 
         "AccountAddress": "ronin:<whohasanaxie>",
         "Transfers": [
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             }
         ]
@@ -171,15 +171,15 @@ This JSON file defines the Axie transfers you wish to do. You define from which 
         "AccountAddress": "ronin:<whohasanaxie>",
         "Transfers": [
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             }
         ]
@@ -189,6 +189,14 @@ This JSON file defines the Axie transfers you wish to do. You define from which 
 ```
 
 As you can see we put the account where we have the axies in `AccountAddress` and then inside `Transfers` we define the transfers we want to do from that account. In each we indicate the `AxieID` and the ronin `ReceiverAddress` to receive that Axie.
+
+
+# Breeding file format
+
+````
+
+```
+
 
 # Mass update CSV file
 This CSV file is quite straight forward. You can use excel or google docs or anything that produces a csv file. To get these results, you will need to add your public ronin on the 1st column and your private key for that account on the 2nd column. The resulting format will be something that looks like:
@@ -238,6 +246,26 @@ Please, this file cannot have any other headers other than the following.
 - **TrainerPayout**: (Optional) If present, will make sure that trainer gets additional SLP on top of the TrainerPercent.
 
 **Note**: Percents in this file are written as whole numbers. For example, 40 means 40%, 5 means 5%.
+
+# Create Breeding CSV file
+This CSV file is used to create the breeding file. You can use excel or google docs or anything that produces a csv file. It has to look like something:
+
+![Secrets CSV Image](../assets/sample_csv_payments.jpg)
+
+And the resulting csv:
+
+```
+Sire,Matron,AccountAddress
+123,345,ronin:abc1
+234,132,ronin:abc1
+5677,879,ronin:abc1
+789,787,ronin:abc1
+```
+
+Please, this file cannot have any other headers other than the following.
+- **Sire**: AxieId of the Sire
+- **Matron**: AxieId of the Matron
+- **AccountAddress**: Account that holds both Axies
 
 # Example Files
 

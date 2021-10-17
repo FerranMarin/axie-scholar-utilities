@@ -23,6 +23,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -40,6 +42,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -57,6 +61,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -74,6 +80,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": True,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -91,6 +99,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": True,
                               "generate_secrets": False,
@@ -108,6 +118,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": True,
@@ -125,6 +137,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": True,
@@ -142,6 +156,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': True,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -159,6 +175,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': "file1",
                               'mass_update_secrets': True,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -176,6 +194,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': "file1",
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -193,6 +213,8 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': "file1",
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -210,6 +232,27 @@ import axie_scholar_cli as cli
                               'transfer_axies': False,
                               '<csv_file>': None,
                               'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["axie_breeding", "file1", "file2"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              '<list_of_accounts>': None, 
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file2",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': "file1",
+                              'axie_breeding': True,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -242,6 +285,9 @@ def test_parses_params(params, expected_result):
                             (["axie_morphing"]),
                             (["axie_morphing", "file1"]),
                             (["axie_morphing", "file1", "foo", "bar"]),
+                            (["axie_breeding"]),
+                            (["axie_breeding", "file1"]),
+                            (["axie_breeding", "file1", "foo", "bar"]),
                          ])
 def test_wrong_inputs(params):
     with pytest.raises(DocoptExit):
@@ -470,3 +516,27 @@ def test_axie_morphing(mock_morphing_execute, mock_find_axies, mock_axies_init, 
     mock_morphingmanager.assert_has_calls([call([1,2,3], "foo", str(f)), call([1,2,3], "bar", str(f))])
     assert mock_find_axies.call_count == 2
     assert mock_morphing_execute.call_count == 2
+
+
+def test_axiebreeding_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "axie_breeding", "s_file.json", "b_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: s_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
+
+
+@patch("axie.BreedManager.__init__", return_value=None)
+@patch("axie.BreedManager.execute")
+@patch("axie.BreedManager.verify_inputs")
+def test_breeding(mock_verify_inputs, mock_execute_breeding, mock_breedingmanager, tmpdir):
+    acc = "ronin:45a1bc784c665e123597d3f29375e45786611234"
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    f2 = tmpdir.join("file2.json")
+    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "axie_breeding", str(f1), str(f2)]):
+        with patch.object(builtins, 'input', lambda _: acc):
+            cli.run_cli()
+    mock_verify_inputs.assert_called_with()
+    mock_execute_breeding.assert_called_with()
+    mock_breedingmanager.assert_called_with(str(f1), str(f2), acc)

@@ -1,9 +1,13 @@
+import sys
 import json
 import logging
 
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
-from utils import get_nonce, RONIN_PROVIDER_FREE, AXIE_CONTRACT
+from axie.schemas import breeding_schema
+from axie.utils import get_nonce, load_json, RONIN_PROVIDER_FREE, AXIE_CONTRACT, check_balance
 
 
 class Breed:
@@ -60,3 +64,66 @@ class Breed:
     def __str__(self):
         return (f"Breeding axie {self.sire_axie} with {self.matron_axie} in account "
                 f"{self.address.replace('0x', 'ronin:')}")
+
+
+class BreedManager:
+
+    def __init__(self, breeding_file, secrets_file, payment_account):
+        self.secrets = load_json(secrets_file)
+        self.breeding_file = load_json(breeding_file)
+        self.payment_account = payment_account
+        self.breeding_costs = 0
+
+    def verify_inputs(self):
+        validation_error = False
+        logging.info("Validating file inputs...")
+        try:
+            validate(self.breeding_file, breeding_schema)
+        except ValidationError as ex:
+            logging.critical(f'Validation of breeding file failed. Error given: {ex.message}\n'
+                             f'For attribute in: {list(ex.path)}')
+            validation_error = True
+        for acc in self.breeding_file:
+            if acc['AccountAddress'] not in self.secrets:
+                logging.critical(f"Account '{acc['AccountAddress']}' is not present in secret file, please add it.")
+                validation_error = True
+        if self.payment_account not in self.secrets:
+            logging.critical(f"Payment account '{self.payment_account}' is not present in secret file, please add it.")
+            validation_error = True       
+        if validation_error:
+            sys.exit()
+
+    def calculate_cost(self):
+        return self.calculate_fee_cost() + self.breeding_costs
+
+    def calculate_breeding_cost(self):
+        # TODO: We need to calculate how much will all breeding cost
+        return 0
+
+    def calculate_fee_cost(self):
+        number_of_breeds = len(self.breeding_file)
+        if number_of_breeds <= 15:
+            cost = number_of_breeds * 30
+        if 15 < number_of_breeds <= 30:
+            cost = (15 * 30) + ((number_of_breeds - 15) * 25)
+        if 30 < number_of_breeds <= 50:
+            cost = (15 * 30) + (15 * 25) + ((number_of_breeds - 30) * 20)
+        if number_of_breeds > 50:
+            cost = (15 * 30) + (15 * 25) + (20 * 20) + ((number_of_breeds - 50) * 15)
+        return cost
+
+    def execute(self):
+        if check_balance(self.payment_account) < self.calculate_cost():
+            logging.critical("Not enough SLP funds to pay for breeding and the fee")
+            sys.exit()
+        
+        logging.info(f"About to start breeding axies")
+        for bf in self.breeding_file:
+            b = Breed(
+                sire_axie=bf['Sire'],
+                matron_axie=bf['Matron'],
+                address=bf['AccountAddress'],
+                private_key=self.secrets[bf['AccountAddress']]
+            )
+            b.execute()
+        logging.info(f"Done breeding axies")
