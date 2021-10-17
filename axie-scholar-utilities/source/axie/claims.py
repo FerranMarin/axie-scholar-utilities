@@ -31,7 +31,7 @@ class Claim(AxieGraphQL):
     def __init__(self, acc_name, **kwargs):
         super(Claim, self).__init__(**kwargs)
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
-        with open("axie/slp_abi.json") as f:
+        with open("axie/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(SLP_CONTRACT),

@@ -227,7 +227,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_contract, caplog):
+def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_contract):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
                        status_code=500)

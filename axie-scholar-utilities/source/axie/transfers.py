@@ -33,7 +33,7 @@ class Transfer:
 
     async def execute(self):
         # Load ABI
-        with open('axie/axie_abi.json') as f:
+        with open('axie/axie_abi.json', encoding='utf-8') as f:
             axie_abi = json.load(f)
         axie_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(AXIE_CONTRACT),

@@ -779,7 +779,7 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
         await p.execute()
-    mock_file.assert_called_with("axie/slp_abi.json")
+    mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")

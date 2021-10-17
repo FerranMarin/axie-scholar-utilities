@@ -88,7 +88,7 @@ def load_json(json_file):
         raise Exception(f"File path {json_file} does not exist. "
                         f"Please provide a correct one")
     try:
-        with open(json_file) as f:
+        with open(json_file, encoding='utf-8') as f:
             data = json.load(f)
     except json.decoder.JSONDecodeError:
         raise Exception(f"File in path {json_file} is not a correctly encoded JSON.")
