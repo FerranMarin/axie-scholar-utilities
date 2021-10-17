@@ -10,7 +10,8 @@ from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
-from axie.claims import Claim, RONIN_PROVIDER_FREE, SLP_CONTRACT
+from axie.claims import Claim
+from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE
 from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 
 
@@ -73,7 +74,7 @@ def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
     s_file.write(json.dumps(s_data))
     axc = AxieClaimsManager(p_file, s_file)
     axc.verify_inputs()
-    axc.secrets_file = {scholar_acc: scholar_private_acc}
+    assert axc.secrets_file == {scholar_acc: scholar_private_acc}
 
 
 def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
@@ -104,7 +105,7 @@ def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
     assert f"Public address {scholar_acc} needs to start with ronin:" in caplog.text
 
 
-def test_claims_manager_verify_input_wrong_public_private_ronin(tmpdir, caplog):
+def test_claims_manager_verify_input_wrong_private_ronin(tmpdir, caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = 'ronin:<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     p_file = tmpdir.join("p.json")
@@ -132,7 +133,7 @@ def test_claims_manager_verify_input_wrong_public_private_ronin(tmpdir, caplog):
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text
 
 
-def test_claims_manager_verify_input_wrong_public_private_short(tmpdir, caplog):
+def test_claims_manager_verify_input_wrong_private_short(tmpdir, caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = 'ronin:<account_s1_private_address>012345'
     p_file = tmpdir.join("p.json")
@@ -402,19 +403,19 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-async def test_execution(mocked_provider,
-                         mocked_checksum,
-                         mocked_contract,
-                         moocked_check_balance,
-                         mocked_unclaimed_slp,
-                         mock_get_jwt,
-                         mock_get_nonce,
-                         mocked_sign_transaction,
-                         mock_raw_send,
-                         mock_receipt,
-                         mock_keccak,
-                         mock_to_hex,
-                         caplog):
+async def test_claim_execution(mocked_provider,
+                               mocked_checksum,
+                               mocked_contract,
+                               moocked_check_balance,
+                               mocked_unclaimed_slp,
+                               mock_get_jwt,
+                               mock_get_nonce,
+                               mocked_sign_transaction,
+                               mock_raw_send,
+                               mock_receipt,
+                               mock_keccak,
+                               mock_to_hex,
+                               caplog):
     # Make sure file is clean to start
     await cleanup_log_file()
     with patch.object(builtins,

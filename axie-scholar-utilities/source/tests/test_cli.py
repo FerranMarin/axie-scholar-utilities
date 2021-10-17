@@ -87,25 +87,6 @@ import axie_scholar_cli as cli
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
-                            (["generate_QR", "file1"],
-                             {"--help": False,
-                              "--version": False,
-                              "--yes": False,
-                              '<list_of_accounts>': None, 
-                              'axie_morphing': False,
-                              "<payments_file>": None,
-                              "<secrets_file>": "file1",
-                              '<transfers_file>': None,
-                              'transfer_axies': False,
-                              '<csv_file>': None,
-                              'mass_update_secrets': False,
-                              '<breedings_file>': None,
-                              'axie_breeding': False,
-                              "claim": False,
-                              "generate_QR": True,
-                              "generate_secrets": False,
-                              'generate_payments': False,
-                              "payout": False}),
                             (["generate_secrets", "file1"],
                              {"--help": False,
                               "--version": False,
@@ -257,6 +238,25 @@ import axie_scholar_cli as cli
                               "generate_QR": False,
                               "generate_secrets": False,
                               'generate_payments': False,
+                              "payout": False}),
+                            (["generate_QR", "file1", "file2"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              '<list_of_accounts>': None, 
+                              'axie_morphing': False,
+                              "<payments_file>": "file1",
+                              "<secrets_file>": "file2",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              "claim": False,
+                              "generate_QR": True,
+                              "generate_secrets": False,
+                              'generate_payments': False,
                               "payout": False})
                          ])
 def test_parses_params(params, expected_result):
@@ -268,6 +268,7 @@ def test_parses_params(params, expected_result):
                          [
                             (["a", "b", "c"]),
                             (["generate_QR"]),
+                            (["generate_QR", "file1"]),
                             (["mass_update_secrets"]),
                             (["mass_update_secrets", "file1"]),
                             (["mass_update_secrets", "file1", "file2", "file3"]),
@@ -313,17 +314,6 @@ def test_secret_gen_file_check_fail_only_payment_file(caplog):
         cli.run_cli()
     assert "Please provide a correct path to the file. Path provided: p_file.json" in caplog.text
     assert "Please review your file paths and re-try." in caplog.text
-
-
-@pytest.mark.parametrize("params",
-                         [
-                            (["", "generate_QR", "file1"])
-                         ])
-def test_not_implemented_methods(params):
-    with pytest.raises(NotImplementedError) as e:
-        with patch.object(sys, 'argv', params):
-            cli.run_cli()
-    assert str(e.value) == "Sorry, I have yet to implement this command"
 
 
 def test_generate_secrets_no_secrets_file(tmpdir):
@@ -540,3 +530,23 @@ def test_breeding(mock_verify_inputs, mock_execute_breeding, mock_breedingmanage
     mock_verify_inputs.assert_called_with()
     mock_execute_breeding.assert_called_with()
     mock_breedingmanager.assert_called_with(str(f1), str(f2), acc)
+
+
+def test_qrcode_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "generate_QR", "s_file.json", "p_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: s_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
+
+
+@patch("axie.QRCodeManager.__init__", return_value=None)
+@patch("axie.QRCodeManager.execute")
+def test_qrcode(mock_execute, mock_qrcodemanager, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    f2 = tmpdir.join("file2.json")
+    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "generate_QR", str(f1), str(f2)]):
+        cli.run_cli()
+    mock_execute.assert_called_with()
+    mock_qrcodemanager.assert_called_with(str(f1), str(f2))

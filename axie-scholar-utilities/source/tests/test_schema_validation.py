@@ -2,7 +2,7 @@ import pytest
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from axie.schemas import payments_schema, payments_percent_schema, transfers_schema
+from axie.schemas import payments_schema, payments_percent_schema, transfers_schema, breeding_schema
 
 
 @pytest.mark.parametrize("json_input, expected_error", [
@@ -490,3 +490,19 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
 ])
 def test_json_validator_pass_payments_percent_schema_optional_params(json_input):
     validate(json_input, payments_percent_schema)
+
+
+@pytest.mark.parametrize("json_input, expected_error", [
+        ([{}], "'AccountAddress' is a required property"),
+        ([{"AccountAddress": "foo"}], "'Sire' is a required property"),
+        ([{"AccountAddress": "foo", "Sire": "foo"}], "'Matron' is a required property"),
+        ([{"AccountAddress": "foo", "Sire": "foo", "Matron": "foo"}], "'foo' does not match '^ronin:'"),
+        ([{"AccountAddress": "ronin:foo", "Sire": "foo", "Matron": "foo"}], "'foo' is not of type 'number'"),
+        ([{"AccountAddress": "ronin:foo", "Sire": 0, "Matron": "foo"}], "'foo' is not of type 'number'"),
+        ([{"AccountAddress": "ronin:foo", "Sire": 0, "Matron": "foo"}], "'foo' is not of type 'number'"),
+        ([{"AccountAddress": "ronin:foo", "Sire": "0", "Matron": "foo"}], "'0' is not of type 'number'")
+])
+def test_json_validator_breeding_schema_error(json_input, expected_error):
+    with pytest.raises(ValidationError) as e:
+        validate(json_input, breeding_schema)
+    assert expected_error in str(e.value)
