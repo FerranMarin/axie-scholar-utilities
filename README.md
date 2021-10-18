@@ -36,7 +36,7 @@ So if you want to breed 22 Axies the fee would be:
 (15 * 30) + (7 * 25) = 625 SLP
 
 The more you breed at once, the cheaper it gets per axie. Be careful with the max amount of tx per account!
-You can breed using multiple accounts and pay the fee with another one. More instructions, in the [wiki](https://ferranmarin.github.io/axie-scholar-utilities/),
+You can breed using multiple accounts and pay the fee with another one. More instructions, in the [wiki](https://ferranmarin.github.io/axie-scholar-utilities/pages/poetry_cmds#axiebreeding),
 
 
 # Roadmap

@@ -53,7 +53,7 @@ def generate_breedings_file(csv_file_path, breeding_file_path=None):
     if not breeding_file_path:
         # Put breeding file in same folder where the csv is
         folder = os.path.dirname(breeding_file_path)
-        breeding_file_path = os.path.join(folder, 'payments.json')
+        breeding_file_path = os.path.join(folder, 'breedings.json')
         with open(breeding_file_path, 'w', encoding='utf-8') as f:
             f.write("{}")
     
