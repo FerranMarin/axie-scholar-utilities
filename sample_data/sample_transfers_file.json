@@ -1,17 +1,17 @@
 [
     {
         "AccountAddress": "ronin:<whohasanaxie>",
-        "Transfers": [
+        "Breeds": [
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             }
         ]
@@ -20,15 +20,15 @@
         "AccountAddress": "ronin:<whohasanaxie>",
         "Transfers": [
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": "<axie_id_to_transfer>",
+                "AxieId": 123,
                 "ReceiverAddress": "<ronin:<whowillgetanaxie>"
             }
         ]
