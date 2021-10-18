@@ -258,7 +258,6 @@ def test_json_validator_pass_payments_schema_optional_params(json_input):
 def test_json_validator_transfers_schema_error(json_input, expected_error):
     with pytest.raises(ValidationError) as e:
         validate(json_input, transfers_schema)
-    print(str(e.value))
     assert expected_error in str(e.value)
 
 

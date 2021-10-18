@@ -45,7 +45,7 @@ def test_claims_manager_verify_input_success(tmpdir):
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
     axc = AxieClaimsManager(p_file, s_file)
     axc.verify_inputs()
-    axc.secrets_file = {scholar_acc: scholar_private_acc}
+    assert axc.secrets_file == {scholar_acc: scholar_private_acc}
 
 
 def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
@@ -451,7 +451,6 @@ async def test_claim_execution(mocked_provider,
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     assert "Account test_acc (ronin:foo) has 456 unclaimed SLP" in caplog.text
-    print(caplog.text)
     assert "SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in caplog.text
     with open(LOG_FILE_PATH) as f:
         log_file = f.readlines()
@@ -484,8 +483,7 @@ async def test_execution_failed_get_blockchain(mocked_provider,
                                                mock_raw_send,
                                                mock_receipt,
                                                mock_keccak,
-                                               mock_to_hex,
-                                               caplog):
+                                               mock_to_hex):
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):

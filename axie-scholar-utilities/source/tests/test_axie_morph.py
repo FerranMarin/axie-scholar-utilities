@@ -1,8 +1,6 @@
 import sys
-import builtins
 
-import pytest
-from mock import patch, call, mock_open
+from mock import patch, call
 import requests_mock
 from hexbytes import HexBytes
 from eth_account.messages import encode_defunct

@@ -34,7 +34,7 @@ from axie import (
     AxieTransferManager,
     Axies,
     AxieMorphingManager,
-    BreedManager,
+    AxieBreedManager,
     QRCodeManager
 )
 from axie.utils import load_json
@@ -234,9 +234,9 @@ def run_cli():
                     payment_account = msg
                 else:
                     logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
-            bm = BreedManager(breedings_file_path, secrets_file_path, payment_account)
-            bm.verify_inputs()
-            bm.execute()
+            abm = AxieBreedManager(breedings_file_path, secrets_file_path, payment_account)
+            abm.verify_inputs()
+            abm.execute()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_QR']:

@@ -69,7 +69,6 @@ def check_balance(account, token='slp'):
         Web3.toChecksumAddress(account.replace("ronin:", "0x"))
     ).call()
     if token == 'weth':
-        print(balance)
         return float(balance/1000000000000000000)
     return int(balance)
 

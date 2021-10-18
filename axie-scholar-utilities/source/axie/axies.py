@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime, timedelta
 
 from web3 import Web3
@@ -36,9 +37,9 @@ class Axies:
             if self.now >= morph_date and not body_shape:
                 axies.append(axie)
             elif not body_shape:
-                print(f"Axie {axie} cannot be morphed until {morph_date}")
+                logging.info(f"Axie {axie} cannot be morphed until {morph_date}")
             else:
-                print(f"Axie {axie} is already an adult!")
+                logging.info(f"Axie {axie} is already an adult!")
         return axies
 
     def get_morph_date_and_body(self, axie_id):
@@ -57,10 +58,3 @@ class Axies:
         birth_date = response.json()["data"]["axie"]["birthDate"]
         morph_date = datetime.fromtimestamp(birth_date) + timedelta(days=5)        
         return morph_date, body_shape
-
-
-if __name__ == "__main__":
-    a = Axies(
-        "ronin:<ronin_acc>"
-    )
-    print(a.find_axies_to_morph())

@@ -1,5 +1,6 @@
 import sys
 import json
+import asyncio
 import logging
 
 from jsonschema import validate
@@ -8,15 +9,16 @@ from web3 import Web3, exceptions
 
 from axie.schemas import breeding_schema
 from axie.utils import get_nonce, load_json, RONIN_PROVIDER_FREE, AXIE_CONTRACT, check_balance
+from axie.payments import Payment, PaymentsSummary, CREATOR_FEE_ADDRESS
 
 
 class Breed:
-    def __init__(self, sire_axie, matron_axie, address, secret, nonce=None):
+    def __init__(self, sire_axie, matron_axie, address, private_key, nonce=None):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
-        self.secret = secret
+        self.private_key = private_key
         if not nonce:
             self.nonce = get_nonce(self.address)
         else:
@@ -43,7 +45,7 @@ class Breed:
         # Sign transaction
         signed = self.w3.eth.account.sign_transaction(
             transaction,
-            private_key=self.secret
+            private_key=self.private_key
         )
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
@@ -66,7 +68,7 @@ class Breed:
                 f"{self.address.replace('0x', 'ronin:')}")
 
 
-class BreedManager:
+class AxieBreedManager:
 
     def __init__(self, breeding_file, secrets_file, payment_account):
         self.secrets = load_json(secrets_file)
@@ -97,7 +99,7 @@ class BreedManager:
         return self.calculate_fee_cost() + self.breeding_costs
 
     def calculate_breeding_cost(self):
-        # TODO: We need to calculate how much will all breeding cost
+        # TODO: We need to calculate how much will all breeding cost, pending for the future!
         return 0
 
     def calculate_fee_cost(self):
@@ -126,4 +128,17 @@ class BreedManager:
                 private_key=self.secrets[bf['AccountAddress']]
             )
             b.execute()
-        logging.info(f"Done breeding axies")
+        logging.info("Done breeding axies")
+        fee = self.calculate_fee_cost()
+        logging.info(f"Time to pay the fee for breeding. For this session it is: {fee} SLP")
+        p = Payment(
+            "Breeding Fee",
+            "donation",
+            self.payment_account,
+            self.secrets[self.payment_account], 
+            CREATOR_FEE_ADDRESS,
+            fee,
+            PaymentsSummary()
+        )
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(p.execute())

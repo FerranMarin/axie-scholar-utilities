@@ -362,7 +362,6 @@ def test_generate_payments_file(tmpdir):
     f2.write('{}')
     with patch.object(builtins, 'input', lambda _: 'ronin:9fa1bc784c665e683597d3f29375e45786617550'):
         cli.generate_payments_file(f1.strpath, f2.strpath)
-    print(json.loads(f2.read()))
     assert json.loads(f2.read()) == {
         'Manager': 'ronin:9fa1bc784c665e683597d3f29375e45786617550',
         'Scholars': [{
@@ -517,9 +516,9 @@ def test_axiebreeding_file_check_fail(caplog):
     assert "Please review your file paths and re-try." in caplog.text
 
 
-@patch("axie.BreedManager.__init__", return_value=None)
-@patch("axie.BreedManager.execute")
-@patch("axie.BreedManager.verify_inputs")
+@patch("axie.AxieBreedManager.__init__", return_value=None)
+@patch("axie.AxieBreedManager.execute")
+@patch("axie.AxieBreedManager.verify_inputs")
 def test_breeding(mock_verify_inputs, mock_execute_breeding, mock_breedingmanager, tmpdir):
     acc = "ronin:45a1bc784c665e123597d3f29375e45786611234"
     f1 = tmpdir.join("file1.json")

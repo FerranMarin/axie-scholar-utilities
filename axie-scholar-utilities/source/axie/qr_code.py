@@ -67,6 +67,5 @@ class QRCodeManager:
                 path=self.path
             ) for acc in self.secrets_file
         ]
-        print(qrcode_list)
         for qr in qrcode_list:
             qr.generate_qr()
