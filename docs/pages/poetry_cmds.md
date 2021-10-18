@@ -55,7 +55,7 @@ This will execute the payments defined in payments.json. Results.log will be upd
 
 If you do now want to confirm account by account, you can run this other command (result will be the same):
 
-    poetry run python axie_scholar_cli.py payout payments.json secrets.json
+    poetry run python axie_scholar_cli.py payout payments.json secrets.json -y
 
 Remmember this command has a cost of 1% of the total ammount of SLP transfered of each account.
 
