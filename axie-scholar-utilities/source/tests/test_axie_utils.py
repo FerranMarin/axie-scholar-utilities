@@ -1,7 +1,5 @@
-import builtins
-
 import pytest
-from mock import patch, call, mock_open
+from mock import patch, call
 
 from axie.utils import (
     check_balance,

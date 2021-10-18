@@ -2,11 +2,7 @@ import sys
 import json
 import builtins
 
-import pytest
 from mock import patch, mock_open, call
-import requests_mock
-from hexbytes import HexBytes
-from eth_account.messages import encode_defunct
 
 from axie import AxieBreedManager
 from axie.breeding import Breed, AXIE_CONTRACT

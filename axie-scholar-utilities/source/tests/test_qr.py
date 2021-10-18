@@ -1,16 +1,14 @@
 import os
 import sys
 import json
-import builtins
 from datetime import datetime
 
 import pytest
-from mock import patch, call, mock_open
+from mock import patch, call
 import requests_mock
 
 from axie import QRCodeManager
 from axie.qr_code import QRCode
-from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE
 
 
 @patch("axie.QRCodeManager.load_secrets_and_acc_name", return_value=("foo", "bar"))
