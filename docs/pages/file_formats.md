@@ -193,9 +193,40 @@ As you can see we put the account where we have the axies in `AccountAddress` an
 
 # Breeding file format
 
-````
+A simple JSON file indicating the Sire and Matron axies that will be breed together. We also indicate the AccountAddress they are in.
 
 ```
+[
+    {
+        "Sire": 123,
+        "Matron": 345,
+        "AccountAddress": "<ronin:<address_that_hold_both_axies>"
+    },
+    {
+        "Sire": 123,
+        "Matron": 345,
+        "AccountAddress": "<ronin:<address_that_hold_both_axies>"
+    },
+    {
+        "Sire": 123,
+        "Matron": 345,
+        "AccountAddress": "<ronin:<address_that_hold_both_axies>"
+    },
+    {
+        "Sire": 123,
+        "Matron": 345,
+        "AccountAddress": "<ronin:<address_that_hold_both_axies>"
+    },
+    {
+        "Sire": 123,
+        "Matron": 345,
+        "AccountAddress": "<ronin:<address_that_hold_both_axies>"
+    }
+]
+
+```
+
+**Caution**: Be careful when running breeding. It won't check you have the funds to pay for the breeding nor you have the free transactions available to carry them out.
 
 
 # Mass update CSV file
@@ -250,7 +281,7 @@ Please, this file cannot have any other headers other than the following.
 # Create Breeding CSV file
 This CSV file is used to create the breeding file. You can use excel or google docs or anything that produces a csv file. It has to look like something:
 
-![Secrets CSV Image](../assets/sample_csv_payments.jpg)
+![Secrets CSV Image](../assets/sample_csv_breedings.jpg)
 
 And the resulting csv:
 
