@@ -5,6 +5,47 @@ Best thing I can do for this bit is send you to follow the instructions in the o
 
 - [Docker on Windows](https://docs.docker.com/desktop/windows/install/)
 
+# Use the image from docker-hub
+
+Every successful build of my code produces a Docker image that is stored [here](https://hub.docker.com/r/epith/axie-scholar-utilities).
+
+After you've downloaded docker, you simply need to execute this command to download the latest image:
+
+    docker pull epith/axie-scholar-utilities
+
+If you go this route, I recomend also setting up these alias in your terminal to execute commands easier:
+
+    # Alias to generate secrets
+    function axie-utils-gen-secrets {
+        docker run -it -v payments.json:/opt/app/files/payments.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json
+    }
+    # Alias to generate payments
+    funcion axie-utils-gen-payments {
+        docker run -it -v payments.csv:/opt/app/files/payments.csv -v payments.json:/opt/app/files/payments.json epith/axie-scholar-utilities generate_payments files/payments.csv files/payments.json
+    }
+    # Alias to mass update secrets
+    function axie-utils-mass-update {
+        docker run -it -v update.csv:/opt/app/files/update.csv -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities mass_update_secrets files/update.csv files/secrets.json
+    }
+    # Alias to execute claims
+    function axie-utils-claim {
+        docker run -it -v payments.json:/opt/app/files/payments.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/payments.json files/secrets.json
+    }
+    # Alias to execute payments
+    function axie-utils-payout {
+        docker run -it -v payments.json:/opt/app/files/payments.json  -v secrets.json:/opt/app/files/secrets.json -v results.log:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json
+    }
+    # Alias to execute auto-payments (no confirmation)
+    function axie-utils-auto-payout {
+        docker run -it -v payments.json:/opt/app/files/payments.json -v secrets.json:/opt/app/files/secrets.json -v results.log:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y
+    }
+    # Alias to execute axie transfers
+    function axie-utils-transfer-axies {
+        docker run -it -v payments.json:/opt/app/files/transfers.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json
+    }
+
+Be aware, that this aliases will require the EXACT file names to work.
+
 # Build docker image from repository
 
 To build the docker image from the code, first you need to download my code, either download it as a zip and unzip it, or git clone it (whatever is easier for you).
@@ -23,7 +64,7 @@ In my case it looks something like this. I extracted the code to my Desktop:
 
 If there are spaces in your path, please enclose it in quotes something like:
 
-        cd 'C:\Users\Ferran Marin\Desktop\axie-scholar-utilities-main\axie-scholar-utilities\docker'
+    cd 'C:\Users\Ferran Marin\Desktop\axie-scholar-utilities-main\axie-scholar-utilities\docker'
 
 Once we reach this point. Use the following command to build the docker image:
 
