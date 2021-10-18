@@ -1,6 +1,6 @@
 """ Axie Scholar Utilities CLI.
 This tool will help you perform various actions.
-They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR, transfer_axies, axie_morphing, axie_breeding
+They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR, transfer_axies, axie_morphing, axie_breeding, generate_breedings
 
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
@@ -11,6 +11,7 @@ Usage:
     axie_scholar_cli.py generate_QR <payments_file> <secrets_file>
     axie_scholar_cli.py axie_morphing <secrets_file> <list_of_accounts>
     axie_scholar_cli.py axie_breeding <breedings_file> <secrets_file>
+    axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
     axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file>
     axie_scholar_cli.py -h | --help
     axie_scholar_cli.py --version
@@ -46,6 +47,28 @@ ch = logging.StreamHandler(sys.stdout)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
 ch.setFormatter(formatter)
 log.addHandler(ch)
+
+
+def generate_breedings_file(csv_file_path, breeding_file_path=None):
+    if not breeding_file_path:
+        # Put breeding file in same folder where the csv is
+        folder = os.path.dirname(breeding_file_path)
+        breeding_file_path = os.path.join(folder, 'payments.json')
+        with open(breeding_file_path, 'w', encoding='utf-8') as f:
+            f.write("{}")
+    
+    with open(csv_file_path, encoding='utf-8') as csv_file:
+        reader = csv.DictReader(csv_file)
+        breed_list = []
+        for row in reader:
+            clean_row = {k: v for k, v in row.items() if v is not None and v != ''}
+            integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
+            clean_row.update(integer_row)
+            breed_list.append(clean_row)
+    
+    with open(breeding_file_path, 'w', encoding='utf-8') as f:
+        json.dump(breed_list, f, ensure_ascii=False, indent=4)
+    log.info('New breeds file saved')
 
 
 def generate_payments_file(csv_file_path, payments_file_path=None):
@@ -135,7 +158,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.9.0')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v1.9.1')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
@@ -237,6 +260,16 @@ def run_cli():
             abm = AxieBreedManager(breedings_file_path, secrets_file_path, payment_account)
             abm.verify_inputs()
             abm.execute()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['generate_breedings']:
+        #Generate breedings file
+        logging.info('I shall help you generate a breedings file')
+        breedings_file_path = args.get('<breedings_file>')
+        csv_file_path = args['<csv_file>']
+        if (breedings_file_path and check_file(breedings_file_path) and
+           check_file(csv_file_path) or not breedings_file_path and check_file(csv_file_path)):
+            generate_breedings_file(csv_file_path, breedings_file_path)
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_QR']:

@@ -26,6 +26,10 @@ Depending on how you've installed the tool, to run the commands you will need to
 - **Claim SLP**: This command will claim the SLP from all the scholar accounts in the payments.json file.
 - **Payout**: This command will pay from the scholar account to Scholar, Trainer and Manager. Trainer is optional. It can be executed asking for approval for each set of transactions (each scholar account), or go in auto-mode, without asking for approval before executing transactions.
 - **Transfer Axies**: This command will help you transfer multiple axies from multiple accounts to multiple accounts.
+- **Generate QR**: This command will generate QR codes for the accounts setup in payments.json. It will store them in the same folder those files are.
+- **Axie Morphing**: This command will morph all axies in one or multiple accounts. It will find and morph them automatically.
+- **Axie Breeding**: This command will breed the axies defined in axie breedings file. It will charge a fee at the end depending on the ammount of axies breed.
+- **Generate Breedings**: This command helps you generate the breedings file from a csv file.
 
 To read the instructions on how to run these commands:
 

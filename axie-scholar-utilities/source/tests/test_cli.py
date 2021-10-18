@@ -24,6 +24,7 @@ import axie_scholar_cli as cli
                               '<csv_file>': None,
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
+                              'generate_breedings': False,
                               'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
@@ -43,6 +44,7 @@ import axie_scholar_cli as cli
                               '<csv_file>': None,
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
+                              'generate_breedings': False,
                               'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
@@ -63,6 +65,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -82,6 +85,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": True,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -101,6 +105,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": True,
@@ -120,6 +125,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": True,
@@ -139,6 +145,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -158,6 +165,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': True,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -177,6 +185,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -196,6 +205,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -215,6 +225,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -234,6 +245,7 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': "file1",
                               'axie_breeding': True,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -253,8 +265,49 @@ import axie_scholar_cli as cli
                               'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
+                              'generate_breedings': False,
                               "claim": False,
                               "generate_QR": True,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["generate_breedings", "file1", "file2"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": None,
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': "file1",
+                              'mass_update_secrets': False,
+                              '<breedings_file>': "file2",
+                              'axie_breeding': False,
+                              'generate_breedings': True,
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["generate_breedings", "file1"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": None,
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': "file1",
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': True,
+                              "claim": False,
+                              "generate_QR": False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False})
@@ -284,6 +337,8 @@ def test_parses_params(params, expected_result):
                             (["generate_payments", "file1", "file2", "file3"]),
                             (["generate_payments"]),
                             (["axie_morphing"]),
+                            (["generate_breedings"]),
+                            (["generate_breedings", "file1", "file2", "file3"]),
                             (["axie_morphing", "file1"]),
                             (["axie_morphing", "file1", "foo", "bar"]),
                             (["axie_breeding"]),
@@ -299,6 +354,13 @@ def test_payout_file_check_fail(caplog):
     with patch.object(sys, 'argv', ["", "payout", "p_file.json", "s_file.json"]):
         cli.run_cli()
     assert "Please provide a correct path to the file. Path provided: p_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
+
+
+def test_generage_breedings_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "generate_breedings", "b_file.csv", "b_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: b_file.json" in caplog.text
     assert "Please review your file paths and re-try." in caplog.text
 
 
@@ -397,6 +459,34 @@ def test_generate_payments_file(tmpdir):
             }
         ]
     }
+
+
+def test_generate_breedings_file(tmpdir):
+    f1 = tmpdir.mkdir("other_folder").join("file1.csv")
+    f1.write('Sire,Matron,AccountAddress\n'
+             '123,234,ronin:abc1\n'
+             '1232,2342,ronin:abc2\n'
+             '1233,2343,ronin:abc3\n')
+    f2 = tmpdir.join("other_folder/breedings.json")
+    f2.write('{}')
+    cli.generate_breedings_file(f1.strpath, f2.strpath)
+    assert json.loads(f2.read()) == [
+        {
+            'Sire': 123,
+            'Matron': 234,
+            'AccountAddress': 'ronin:abc1',
+        },
+        {
+            'Sire': 1232,
+            'Matron': 2342,
+            'AccountAddress': 'ronin:abc2',
+        },
+        {
+            'Sire': 1233,
+            'Matron': 2343,
+            'AccountAddress': 'ronin:abc3',
+        }
+    ]
 
 
 def test_generate_secrets_partially_there(tmpdir):
