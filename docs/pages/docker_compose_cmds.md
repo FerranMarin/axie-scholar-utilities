@@ -73,7 +73,7 @@ For this command to work, remmember you will need to have in the same files fold
 
 For this command we need to have a generated payments file and secrets file. Then the command will be as follows:
 
-    docker-compose run scholar-utilities generate_QR payments.json secrets.json
+    docker-compose run scholar-utilities generate_QR files/payments.json files/secrets.json
 
 The resulting QR codes will be placed in same folder as secrets.json (in this case the files folder)
 
@@ -81,7 +81,7 @@ The resulting QR codes will be placed in same folder as secrets.json (in this ca
 
 This command will need a csv file to generate the final breedsings.json file. It needs to be inside the files folder. Then the command is as follows:
 
-    docker-compose run scholar-utilities generate_breedings breedings.csv breedings.json
+    docker-compose run scholar-utilities generate_breedings files/breedings.csv files/breedings.json
 
 For ease of use, please have a breedings.json file only containing `{}` in it. (Same as the empty secrets.json or payments.json)
 
@@ -89,7 +89,7 @@ For ease of use, please have a breedings.json file only containing `{}` in it. (
 
 To execute breedings, you need a generated breedings.json, explained in the previous step. Then the command is as follows:
 
-    docker-compose run scholar-utilities axie_breeding breedsings.json secrets.json
+    docker-compose run scholar-utilities axie_breeding files/breedings.json files/secrets.json
 
 This command will ask you to introduce a ronin account where you would like to pay the SLP fee for breeding. Pricing for this command will be charged all at once in a unique transaction once all breeds have been done.
 Each breed costs:
@@ -112,6 +112,6 @@ You can breed using multiple accounts and pay the fee with another one.
 
 This command will automatically find your axies to morph and morph them. It needs to have such account private keys in secrets.json. Then the command is as follows:
 
-    docker-compose run scholar-utilities axie_moprhing secrets.json ronin:abc1,ronin:abc2
+    docker-compose run scholar-utilities axie_moprhing files/secrets.json ronin:abc1,ronin:abc2
 
-Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACE!)
+Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACES!)
