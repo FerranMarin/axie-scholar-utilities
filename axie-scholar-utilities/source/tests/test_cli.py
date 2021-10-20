@@ -159,7 +159,7 @@ import axie_scholar_cli as cli
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
-                              'generate_transfer_axies': False
+                              'generate_transfer_axies': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
