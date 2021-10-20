@@ -65,6 +65,10 @@ For this command to work, remmember you will need to have in the source folder (
 
     poetry run python axie_scholar_cli.py transfer_axies transfers.json secrets.json
 
+If you want to be extra safe, you can use the `--safe-mode` flag to only allow transfers to accounts that are present in secrets.json. Command would loke like:
+
+    poetry run python axie_scholar_cli.py transfers.json secrets.json --safe-mode
+
 ## Generate QR
 
 For this command we need to have a generated payments file and secrets file. Then the command will be as follows:

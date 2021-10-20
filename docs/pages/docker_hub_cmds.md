@@ -68,6 +68,9 @@ For this command to work, remmember you will need to have in the folder the json
 
     axie-utils-transfer-axies transfers.json secrets.json
 
+If you want to be extra safe, you can use the `--safe-mode` flag to only allow transfers to accounts that are present in secrets.json. Command would loke like:
+
+    axie-utils-transfer-axies transfers.json secrets.json --safe-mode
 
 ## Generate QR
 

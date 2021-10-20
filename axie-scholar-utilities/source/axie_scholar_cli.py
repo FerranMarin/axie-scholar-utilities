@@ -12,7 +12,7 @@ Usage:
     axie_scholar_cli.py axie_morphing <secrets_file> <list_of_accounts>
     axie_scholar_cli.py axie_breeding <breedings_file> <secrets_file>
     axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
-    axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file>
+    axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file> [--safe-mode]
     axie_scholar_cli.py -h | --help
     axie_scholar_cli.py --version
 
@@ -56,7 +56,7 @@ def generate_breedings_file(csv_file_path, breeding_file_path=None):
         breeding_file_path = os.path.join(folder, 'breedings.json')
         with open(breeding_file_path, 'w', encoding='utf-8') as f:
             f.write("{}")
-    
+
     with open(csv_file_path, encoding='utf-8') as csv_file:
         reader = csv.DictReader(csv_file)
         breed_list = []
@@ -65,7 +65,7 @@ def generate_breedings_file(csv_file_path, breeding_file_path=None):
             integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
             clean_row.update(integer_row)
             breed_list.append(clean_row)
-    
+
     with open(breeding_file_path, 'w', encoding='utf-8') as f:
         json.dump(breed_list, f, ensure_ascii=False, indent=4)
     log.info('New breeds file saved')
@@ -209,8 +209,9 @@ def run_cli():
         logging.info('I shall send axies around')
         transfers_file_path = args['<transfers_file>']
         secrets_file_path = args['<secrets_file>']
+        secure = args.get("--safe-mode", None)
         if check_file(transfers_file_path) and check_file(secrets_file_path):
-            atm = AxieTransferManager(transfers_file_path, secrets_file_path)
+            atm = AxieTransferManager(transfers_file_path, secrets_file_path, secure=secure)
             atm.verify_inputs()
             atm.prepare_transfers()
         else:
