@@ -48,20 +48,20 @@ If you go this route, I recomend also setting up these alias in your terminal to
         docker run -it -v transfers.csv:/opt/app/files/transfers.csv -v transfers.json:/opt/app/files/transfers.json epith/axie-scholar-utilities generate_transfer_axies files/transfers.csv files/transfers.json
     }
     # Alias to execute generate_qr
-    functions axie-utils-gen-QR {
+    function axie-utils-gen-QR {
         docker run -it -v payments.json:/opt/app/files/transfers.json -v secrets.json:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json
     }
     #Alias to generate breedings file
-    functions axie-utils-gen-breedings {
+    function axie-utils-gen-breedings {
         docker run -it -v breedings.csv:/opt/app/files/breedings.csv -v breedings.json:/opt/app/files/breedings.json epith/axie-scholar-utilities generate_breedings files/breedings.csv files/breedings.json
     }
     # Alias to breed axies
-    functions axie-utils-axie-breeding {
+    function axie-utils-axie-breeding {
         docker run -it -v breedings.json:/opt/app/files/breedings.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_breeding files/breedings.json files/secrets.json
     }
     # Alias to morph axies
-    functions axie-utils-axie-moprhing {
-        docker run -it -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_moprhing files/secrets.json
+    function axie-utils-axie-morphing {
+        docker run -it -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_morphing files/secrets.json
     }
 
 Be aware, that this aliases will require the EXACT file names to work.

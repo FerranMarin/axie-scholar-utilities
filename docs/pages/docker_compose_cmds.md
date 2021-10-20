@@ -123,6 +123,6 @@ You can breed using multiple accounts and pay the fee with another one.
 
 This command will automatically find your axies to morph and morph them. It needs to have such account private keys in secrets.json. Then the command is as follows:
 
-    docker-compose run scholar-utilities axie_moprhing files/secrets.json ronin:abc1,ronin:abc2
+    docker-compose run scholar-utilities axie_morphing files/secrets.json ronin:abc1,ronin:abc2
 
 Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACES!)

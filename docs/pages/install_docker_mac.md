@@ -39,7 +39,7 @@ If you go this route, I recomend also setting up these alias in your terminal to
     # Alias to breed axies
         axie-utils-axie-breeding() {docker run -it -v ${PWD}/${1}:/opt/app/files/breedings.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_breeding files/breedings.json files/secrets.json}
     # Alias to morph axies
-        axie-utils-axie-moprhing() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_moprhing files/secrets.json}
+        axie-utils-axie-morphing() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_morphing files/secrets.json}
 
 
 To learn how to run the commands, please follow this [link](../pages/docker_hub_cmds.html)
