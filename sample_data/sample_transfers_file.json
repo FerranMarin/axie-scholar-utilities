@@ -1,35 +1,35 @@
 [
     {
-        "AccountAddress": "ronin:<whohasanaxie>",
-        "Breeds": [
+        "AccountAddress": "ronin:<whohasanaxie1>",
+        "Transfers": [
             {
-                "AxieId": 123,
-                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+                "AxieId": 1231,
+                "ReceiverAddress": "ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": 123,
-                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+                "AxieId": 1232,
+                "ReceiverAddress": "ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": 123,
-                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+                "AxieId": 1233,
+                "ReceiverAddress": "ronin:<whowillgetanaxie>"
             }
         ]
     },
     {
-        "AccountAddress": "ronin:<whohasanaxie>",
+        "AccountAddress": "ronin:<whohasanaxie2>",
         "Transfers": [
             {
-                "AxieId": 123,
-                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+                "AxieId": 1234,
+                "ReceiverAddress": "ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": 123,
-                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+                "AxieId": 1235,
+                "ReceiverAddress": "ronin:<whowillgetanaxie>"
             },
             {
-                "AxieId": 123,
-                "ReceiverAddress": "<ronin:<whowillgetanaxie>"
+                "AxieId": 1236,
+                "ReceiverAddress": "ronin:<whowillgetanaxie>"
             }
         ]
     }

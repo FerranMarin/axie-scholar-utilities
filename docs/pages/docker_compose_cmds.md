@@ -68,6 +68,13 @@ For this command to work, remmember you will need to have in the same files fold
 
     docker-compose run scholar-utilities transfer_axies files/transfers.json files/secrets.json
 
+## Generate Transfers File
+
+This command will need a csv file to generate the final transfers.json file. It needs to be inside the files folder. Then the command is as follows:
+
+    docker-compose run scholar-utilities generate_transfer_axies transfers.csv transfers.json
+
+For ease of use, please have a transfers.json file only containing `{}` in it. (Same as the empty secrets.json or payments.json)
 
 ## Generate QR
 

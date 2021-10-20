@@ -68,6 +68,11 @@ For this command to work, remmember you will need to have in the folder the json
 
     axie-utils-transfer-axies transfers.json secrets.json
 
+## Generate Transfers File
+
+This command will need a csv file to generate the final transfers.json file. It needs to be inside the same folder where you have the rest of files. Then the command is as follows:
+
+    axie-utils-gen-transfers transfers.csv transfers.json
 
 ## Generate QR
 

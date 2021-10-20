@@ -30,6 +30,8 @@ If you go this route, I recomend also setting up these alias in your terminal to
         axie-utils-auto-payout() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/${3}:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y}
     # Alias to execute axie transfers
         axie-utils-transfer-axies() {docker run -it -v ${PWD}/${1}:/opt/app/files/transfers.json -v ${PWD}/${2}:/opt/app/files/secrets.json epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json}
+    #Alias to generate transfers file
+        axie-utils-gen-transfers() {docker run -it -v ${PWD}/${1}:/opt/app/files/transfers.csv -v ${PWD}/${2}:/opt/app/files/transfers.json epith/axie-scholar-utilities generate_transfer_axies files/transfers.csv files/transfers.json}
     # Alias to execute generate_qr
         axie-utils-gen-QR() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json}
     #Alias to generate breedings file

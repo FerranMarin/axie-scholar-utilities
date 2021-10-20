@@ -43,6 +43,10 @@ If you go this route, I recomend also setting up these alias in your terminal to
     function axie-utils-transfer-axies {
         docker run -it -v payments.json:/opt/app/files/transfers.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json
     }
+    #Alias to generate transfers file
+    function axie-utils-gen-transfers {
+        docker run -it -v transfers.csv:/opt/app/files/transfers.csv -v transfers.json:/opt/app/files/transfers.json epith/axie-scholar-utilities generate_transfer_axies files/transfers.csv files/transfers.json
+    }
     # Alias to execute generate_qr
     functions axie-utils-gen-QR {
         docker run -it -v payments.json:/opt/app/files/transfers.json -v secrets.json:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json
