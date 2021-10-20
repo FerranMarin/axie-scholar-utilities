@@ -69,6 +69,14 @@ If you want to be extra safe, you can use the `--safe-mode` flag to only allow t
 
     poetry run python axie_scholar_cli.py transfers.json secrets.json --safe-mode
 
+## Generate Transfers File
+
+This command will need a csv file to generate the final transfers.json file. It needs to be inside the source folder. Then the command is as follows:
+
+    poetry run python axie_scholar_cli.py generate_transfer_axies transfers.csv transfers.json
+
+If you do not provide a transfers.json it will be generated for you in the same folder transfers.csv is.
+
 ## Generate QR
 
 For this command we need to have a generated payments file and secrets file. Then the command will be as follows:

@@ -13,6 +13,7 @@ Usage:
     axie_scholar_cli.py axie_breeding <breedings_file> <secrets_file>
     axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
     axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file> [--safe-mode]
+    axie_scholar_cli.py generate_transfer_axies <csv_file> [<transfers_file>]
     axie_scholar_cli.py -h | --help
     axie_scholar_cli.py --version
 
@@ -49,10 +50,41 @@ ch.setFormatter(formatter)
 log.addHandler(ch)
 
 
+def generate_transfers_file(csv_file_path, transfer_file_path=None):
+    if not transfer_file_path:
+        # Put transfer file in same folder where the csv is
+        folder = os.path.dirname(csv_file_path)
+        transfer_file_path = os.path.join(folder, 'transfers.json')
+        with open(transfer_file_path, 'w', encoding='utf-8') as f:
+            f.write("{}")
+
+    transfers_dict = {}
+    with open(csv_file_path, encoding='utf-8') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            acc = row['AccountAddress']
+            axie = row['AxieId']
+            receiver = row['ReceiverAddress']
+            ax_dict = {"AxieId": int(axie), "ReceiverAddress": receiver}
+            if acc not in transfers_dict:
+                transfers_dict[acc] = {"Transfers": [ax_dict]}
+            else:
+                transfers_dict[acc]['Transfers'].append(ax_dict)
+
+    transfers_list = []
+    for d in transfers_dict:
+        transfers_list.append({"AccountAddress": d, "Transfers": transfers_dict[d]['Transfers']})
+
+    with open(transfer_file_path, 'w', encoding='utf-8') as f:
+        json.dump(transfers_list, f, ensure_ascii=False, indent=4)
+
+    log.info("New transfers file saved")
+
+
 def generate_breedings_file(csv_file_path, breeding_file_path=None):
     if not breeding_file_path:
         # Put breeding file in same folder where the csv is
-        folder = os.path.dirname(breeding_file_path)
+        folder = os.path.dirname(csv_file_path)
         breeding_file_path = os.path.join(folder, 'breedings.json')
         with open(breeding_file_path, 'w', encoding='utf-8') as f:
             f.write("{}")
@@ -68,13 +100,14 @@ def generate_breedings_file(csv_file_path, breeding_file_path=None):
 
     with open(breeding_file_path, 'w', encoding='utf-8') as f:
         json.dump(breed_list, f, ensure_ascii=False, indent=4)
+
     log.info('New breeds file saved')
 
 
 def generate_payments_file(csv_file_path, payments_file_path=None):
     if not payments_file_path:
         # Put payments file in same folder where the csv is
-        folder = os.path.dirname(payments_file_path)
+        folder = os.path.dirname(csv_file_path)
         payments_file_path = os.path.join(folder, 'payments.json')
         with open(payments_file_path, 'w', encoding='utf-8') as f:
             f.write("{}")
@@ -104,6 +137,7 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
 
     with open(payments_file_path, 'w', encoding='utf-8') as f:
         json.dump(payments_dict, f, ensure_ascii=False, indent=4)
+
     log.info('New payments file saved')
 
 
@@ -202,6 +236,16 @@ def run_cli():
         secrets_file_path = args['<secrets_file>']
         if check_file(csv_file_path) and check_file(secrets_file_path):
             mass_update_secret_file(csv_file_path, secrets_file_path)
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['generate_transfer_axies']:
+        # Generate Axie Transfer Files
+        logging.info('I shall help you create axie transfers file')
+        csv_file_path = args['<csv_file>']
+        transfers_file_path = args.get('<transfers_file>')
+        if (transfers_file_path and check_file(transfers_file_path) and
+           check_file(csv_file_path) or not transfers_file_path and check_file(csv_file_path)):
+            generate_transfers_file(csv_file_path, transfers_file_path)
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['transfer_axies']:

@@ -72,6 +72,12 @@ If you want to be extra safe, you can use the `--safe-mode` flag to only allow t
 
     axie-utils-transfer-axies transfers.json secrets.json --safe-mode
 
+## Generate Transfers File
+
+This command will need a csv file to generate the final transfers.json file. It needs to be inside the same folder where you have the rest of files. Then the command is as follows:
+
+    axie-utils-gen-transfers transfers.csv transfers.json
+
 ## Generate QR
 
 For this command we need to have a generated payments file and secrets file. Then the command will be as follows:

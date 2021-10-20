@@ -278,6 +278,28 @@ Please, this file cannot have any other headers other than the following.
 
 **Note**: Percents in this file are written as whole numbers. For example, 40 means 40%, 5 means 5%.
 
+# Create Transfers CSV file
+This CSV file is used to create the transfers file. You can use excel or google docs or anything that produces a csv file. It has to look like something:
+
+![Transfers CSV Image](../assets/sample_csv_transfers.jpg)
+
+And the resulting csv:
+
+```
+AccountAddress,AxieId,ReceiverAddress
+ronin:<whohasanaxie1>,1231,ronin:<whowillgetanaxie>
+ronin:<whohasanaxie1>,1232,ronin:<whowillgetanaxie>
+ronin:<whohasanaxie1>,1233,ronin:<whowillgetanaxie>
+ronin:<whohasanaxie2>,1234,ronin:<whowillgetanaxie>
+ronin:<whohasanaxie2>,1235,ronin:<whowillgetanaxie>
+ronin:<whohasanaxie2>,1236,ronin:<whowillgetanaxie>
+```
+
+Please, this file cannot have any other headers other than the following.
+- **AccountAddress**: Account that currently holds the axie to be sent
+- **AxieId**: Id of the Axie to be transfered
+- **ReceiverAddress**: Account that the axie will be sent to
+
 # Create Breeding CSV file
 This CSV file is used to create the breeding file. You can use excel or google docs or anything that produces a csv file. It has to look like something:
 

@@ -72,6 +72,14 @@ If you want to be extra safe, you can use the `--safe-mode` flag to only allow t
 
     docker-compose run scholar-utilities transfer_axies files/transfers.json files/secrets.json --safe-mode
 
+## Generate Transfers File
+
+This command will need a csv file to generate the final transfers.json file. It needs to be inside the files folder. Then the command is as follows:
+
+    docker-compose run scholar-utilities generate_transfer_axies transfers.csv transfers.json
+
+For ease of use, please have a transfers.json file only containing `{}` in it. (Same as the empty secrets.json or payments.json)
+
 ## Generate QR
 
 For this command we need to have a generated payments file and secrets file. Then the command will be as follows:

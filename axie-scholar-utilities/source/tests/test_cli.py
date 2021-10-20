@@ -29,6 +29,7 @@ import axie_scholar_cli as cli
                               'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": True}),
@@ -50,6 +51,7 @@ import axie_scholar_cli as cli
                               'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": True}),
@@ -71,6 +73,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": True}),
@@ -92,6 +95,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": True,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
@@ -113,6 +117,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": True,
                               'generate_payments': False,
                               "payout": False}),
@@ -134,6 +139,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": True,
                               'generate_payments': False,
                               "payout": False}),
@@ -153,6 +159,7 @@ import axie_scholar_cli as cli
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
+                              'generate_transfer_axies': False,
                               "claim": False,
                               "generate_QR": False,
                               "generate_secrets": False,
@@ -176,6 +183,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
@@ -197,6 +205,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
@@ -218,6 +227,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': True,
                               "payout": False}),
@@ -239,6 +249,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': True,
                               "payout": False}),
@@ -260,6 +271,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
@@ -281,6 +293,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
@@ -302,6 +315,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": True,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
@@ -323,6 +337,7 @@ import axie_scholar_cli as cli
                               'generate_breedings': True,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False}),
@@ -344,6 +359,51 @@ import axie_scholar_cli as cli
                               'generate_breedings': True,
                               "claim": False,
                               "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["generate_transfer_axies", "file1", "file2"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": None,
+                              '<transfers_file>': "file2",
+                              'transfer_axies': False,
+                              '<csv_file>': "file1",
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': True,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["generate_transfer_axies", "file1"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": None,
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': "file1",
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              'generate_transfer_axies': True,
                               "generate_secrets": False,
                               'generate_payments': False,
                               "payout": False})
@@ -375,6 +435,8 @@ def test_parses_params(params, expected_result):
                             (["axie_morphing"]),
                             (["generate_breedings"]),
                             (["generate_breedings", "file1", "file2", "file3"]),
+                            (["generate_transfer_axies"]),
+                            (["generate_transfer_axies", "file1", "file2", "file3"]),
                             (["axie_morphing", "file1"]),
                             (["axie_morphing", "file1", "foo", "bar"]),
                             (["axie_breeding"]),
@@ -393,10 +455,16 @@ def test_payout_file_check_fail(caplog):
     assert "Please review your file paths and re-try." in caplog.text
 
 
-def test_generage_breedings_file_check_fail(caplog):
+def test_generate_breedings_file_check_fail(caplog):
     with patch.object(sys, 'argv', ["", "generate_breedings", "b_file.csv", "b_file.json"]):
         cli.run_cli()
     assert "Please provide a correct path to the file. Path provided: b_file.json" in caplog.text
+    assert "Please review your file paths and re-try." in caplog.text
+
+def test_generate_transfers_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "generate_transfer_axies", "t_file.csv", "t_file.json"]):
+        cli.run_cli()
+    assert "Please provide a correct path to the file. Path provided: t_file.json" in caplog.text
     assert "Please review your file paths and re-try." in caplog.text
 
 
@@ -521,6 +589,56 @@ def test_generate_breedings_file(tmpdir):
             'Sire': 1233,
             'Matron': 2343,
             'AccountAddress': 'ronin:abc3',
+        }
+    ]
+
+
+def test_generate_transfer_file(tmpdir):
+    f1 = tmpdir.mkdir("other_folder").join("file1.csv")
+    f1.write('AccountAddress,AxieId,ReceiverAddress\n'
+             'ronin:<whohasanaxie1>,1231,ronin:<whowillgetanaxie>\n'
+             'ronin:<whohasanaxie1>,1232,ronin:<whowillgetanaxie>\n'
+             'ronin:<whohasanaxie1>,1233,ronin:<whowillgetanaxie>\n'
+             'ronin:<whohasanaxie2>,1234,ronin:<whowillgetanaxie>\n'
+             'ronin:<whohasanaxie2>,1235,ronin:<whowillgetanaxie>\n'
+             'ronin:<whohasanaxie2>,1236,ronin:<whowillgetanaxie>\n')
+    f2 = tmpdir.join("other_folder/breedings.json")
+    f2.write('{}')
+    cli.generate_transfers_file(f1.strpath, f2.strpath)
+    assert json.loads(f2.read()) == [
+        {
+            "AccountAddress": "ronin:<whohasanaxie1>",
+            "Transfers": [
+                {
+                    "AxieId": 1231,
+                    "ReceiverAddress": "ronin:<whowillgetanaxie>"
+                },
+                {
+                    "AxieId": 1232,
+                    "ReceiverAddress": "ronin:<whowillgetanaxie>"
+                },
+                {
+                    "AxieId": 1233,
+                    "ReceiverAddress": "ronin:<whowillgetanaxie>"
+                }
+            ]
+        },
+        {
+            "AccountAddress": "ronin:<whohasanaxie2>",
+            "Transfers": [
+                {
+                    "AxieId": 1234,
+                    "ReceiverAddress": "ronin:<whowillgetanaxie>"
+                },
+                {
+                    "AxieId": 1235,
+                    "ReceiverAddress": "ronin:<whowillgetanaxie>"
+                },
+                {
+                    "AxieId": 1236,
+                    "ReceiverAddress": "ronin:<whowillgetanaxie>"
+                }
+            ]
         }
     ]
 
