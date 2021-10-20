@@ -20,7 +20,7 @@ If you go this route, I recomend also setting up these alias in your terminal to
         docker run -it -v payments.json:/opt/app/files/payments.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities generate_secrets files/payments.json files/secrets.json
     }
     # Alias to generate payments
-    funcion axie-utils-gen-payments {
+    function axie-utils-gen-payments {
         docker run -it -v payments.csv:/opt/app/files/payments.csv -v payments.json:/opt/app/files/payments.json epith/axie-scholar-utilities generate_payments files/payments.csv files/payments.json
     }
     # Alias to mass update secrets
