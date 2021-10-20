@@ -12,10 +12,13 @@ from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 def test_transfer_manager_init(mocked_load_json):
     transfers_file = "sample_transfers_file.json"
     secrets_file = "sample_secrets_file.json"
-    AxieTransferManager(transfers_file, secrets_file)
+    atm = AxieTransferManager(transfers_file, secrets_file)
     mocked_load_json.assert_has_calls(
         calls=[call(transfers_file), call(secrets_file)]
     )
+    assert atm.secure == None
+    atm = AxieTransferManager(transfers_file, secrets_file, True)
+    assert atm.secure == True
 
 
 @patch("axie.transfers.get_nonce", return_value=1)
@@ -58,6 +61,34 @@ def test_transfer_manager_prepare_transfers(mocked_execute_transfers,
     assert transactions_list[2].to_acc == "0x3"
     assert transactions_list[2].axie_id == 234
     assert transactions_list[2].nonce == 3
+
+@patch("axie.transfers.get_nonce", return_value=1)
+@patch("axie.transfers.load_json")
+@patch("axie.transfers.AxieTransferManager.execute_transfers")
+def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers,
+                                            mocked_load_json,
+                                            mocked_get_nonce):
+    transfers_file = "sample_transfers_file.json"
+    secrets_file = "sample_secrets_file.json"
+    atm = AxieTransferManager(transfers_file, secrets_file, True)
+    mocked_load_json.assert_has_calls(
+        calls=[call(transfers_file), call(secrets_file)]
+    )
+    atm.transfers_file = [{"AccountAddress": "ronin:1", "Transfers": [
+        {"AxieId": 123, "ReceiverAddress": "ronin:2"},
+        {"AxieId": 123123, "ReceiverAddress": "ronin:2"},
+        {"AxieId": 234, "ReceiverAddress": "ronin:3"}
+    ]}]
+    atm.secrets_file = {"ronin:1": "0xsecret1", "ronin:3": "0xsecret3"}
+    atm.prepare_transfers()
+    assert mocked_get_nonce.call_count == 1
+    assert mocked_execute_transfers.call_count == 1
+    transactions_list = mocked_execute_transfers.call_args_list[0][0][0]
+    assert transactions_list[0].from_acc == "0x1"
+    assert transactions_list[0].from_private == "0xsecret1"
+    assert transactions_list[0].to_acc == "0x3"
+    assert transactions_list[0].axie_id == 234
+    assert transactions_list[0].nonce == 1
 
 
 @pytest.mark.asyncio

@@ -12,7 +12,7 @@ Usage:
     axie_scholar_cli.py axie_morphing <secrets_file> <list_of_accounts>
     axie_scholar_cli.py axie_breeding <breedings_file> <secrets_file>
     axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
-    axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file>
+    axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file> [--safe-mode]
     axie_scholar_cli.py generate_transfer_axies <csv_file> [<transfers_file>]
     axie_scholar_cli.py -h | --help
     axie_scholar_cli.py --version
@@ -253,8 +253,9 @@ def run_cli():
         logging.info('I shall send axies around')
         transfers_file_path = args['<transfers_file>']
         secrets_file_path = args['<secrets_file>']
+        secure = args.get("--safe-mode", None)
         if check_file(transfers_file_path) and check_file(secrets_file_path):
-            atm = AxieTransferManager(transfers_file_path, secrets_file_path)
+            atm = AxieTransferManager(transfers_file_path, secrets_file_path, secure=secure)
             atm.verify_inputs()
             atm.prepare_transfers()
         else:

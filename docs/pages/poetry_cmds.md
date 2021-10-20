@@ -65,6 +65,10 @@ For this command to work, remmember you will need to have in the source folder (
 
     poetry run python axie_scholar_cli.py transfer_axies transfers.json secrets.json
 
+If you want to be extra safe, you can use the `--safe-mode` flag to only allow transfers to accounts that are present in secrets.json. Command would loke like:
+
+    poetry run python axie_scholar_cli.py transfers.json secrets.json --safe-mode
+
 ## Generate Transfers File
 
 This command will need a csv file to generate the final transfers.json file. It needs to be inside the source folder. Then the command is as follows:
