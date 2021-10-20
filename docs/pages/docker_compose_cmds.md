@@ -68,6 +68,9 @@ For this command to work, remmember you will need to have in the same files fold
 
     docker-compose run scholar-utilities transfer_axies files/transfers.json files/secrets.json
 
+If you want to be extra safe, you can use the `--safe-mode` flag to only allow transfers to accounts that are present in secrets.json. Command would loke like:
+
+    docker-compose run scholar-utilities transfer_axies files/transfers.json files/secrets.json --safe-mode
 
 ## Generate QR
 

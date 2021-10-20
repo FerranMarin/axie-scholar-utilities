@@ -86,9 +86,10 @@ class Transfer:
 
 
 class AxieTransferManager:
-    def __init__(self, transfers_file, secrets_file):
+    def __init__(self, transfers_file, secrets_file, secure=None):
         self.transfers_file = load_json(transfers_file)
         self.secrets_file = load_json(secrets_file)
+        self.secure = secure
 
     def verify_inputs(self):
         logging.info("Validating file inputs...")
@@ -124,15 +125,16 @@ class AxieTransferManager:
         for acc in self.transfers_file:
             nonce = None
             for axie in acc['Transfers']:
-                t = Transfer(
-                    to_acc=axie['ReceiverAddress'],
-                    from_private=self.secrets_file[acc['AccountAddress']],
-                    from_acc=acc['AccountAddress'],
-                    axie_id=axie['AxieId'],
-                    nonce=nonce
-                )
-                nonce = t.nonce + 1
-                transfers.append(t)
+                if not self.secure or (self.secure and axie['ReceiverAddress'] in self.secrets_file):
+                    t = Transfer(
+                        to_acc=axie['ReceiverAddress'],
+                        from_private=self.secrets_file[acc['AccountAddress']],
+                        from_acc=acc['AccountAddress'],
+                        axie_id=axie['AxieId'],
+                        nonce=nonce
+                    )
+                    nonce = t.nonce + 1
+                    transfers.append(t)
         self.execute_transfers(transfers)
 
     def execute_transfers(self, transfers):

@@ -15,7 +15,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
@@ -35,7 +36,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": True,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
@@ -55,7 +57,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": True,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
@@ -75,7 +78,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
@@ -95,7 +99,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": None,
@@ -115,7 +120,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
@@ -135,7 +141,29 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": None,
+                              "<secrets_file>": "file2",
+                              '<transfers_file>': "file1",
+                              'transfer_axies': True,
+                              '<csv_file>': None,
+                              'mass_update_secrets': False,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": False,
+                              "generate_QR": False,
+                              "generate_secrets": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["transfer_axies", "file1", "file2", "--safe-mode"],
+                             {"--help": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": True,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": "file2",
@@ -155,7 +183,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": "file2",
@@ -175,7 +204,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file2",
                               "<secrets_file>": None,
@@ -195,7 +225,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": None,
@@ -215,7 +246,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': "a,b,c", 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': "a,b,c",
                               'axie_morphing': True,
                               "<payments_file>": None,
                               "<secrets_file>": "file1",
@@ -235,7 +267,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
                               "<secrets_file>": "file2",
@@ -255,7 +288,8 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
-                              '<list_of_accounts>': None, 
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
                               "<secrets_file>": "file2",
@@ -275,6 +309,7 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
+                              "--safe-mode": False,
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
@@ -295,6 +330,7 @@ import axie_scholar_cli as cli
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
+                              "--safe-mode": False,
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
@@ -572,7 +608,22 @@ def test_transfer(mock_verify_inputs, mock_prepare_transfers, mock_transfersmana
         cli.run_cli()
     mock_verify_inputs.assert_called_with()
     mock_prepare_transfers.assert_called_with()
-    mock_transfersmanager.assert_called_with(str(f1), str(f2))
+    mock_transfersmanager.assert_called_with(str(f1), str(f2), secure=False)
+
+
+@patch("axie.AxieTransferManager.__init__", return_value=None)
+@patch("axie.AxieTransferManager.prepare_transfers")
+@patch("axie.AxieTransferManager.verify_inputs")
+def test_transfer_secure(mock_verify_inputs, mock_prepare_transfers, mock_transfersmanager, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    f2 = tmpdir.join("file2.json")
+    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "transfer_axies", str(f1), str(f2), "--safe-mode"]):
+        cli.run_cli()
+    mock_verify_inputs.assert_called_with()
+    mock_prepare_transfers.assert_called_with()
+    mock_transfersmanager.assert_called_with(str(f1), str(f2), secure=True)
 
 
 def test_axie_morphing_file_check_fail(caplog):
@@ -592,7 +643,7 @@ def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axi
     f.write('{"ronin:<account_s1_address>": "hello"}')
     with patch.object(sys, 'argv', ["", "axie_morphing", str(f), "foo,bar"]):
         cli.run_cli()
-    mock_axies_init.assert_has_calls([call('foo'), call('bar')])    
+    mock_axies_init.assert_has_calls([call('foo'), call('bar')])
     mock_morphingmanager.assert_has_calls([call([1,2,3], "foo", str(f)), call([1,2,3], "bar", str(f))])
     assert mock_veritfy_inputs.call_count == 2
     assert mock_find_axies.call_count == 2
