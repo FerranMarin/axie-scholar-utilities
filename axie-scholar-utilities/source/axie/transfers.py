@@ -57,7 +57,7 @@ class Transfer:
             transaction,
             private_key=self.from_private
         )
-         # Send raw transaction
+        # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
@@ -75,10 +75,10 @@ class Transfer:
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:
-             logging.info(f"Important: {self} completed! Hash: {hash} - "
-                          f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+            logging.info(f"Important: {self} completed! Hash: {hash} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
         else:
-             logging.info(f"Important: {self} failed")
+            logging.info(f"Important: {self} failed")
 
     def __str__(self):
         return (f"Axie Transfer of axie ({self.axie_id}) from account ({self.from_acc.replace('0x', 'ronin:')}) "

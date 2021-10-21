@@ -13,7 +13,7 @@ class QRCode(AxieGraphQL):
     def __init__(self, acc_name, path, **kwargs):
         super(QRCode, self).__init__(**kwargs)
         self.acc_name = acc_name
-        self.path = os.path.join(path , f'{self.acc_name.lower()}-{int(datetime.timestamp(datetime.now()))}.png')
+        self.path = os.path.join(path, f'{self.acc_name.lower()}-{int(datetime.timestamp(datetime.now()))}.png')
 
     def generate_qr(self):
         jwt = self.get_jwt()
@@ -39,7 +39,7 @@ class QRCodeManager:
             refined_secrets[key] = secrets[key]
             acc_names[key] = scholar['Name']
         return refined_secrets, acc_names
-    
+
     def verify_inputs(self):
         validation_success = True
         # Check secrets file is not empty

@@ -14,7 +14,7 @@ def test_morph_manager_init(mock_load_json):
     secrets_file = "s_file.json"
     mm = AxieMorphingManager([1, 2, 3], "ronin:abc1", secrets_file)
     mock_load_json.assert_called_with(secrets_file)
-    assert mm.axie_list == [1,2,3]
+    assert mm.axie_list == [1, 2, 3]
     assert mm.account == "ronin:abc1"
     assert mm.secrets == {"foo": "bar"}
 
@@ -24,9 +24,9 @@ def test_morph_manager_verify_input_success(tmpdir):
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
-    mm = AxieMorphingManager([1,2,3], scholar_acc, s_file)
+    mm = AxieMorphingManager([1, 2, 3], scholar_acc, s_file)
     mm.verify_inputs()
-    assert mm.axie_list == [1,2,3]
+    assert mm.axie_list == [1, 2, 3]
     assert mm.account == scholar_acc
     assert mm.secrets == {scholar_acc: scholar_private_acc}
 
@@ -36,7 +36,7 @@ def test_morph_manager_verify_input_fail(tmpdir, caplog):
     s_file = tmpdir.join("s.json")
     s_file.write('{"foo": "bar"}')
     with patch.object(sys, "exit") as mocked_sys:
-        mm = AxieMorphingManager([1,2,3], scholar_acc, s_file)
+        mm = AxieMorphingManager([1, 2, 3], scholar_acc, s_file)
         mm.verify_inputs()
     mocked_sys.assert_called_once()
     assert f"Account '{scholar_acc}' is not present in secret file, please add it." in caplog.text
@@ -49,7 +49,7 @@ def test_morph_manager_execute(mock_morph_init, mock_morph_execute, tmpdir):
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
     s_file = tmpdir.join("s.json")
     s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
-    mm = AxieMorphingManager([1,2,3], scholar_acc, s_file)
+    mm = AxieMorphingManager([1, 2, 3], scholar_acc, s_file)
     mm.execute()
     mock_morph_init.assert_has_calls(calls=[
         call(axie=1, account=scholar_acc, private_key=scholar_private_acc),
@@ -80,7 +80,7 @@ def test_morph_execute(mock_get_jwt, mock_sign_msg, caplog):
         m.execute()
     mock_get_jwt.assert_called()
     mock_sign_msg.assert_called_with(encode_defunct(text=f"axie_id={m.axie}&owner={m.account}"),
-                                                    private_key=m.private_key)
+                                     private_key=m.private_key)
     assert f"Axie {m.axie} in {m.account} correctly morphed!" in caplog.text
 
 
@@ -98,5 +98,5 @@ def test_morph_execute_bad_json_response(mock_get_jwt, mock_sign_msg, caplog):
         m.execute()
     mock_get_jwt.assert_called()
     mock_sign_msg.assert_called_with(encode_defunct(text=f"axie_id={m.axie}&owner={m.account}"),
-                                                    private_key=m.private_key)
+                                     private_key=m.private_key)
     assert f"Somethin went wrong morphing axie {m.axie} in {m.account}" in caplog.text

@@ -39,7 +39,7 @@ class Claim(AxieGraphQL):
         )
         self.acc_name = acc_name
         self.request = requests.Session()
-        
+
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
         try:
@@ -73,13 +73,13 @@ class Claim(AxieGraphQL):
             response = self.request.post(url, headers=headers, json="")
         except RetryError as e:
             logging.critical(f"Error! Executing SLP claim API call for account {self.acc_name}"
-                            f"({self.account.replace('0x', 'ronin:')}). Error {e}")
+                             f"({self.account.replace('0x', 'ronin:')}). Error {e}")
             return
         if 200 <= response.status_code <= 299:
             signature = response.json()["blockchain_related"].get("signature")
             if not signature or not signature["signature"]:
                 logging.critical(f"Account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) had no signature "
-                                "in blockchain_related")
+                                 "in blockchain_related")
                 return
         else:
             logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "

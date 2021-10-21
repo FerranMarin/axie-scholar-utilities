@@ -30,7 +30,7 @@ def test_check_balance_slp(mock_provider, mock_contract, mock_checksum, _):
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.HTTPProvider", return_value='foo')
-def test_check_balance_slp(mock_provider, mock_contract, mock_checksum, _):
+def test_check_balance_slp_explicit(mock_provider, mock_contract, mock_checksum, _):
     result = check_balance("ronin:abc", 'slp')
     mock_provider.assert_called_with(RONIN_PROVIDER)
     mock_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xabc")])

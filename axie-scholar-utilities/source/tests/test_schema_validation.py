@@ -239,9 +239,9 @@ def test_json_validator_pass_payments_schema_optional_params(json_input):
     ({}, "{} is not of type 'array"),
     ([{}], "'AccountAddress' is a required property"),
     ([{"AccountAddress": "hello", "Transfers": []}],
-       "'hello' does not match '^ronin:'"),
+     "'hello' does not match '^ronin:'"),
     ([{"AccountAddress": "ronin:abc", "Transfers": [{}]}],
-       "'AxieId' is a required property"),
+     "'AxieId' is a required property"),
     ([{"AccountAddress": "ronin:abc", "Transfers": [
         {"AxieId": "abc"}
     ]}],
@@ -270,7 +270,7 @@ def test_json_validator_transfers_schema_error(json_input, expected_error):
     ]}, {"AccountAddress": "ronin:abc", "Transfers": [
         {"AxieId": 123, "ReceiverAddress": "ronin:foo"}
     ]}]),
-     ([{"AccountAddress": "ronin:abc", "Transfers": [
+    ([{"AccountAddress": "ronin:abc", "Transfers": [
         {"AxieId": 123, "ReceiverAddress": "ronin:foo"},
         {"AxieId": 123, "ReceiverAddress": "ronin:foo"},
         {"AxieId": 123, "ReceiverAddress": "ronin:foo"}
@@ -403,7 +403,7 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                 }
             ]
         }),
-        ({
+    ({
             "Manager": "ronin:<Manager address here>",
             "Scholars": [
                 {
@@ -425,7 +425,7 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                 }
             ]
         }),
-        ({
+    ({
             "Manager": "ronin:<Manager address here>",
             "Scholars": [
                 {
@@ -445,7 +445,7 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                     "TrainerPercent": 14,
                     "TrainerPayout": 100
                 }]}),
-        ({
+    ({
             "Manager": "ronin:<Manager address here>",
             "Scholars": [
                 {
@@ -464,7 +464,7 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                     "ScholarPercent": 45
                 }
             ]}),
-         ({
+    ({
             "Manager": "ronin:<Manager address here>",
             "Scholars": [
                 {
@@ -484,8 +484,8 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                     "ScholarPercent": 45
                 }
             ]}),
-        ({"Manager": "ronin:abc", "Scholars": []}),
-        ({"Manager": "ronin:abc", "Scholars": [], "Donations": []}),
+    ({"Manager": "ronin:abc", "Scholars": []}),
+    ({"Manager": "ronin:abc", "Scholars": [], "Donations": []}),
 ])
 def test_json_validator_pass_payments_percent_schema_optional_params(json_input):
     validate(json_input, payments_percent_schema)

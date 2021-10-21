@@ -3,9 +3,7 @@ import sys
 import json
 from datetime import datetime
 
-import pytest
 from mock import patch, call
-import requests_mock
 
 from axie import QRCodeManager
 from axie.qr_code import QRCode
@@ -65,6 +63,7 @@ def test_qrcode_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
 
     mocked_sys.assert_called_once()
     assert f"Public address {scholar_acc} needs to start with ronin:" in caplog.text
+
 
 def test_qrcode_manager_verify_input_wrong_private_ronin(tmpdir, caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
@@ -142,12 +141,12 @@ def test_qrcode_manager_execute(mocked_qrcode_init, mocked_qrcode_generate_qr, t
     }
     p_file.write(json.dumps(data))
     s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'", "'+scholar_acc_other+'":"'+scholar_private_acc_other+'"}')
+    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'", "'+scholar_acc_other+'":"'+scholar_private_acc_other+'"}') # noqa
     qr = QRCodeManager(p_file, s_file)
     qr.execute()
     mocked_qrcode_init.assert_has_calls(calls=[
         call(account=scholar_acc, private_key=scholar_private_acc, acc_name="Scholar 1", path=os.path.dirname(s_file)),
-        call(account=scholar_acc_other, private_key=scholar_private_acc_other, acc_name="Scholar 2", path=os.path.dirname(s_file))
+        call(account=scholar_acc_other, private_key=scholar_private_acc_other, acc_name="Scholar 2", path=os.path.dirname(s_file)) # noqa
     ])
     assert mocked_qrcode_generate_qr.call_count == 2
 

@@ -461,6 +461,7 @@ def test_generate_breedings_file_check_fail(caplog):
     assert "Please provide a correct path to the file. Path provided: b_file.json" in caplog.text
     assert "Please review your file paths and re-try." in caplog.text
 
+
 def test_generate_transfers_file_check_fail(caplog):
     with patch.object(sys, 'argv', ["", "generate_transfer_axies", "t_file.csv", "t_file.json"]):
         cli.run_cli()
@@ -753,16 +754,16 @@ def test_axie_morphing_file_check_fail(caplog):
 
 @patch("axie.AxieMorphingManager.__init__", return_value=None)
 @patch("axie.Axies.__init__", return_value=None)
-@patch("axie.Axies.find_axies_to_morph", return_value=[1,2,3])
+@patch("axie.Axies.find_axies_to_morph", return_value=[1, 2, 3])
 @patch("axie.AxieMorphingManager.execute")
 @patch("axie.AxieMorphingManager.verify_inputs")
-def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir):
+def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir): # noqa
     f = tmpdir.join("file2.json")
     f.write('{"ronin:<account_s1_address>": "hello"}')
     with patch.object(sys, 'argv', ["", "axie_morphing", str(f), "foo,bar"]):
         cli.run_cli()
     mock_axies_init.assert_has_calls([call('foo'), call('bar')])
-    mock_morphingmanager.assert_has_calls([call([1,2,3], "foo", str(f)), call([1,2,3], "bar", str(f))])
+    mock_morphingmanager.assert_has_calls([call([1, 2, 3], "foo", str(f)), call([1, 2, 3], "bar", str(f))])
     assert mock_veritfy_inputs.call_count == 2
     assert mock_find_axies.call_count == 2
     assert mock_morphing_execute.call_count == 2

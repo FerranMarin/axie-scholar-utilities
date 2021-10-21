@@ -24,7 +24,7 @@ class Axies:
         return self.contract.functions.balanceOf(
             Web3.toChecksumAddress(self.acc)
         ).call()
-    
+
     def find_axies_to_morph(self):
         num_axies = self.number_of_axies()
         axies = []
@@ -56,5 +56,5 @@ class Axies:
         # In case we want to check correctly morphed
         body_shape = response.json()["data"]["axie"]["bodyShape"]
         birth_date = response.json()["data"]["axie"]["birthDate"]
-        morph_date = datetime.fromtimestamp(birth_date) + timedelta(days=5)        
+        morph_date = datetime.fromtimestamp(birth_date) + timedelta(days=5)
         return morph_date, body_shape

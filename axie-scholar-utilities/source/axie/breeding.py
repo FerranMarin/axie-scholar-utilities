@@ -25,7 +25,7 @@ class Breed:
             self.nonce = max(get_nonce(self.address), nonce)
 
     def execute(self):
-        #Prepare transaction
+        # Prepare transaction
         with open("axie/axie_abi.json") as f:
             axie_abi = json.load(f)
         axie_contract = self.w3.eth.contract(
@@ -57,7 +57,7 @@ class Breed:
             recepit = self.w3.eth.wait_for_transaction_receipt(hash, timeout=300, poll_latency=5)
         except exceptions.TimeExhausted:
             logging.info("{self}, Transaction could not be processed within 5min, skipping it!")
-        
+
         if recepit['status'] == 1:
             logging.info("Important: {self} completed successfully")
         else:
@@ -91,7 +91,7 @@ class AxieBreedManager:
                 validation_error = True
         if self.payment_account not in self.secrets:
             logging.critical(f"Payment account '{self.payment_account}' is not present in secret file, please add it.")
-            validation_error = True       
+            validation_error = True
         if validation_error:
             sys.exit()
 
@@ -118,8 +118,8 @@ class AxieBreedManager:
         if check_balance(self.payment_account) < self.calculate_cost():
             logging.critical("Not enough SLP funds to pay for breeding and the fee")
             sys.exit()
-        
-        logging.info(f"About to start breeding axies")
+
+        logging.info("About to start breeding axies")
         for bf in self.breeding_file:
             b = Breed(
                 sire_axie=bf['Sire'],
@@ -135,7 +135,7 @@ class AxieBreedManager:
             "Breeding Fee",
             "donation",
             self.payment_account,
-            self.secrets[self.payment_account], 
+            self.secrets[self.payment_account],
             CREATOR_FEE_ADDRESS,
             fee,
             PaymentsSummary()

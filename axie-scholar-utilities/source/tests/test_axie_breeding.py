@@ -133,7 +133,7 @@ def test_breed_manager_calculate_fee_cost(tmpdir):
     b_file.write(json.dumps(data))
     abm = AxieBreedManager(b_file, s_file, acc)
     assert abm.calculate_fee_cost() == 30
-    abm.breeding_file = [1,2,3]
+    abm.breeding_file = [1, 2, 3]
     assert abm.calculate_fee_cost() == 30*3
     abm.breeding_file = list(range(17))
     assert abm.calculate_fee_cost() == (15 * 30) + ((17 - 15) * 25)
@@ -181,7 +181,7 @@ def test_breed_manager_execute(mock_payments_init,
         "Sire": 1234,
         "Matron": 5678,
         "AccountAddress": acc
-    },{
+    }, {
         "Sire": 123,
         "Matron": 456,
         "AccountAddress": acc
@@ -195,13 +195,14 @@ def test_breed_manager_execute(mock_payments_init,
         call(sire_axie=123, matron_axie=456, address=acc, private_key=private_acc)
     ])
     assert mock_bree_execute.call_count == 2
-    mock_payments_init.assert_called_with("Breeding Fee",
-            "donation",
-            acc,
-            private_acc, 
-            CREATOR_FEE_ADDRESS,
-            60,
-            PaymentsSummary())
+    mock_payments_init.assert_called_with(
+        "Breeding Fee",
+        "donation",
+        acc,
+        private_acc,
+        CREATOR_FEE_ADDRESS,
+        60,
+        PaymentsSummary())
     assert mock_payments_execute.call_count == 1
 
 
@@ -220,7 +221,7 @@ def test_breed_manager_execute_not_enough_slp(mock_check_balance, _, __, ___, __
         "Sire": 1234,
         "Matron": 5678,
         "AccountAddress": acc
-    },{
+    }, {
         "Sire": 123,
         "Matron": 456,
         "AccountAddress": acc
@@ -281,4 +282,3 @@ def test_breed_execute(mocked_provider,
     mock_keccak.assert_called_once()
     mock_to_hex.assert_called_with("result_of_keccak")
     mock_receipt.assert_called_with("transaction_hash", timeout=300, poll_latency=5)
-

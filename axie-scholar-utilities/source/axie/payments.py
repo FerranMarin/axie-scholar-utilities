@@ -149,7 +149,7 @@ class AxiePaymentsManager:
             if total > 0.99:
                 logging.critical("Payments file donations exeeds 100%, please review it")
                 validation_success = False
-            if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]):
+            if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]):  # noqa
                 logging.critical("Please review the ronins in your donations. One or more are wrong!")
                 validation_success = False
             self.donations = self.payments_file["Donations"]
@@ -158,11 +158,11 @@ class AxiePaymentsManager:
             if total > 99:
                 logging.critical("Payments file donations exeeds 100%, please review it")
                 validation_success = False
-            if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]):
+            if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]): # noqa
                 logging.critical("Please review the ronins in your donations. One or more are wrong!")
                 validation_success = False
             self.donations = self.payments_file["Donations"]
-        
+
         # Check we have private keys for all accounts
         for acc in self.payments_file["Scholars"]:
             if acc["AccountAddress"] not in self.secrets_file:
@@ -190,7 +190,7 @@ class AxiePaymentsManager:
             return False
         elif account_balance - balance > 0:
             logging.info(f'These payments will leave {account_balance - balance} SLP in your wallet.'
-                          'Cancel payments and adjust payments if you want to leave 0 SLP in it.')
+                         'Cancel payments and adjust payments if you want to leave 0 SLP in it.')
         return True
 
     def prepare_payout(self):
@@ -288,15 +288,14 @@ class AxiePaymentsManager:
                 if manager_payout - total_dono >= 0:
                     self.payout_account(acc["Name"], acc_payments)
                 else:
-                    logging.info("Fix your payments, currently after fees and donations manager is receiving a negative "
-                                 f"payment of {manager_payout - total_dono}")
+                    logging.info("Fix your payments, currently after fees and donations manager "
+                                 f"is receiving a negative payment of {manager_payout - total_dono}")
         logging.info(f"Important: Transactions Summary:\n {self.summary}")
 
     def prepare_payout_percent(self):
         for acc in self.scholar_accounts:
             acc_balance = check_balance(acc['AccountAddress'])
             total_payments = 0
-            total_dono = 0
             acc_payments = []
             # Scholar Payment
             scholar_amount = acc_balance * (acc["ScholarPercent"]/100)

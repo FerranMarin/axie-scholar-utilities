@@ -309,7 +309,7 @@ def run_cli():
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_breedings']:
-        #Generate breedings file
+        # Generate breedings file
         logging.info('I shall help you generate a breedings file')
         breedings_file_path = args.get('<breedings_file>')
         csv_file_path = args['<csv_file>']

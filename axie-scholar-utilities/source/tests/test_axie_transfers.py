@@ -16,9 +16,9 @@ def test_transfer_manager_init(mocked_load_json):
     mocked_load_json.assert_has_calls(
         calls=[call(transfers_file), call(secrets_file)]
     )
-    assert atm.secure == None
+    assert atm.secure is None
     atm = AxieTransferManager(transfers_file, secrets_file, True)
-    assert atm.secure == True
+    assert atm.secure is True
 
 
 @patch("axie.transfers.get_nonce", return_value=1)
@@ -62,12 +62,13 @@ def test_transfer_manager_prepare_transfers(mocked_execute_transfers,
     assert transactions_list[2].axie_id == 234
     assert transactions_list[2].nonce == 3
 
+
 @patch("axie.transfers.get_nonce", return_value=1)
 @patch("axie.transfers.load_json")
 @patch("axie.transfers.AxieTransferManager.execute_transfers")
 def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers,
-                                            mocked_load_json,
-                                            mocked_get_nonce):
+                                                   mocked_load_json,
+                                                   mocked_get_nonce):
     transfers_file = "sample_transfers_file.json"
     secrets_file = "sample_secrets_file.json"
     atm = AxieTransferManager(transfers_file, secrets_file, True)

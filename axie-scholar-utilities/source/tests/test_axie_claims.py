@@ -256,7 +256,7 @@ def test_create_random_msg_fail_req():
                         status_code=500)
         c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         random_msg = c.create_random_msg()
-        assert random_msg == None
+        assert random_msg is None
 
 
 @patch("web3.eth.Eth.contract")
@@ -303,7 +303,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
                         status_code=500)
         c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         jwt = c.get_jwt()
-        assert jwt == None
+        assert jwt is None
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -349,7 +349,7 @@ def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_ms
             "{createAccessTokenWithSignature(input: $input) "
             "{newAccount result accessToken __typename}}"
         }
-        assert jwt == None
+        assert jwt is None
         assert req_mocker.request_history[0].json() == expected_payload
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
@@ -364,7 +364,7 @@ def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_ms
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _):
     with requests_mock.Mocker() as req_mocker:
-        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", 
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createAccessTokenWithSignature": {}}})
         c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         jwt = c.get_jwt()
@@ -383,7 +383,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
             "{newAccount result accessToken __typename}}"
         }
         assert req_mocker.request_history[0].json() == expected_payload
-        assert jwt == None
+        assert jwt is None
         mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -516,4 +516,3 @@ async def test_execution_failed_get_blockchain(mocked_provider,
         mock_receipt.assert_not_called()
         mock_keccak.assert_not_called()
         mock_to_hex.assert_not_called()
-    

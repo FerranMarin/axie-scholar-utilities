@@ -19,9 +19,9 @@ def test_payments_manager_init(mocked_load_json):
     mocked_load_json.assert_has_calls(
         calls=[call(payments_file), call(secrets_file)]
     )
-    assert axp.auto == False
+    assert axp.auto is False
     axp2 = AxiePaymentsManager(payments_file, secrets_file, auto=True)
-    assert axp2.auto == True
+    assert axp2.auto is True
 
 
 def test_payments_manager_verify_input_success(tmpdir):
@@ -135,7 +135,7 @@ def test_payments_manager_verify_input_manager_ronin_short(tmpdir, caplog):
         axp = AxiePaymentsManager(p_file, s_file)
         axp.verify_inputs()
     mocked_sys.assert_called_once()
-    assert f"Please review the ronins in your donations. One or more are wrong!" in caplog.text
+    assert "Please review the ronins in your donations. One or more are wrong!" in caplog.text
 
 
 def test_payments_manager_verify_input_donations_exceed_max(tmpdir, caplog):
@@ -158,6 +158,7 @@ def test_payments_manager_verify_input_donations_exceed_max(tmpdir, caplog):
     mocked_sys.assert_called_once()
     assert "Payments file donations exeeds 100%, please review it" in caplog.text
 
+
 def test_payments_manager_verify_input_correct_dono(tmpdir, caplog):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
@@ -176,7 +177,6 @@ def test_payments_manager_verify_input_correct_dono(tmpdir, caplog):
         axp.verify_inputs()
     mocked_sys.assert_called_once()
     assert "Account 'Scholar 1' is not present in secret file, please add it." in caplog.text
-
 
 
 def test_payments_manager_verify_input_missing_private_key(tmpdir, caplog):
@@ -412,8 +412,8 @@ def test_payments_manager_prepare_payout_check_correct_calcs_amount(mocked_prepa
 @patch("axie.AxiePaymentsManager.prepare_payout_amount")
 @patch("axie.AxiePaymentsManager.prepare_payout_percent")
 def test_payments_manager_prepare_payout_check_correct_calcs_percent(mocked_prepare_payout_percent,
-                                                                    mocked_prepare_payout_amount,
-                                                                    tmpdir):
+                                                                     mocked_prepare_payout_amount,
+                                                                     tmpdir):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
@@ -471,7 +471,7 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent(mocked_e
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 450
     assert mocked_payout.call_args[0][1][0].nonce == 1
-     # 2nd payment
+    # 2nd payment
     assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
@@ -556,6 +556,7 @@ def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_bala
     mocked_check_balance.assert_called_with(scholar_acc, 1000)
     mocked_payout.assert_not_called()
 
+
 @patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
@@ -585,7 +586,6 @@ def test_payments_manager_prepare_no_payout_not_manager_payout(mocked_check_bala
     mocked_payout.assert_not_called()
     assert ('Fix your payments, currently after fees and donations manager is receiving a '
             'negative payment of -5' in caplog.text)
-
 
 
 @patch("axie.payments.get_nonce", return_value=100)
@@ -684,7 +684,6 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
         assert f"Payment to manager of Scholar 1({manager_acc}) for the amount of 386 SLP" in caplog.text
         assert "Transactions completed for account: 'Scholar 1'" in caplog.text
         assert "Transactions Summary:" in caplog.text
-
 
 
 @patch("axie.payments.Payment.execute")
