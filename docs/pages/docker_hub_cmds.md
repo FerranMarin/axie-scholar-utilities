@@ -36,7 +36,7 @@ This will ask for your manager ronin and then create a payments file according t
 
 ## Mass Update Secrets
 
-For this command you will need a file called update.csv. It needs to be inside the files folder. Then the command is as follows:
+For this command you will need a file called update.csv. It needs to be inside the folder that holds your json and csv files. Then the command is as follows:
 
     axie-utils-mass-update update.csv secrets.json
 
