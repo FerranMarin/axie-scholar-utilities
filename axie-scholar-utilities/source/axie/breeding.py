@@ -140,5 +140,4 @@ class AxieBreedManager:
             fee,
             PaymentsSummary()
         )
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(p.execute())
+        p.execute()

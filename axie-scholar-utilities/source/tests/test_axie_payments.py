@@ -224,10 +224,9 @@ def test_payments_manager_verify_input_invalid_private_key(tmpdir, caplog):
             "an empty secrets file" in caplog.text)
 
 
-@patch("axie.payments.get_nonce", return_value=1)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-def test_payments_manager_prepare_payout_low_slp(mocked_enough_balance, mocked_payout, mocked_get_nonce, tmpdir):
+def test_payments_manager_prepare_payout_low_slp(mocked_enough_balance, mocked_payout, tmpdir):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
@@ -246,7 +245,6 @@ def test_payments_manager_prepare_payout_low_slp(mocked_enough_balance, mocked_p
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_enough_balance.assert_called_with(scholar_acc, 20)
-    assert mocked_get_nonce.call_count == 4
     mocked_payout.assert_called_once()
     # 1st payment
     assert mocked_payout.call_args[0][0] == "Scholar 1"
@@ -254,28 +252,23 @@ def test_payments_manager_prepare_payout_low_slp(mocked_enough_balance, mocked_p
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 10
-    assert mocked_payout.call_args[0][1][0].nonce == 1
     # 2nd payment
     assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][1].amount == 1
-    assert mocked_payout.call_args[0][1][1].nonce == 2
     # 3rd Payment
     assert mocked_payout.call_args[0][1][2].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][2].amount == 9
-    assert mocked_payout.call_args[0][1][2].nonce == 3
     assert len(mocked_payout.call_args[0][1]) == 3
 
 
-@patch("axie.payments.get_nonce", return_value=1)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_enough_balance,
                                                            mocked_payout,
-                                                           mocked_get_nonce,
                                                            tmpdir):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
@@ -293,7 +286,6 @@ def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_enough_balance
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_enough_balance.assert_called_with(scholar_acc, 1000)
-    assert mocked_get_nonce.call_count == 5
     mocked_payout.assert_called_once()
     # 1st payment
     assert mocked_payout.call_args[0][0] == "Scholar 1"
@@ -301,34 +293,28 @@ def test_payments_manager_prepare_payout_high_slp_no_donos(mocked_enough_balance
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 500
-    assert mocked_payout.call_args[0][1][0].nonce == 1
     # 2nd payment
     assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][1].amount == 100
-    assert mocked_payout.call_args[0][1][1].nonce == 2
     # 3rd Payment (fee)
     assert mocked_payout.call_args[0][1][2].name == "Donation to software creator for Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][2].amount == round(1000*0.01)
-    assert mocked_payout.call_args[0][1][2].nonce == 3
     # 4th Payment
     assert mocked_payout.call_args[0][1][3].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][3].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][3].amount == 400 - round(1000*0.01)
-    assert mocked_payout.call_args[0][1][3].nonce == 4
     assert len(mocked_payout.call_args[0][1]) == 4
 
 
-@patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_high_slp_with_donos(mocked_enough_balance,
                                                              mocked_payout,
-                                                             mocked_get_nonce,
                                                              tmpdir):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
@@ -348,7 +334,6 @@ def test_payments_manager_prepare_payout_high_slp_with_donos(mocked_enough_balan
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_enough_balance.assert_called_with(scholar_acc, 1000)
-    assert mocked_get_nonce.call_count == 6
     mocked_payout.assert_called_once()
     # 1st payment
     assert mocked_payout.call_args[0][0] == "Scholar 1"
@@ -356,31 +341,26 @@ def test_payments_manager_prepare_payout_high_slp_with_donos(mocked_enough_balan
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 500
-    assert mocked_payout.call_args[0][1][0].nonce == 100
     # 2nd payment
     assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][1].amount == 100
-    assert mocked_payout.call_args[0][1][1].nonce == 101
     # 3rd payment (dono)
     assert mocked_payout.call_args[0][1][2].name == "Donation to Entity 1 for Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][2].amount == round(400*0.01)
-    assert mocked_payout.call_args[0][1][2].nonce == 102
     # 4th Payment (fee)
     assert mocked_payout.call_args[0][1][3].name == "Donation to software creator for Scholar 1"
     assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][3].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][3].amount == round(1000*0.01)
-    assert mocked_payout.call_args[0][1][3].nonce == 103
     # 5th Payment
     assert mocked_payout.call_args[0][1][4].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][4].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][4].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][4].amount == 400 - round(1000*0.01) - round(400*0.01)
-    assert mocked_payout.call_args[0][1][4].nonce == 104
     assert len(mocked_payout.call_args[0][1]) == 5
 
 
@@ -435,12 +415,10 @@ def test_payments_manager_prepare_payout_check_correct_calcs_percent(mocked_prep
 
 
 @patch("axie.payments.check_balance", return_value=1000)
-@patch("axie.payments.get_nonce", return_value=1)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_check_correct_payments_percent(mocked_enough_balance,
                                                                         mocked_payout,
-                                                                        mocked_get_nonce,
                                                                         mocked_check_balance,
                                                                         tmpdir):
     p_file = tmpdir.join("p.json")
@@ -462,7 +440,6 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent(mocked_e
     axp.prepare_payout()
     mocked_check_balance.assert_called()
     mocked_enough_balance.assert_called_with(scholar_acc, 1000)
-    assert mocked_get_nonce.call_count == 6
     mocked_payout.assert_called_once()
     # 1st payment
     assert mocked_payout.call_args[0][0] == "Scholar 1"
@@ -470,41 +447,34 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent(mocked_e
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][0].amount == 450
-    assert mocked_payout.call_args[0][1][0].nonce == 1
     # 2nd payment
     assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][1].amount == 100
-    assert mocked_payout.call_args[0][1][1].nonce == 2
     # 3rd payment (dono)
     assert mocked_payout.call_args[0][1][2].name == "Donation to Entity 1 for Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][2].amount == round(450*0.01)
-    assert mocked_payout.call_args[0][1][2].nonce == 3
     # 4th Payment (fee)
     assert mocked_payout.call_args[0][1][3].name == "Donation to software creator for Scholar 1"
     assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][3].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][3].amount == round(1000*0.01)
-    assert mocked_payout.call_args[0][1][3].nonce == 4
     # 5th Payment
     assert mocked_payout.call_args[0][1][4].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][4].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][4].from_private == scholar_private_acc
     assert mocked_payout.call_args[0][1][4].amount == 1000 - 550 - round(1000*0.01) - round(450*0.01)
-    assert mocked_payout.call_args[0][1][4].nonce == 5
     assert len(mocked_payout.call_args[0][1]) == 5
 
 
 @patch("axie.payments.check_balance", return_value=0)
-@patch("axie.payments.get_nonce", return_value=1)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_check_correct_payments_percent_no_balance(mocked_enough_balance,
                                                                                    mocked_payout,
-                                                                                   mocked_get_nonce,
                                                                                    mocked_check_balance,
                                                                                    tmpdir):
     p_file = tmpdir.join("p.json")
@@ -525,16 +495,13 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent_no_balan
     axp.prepare_payout()
     mocked_check_balance.assert_called()
     mocked_enough_balance.assert_called_with(scholar_acc, 0)
-    assert mocked_get_nonce.call_count == 2
     mocked_payout.assert_not_called()
 
 
-@patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=False)
 def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_balance,
                                                                mocked_payout,
-                                                               mocked_get_nonce,
                                                                tmpdir):
     p_file = tmpdir.join("p.json")
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
@@ -552,17 +519,14 @@ def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_bala
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
     axp.prepare_payout()
-    assert mocked_get_nonce.call_count == 6
     mocked_check_balance.assert_called_with(scholar_acc, 1000)
     mocked_payout.assert_not_called()
 
 
-@patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_no_payout_not_manager_payout(mocked_check_balance,
                                                                mocked_payout,
-                                                               mocked_get_nonce,
                                                                tmpdir,
                                                                caplog):
     p_file = tmpdir.join("p.json")
@@ -581,19 +545,16 @@ def test_payments_manager_prepare_no_payout_not_manager_payout(mocked_check_bala
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
     axp.prepare_payout()
-    assert mocked_get_nonce.call_count == 5
     mocked_check_balance.assert_called_with(scholar_acc, 601)
     mocked_payout.assert_not_called()
     assert ('Fix your payments, currently after fees and donations manager is receiving a '
             'negative payment of -5' in caplog.text)
 
 
-@patch("axie.payments.get_nonce", return_value=100)
 @patch("axie.AxiePaymentsManager.payout_account")
 @patch("axie.payments.check_balance", return_value=90000)
 def test_payments_manager_enough_balance_with_leftovers(mocked_check_balance,
                                                         mocked_payout,
-                                                        mocked_get_nonce,
                                                         tmpdir,
                                                         caplog):
     p_file = tmpdir.join("p.json")
@@ -612,7 +573,6 @@ def test_payments_manager_enough_balance_with_leftovers(mocked_check_balance,
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
     axp.prepare_payout()
-    assert mocked_get_nonce.call_count == 6
     mocked_check_balance.assert_called_with(scholar_acc)
     mocked_payout.assert_called()
     assert ("These payments will leave 89000 SLP in your wallet."
@@ -712,39 +672,34 @@ def test_payments_manager_payout_account_deny(_, mocked_check_balance, mocked_ex
     assert "Transactions canceled for account: 'Scholar 1'" in caplog.text
 
 
+@patch("web3.eth.Eth.contract", return_value="contract")
 @patch("web3.Web3.toChecksumAddress")
-@patch("web3.eth.Eth.get_transaction_count", return_value=123)
-def test_payment_get_nonce_calls_w3_low_nonce(_, mocked_transaction_count):
-    p = Payment(
-        "random_account",
-        "manager",
-        "ronin:from_ronin",
-        "ronin:from_private_ronin",
-        "ronin:to_ronin",
-        10,
-        PaymentsSummary(),
-        1)
-    mocked_transaction_count.assert_called_once()
-    assert p.nonce == 123
+def test_payment_get_nonce_calls_w3_low_nonce(mocked_checksum, mock_contract):
+    s = PaymentsSummary()
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
+        p = Payment(
+            "random_account",
+            "manager",
+            "ronin:from_ronin",
+            "ronin:from_private_ronin",
+            "ronin:to_ronin",
+            10,
+            s)
+    mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
+    mocked_checksum.assert_called_with(SLP_CONTRACT)
+    mock_contract.assert_called()
+    assert p.contract == "contract"
+    assert p.name == "random_account"
+    assert p.payment_type == "manager"
+    assert p.from_acc == "0xfrom_ronin"
+    assert p.from_private == "ronin:from_private_ronin"
+    assert p.to_acc == "0xto_ronin"
+    assert p.amount == 10
+    assert p.summary == s
 
 
-@patch("web3.Web3.toChecksumAddress")
-@patch("web3.eth.Eth.get_transaction_count", return_value=123)
-def test_payment_get_nonce_calls_w3_high_nonce(_, mocked_transaction_count):
-    p = Payment(
-        "random_account",
-        "manager",
-        "ronin:from_ronin",
-        "ronin:from_private_ronin",
-        "ronin:to_ronin",
-        10,
-        PaymentsSummary(),
-        125)
-    mocked_transaction_count.assert_called_once()
-    assert p.nonce == 125
-
-
-@pytest.mark.asyncio
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.eth.Eth.account.sign_transaction")
@@ -753,7 +708,7 @@ def test_payment_get_nonce_calls_w3_high_nonce(_, mocked_transaction_count):
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.contract")
 @patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
-async def test_execute_calls_web3_functions(mock_transaction_receipt,
+def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             mock_contract,
                                             mock_keccak,
                                             mock_to_hex,
@@ -763,22 +718,21 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    await cleanup_log_file()
+    cleanup_log_file()
     PaymentsSummary().clear()
     s = PaymentsSummary()
-    p = Payment(
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
+        p = Payment(
         "random_account",
         "manager",
         "ronin:from_ronin",
         "ronin:from_private_ronin",
         "ronin:to_ronin",
         10,
-        s
-    )
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        await p.execute()
+        s)
+        p.execute()
     mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     mock_keccak.assert_called_once()
@@ -787,8 +741,8 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
     mock_sign.assert_called_once()
     assert mock_sign.call_args[1]['private_key'] == "ronin:from_private_ronin"
     mock_checksum.assert_has_calls(calls=[
-        call('0xfrom_ronin'),
-        call(SLP_CONTRACT),
+         call(SLP_CONTRACT),
+        call('0xfrom_ronin'),       
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
@@ -799,4 +753,63 @@ async def test_execute_calls_web3_functions(mock_transaction_receipt,
         assert len(log_file) == 1
     assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! "
             "Hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash") in log_file[0]
-    await cleanup_log_file()
+    cleanup_log_file()
+
+
+@patch("web3.eth.Eth.get_transaction_count", return_value=123)
+@patch("axie.payments.Payment.send_replacement_tx")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.eth.Eth.account.sign_transaction")
+@patch("web3.eth.Eth.send_raw_transaction")
+@patch("web3.Web3.toHex", return_value="transaction_hash")
+@patch("web3.Web3.keccak", return_value='result_of_keccak')
+@patch("web3.eth.Eth.contract")
+@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 0})
+def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
+                                            mock_contract,
+                                            mock_keccak,
+                                            mock_to_hex,
+                                            mock_send,
+                                            mock_sign,
+                                            mock_checksum,
+                                            mock_replacement_tx,
+                                            _,
+                                            caplog):
+    # Make sure file is clean to start
+    cleanup_log_file()
+    PaymentsSummary().clear()
+    s = PaymentsSummary()
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
+        p = Payment(
+        "random_account",
+        "manager",
+        "ronin:from_ronin",
+        "ronin:from_private_ronin",
+        "ronin:to_ronin",
+        10,
+        s)
+        p.execute()
+    mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
+    mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mock_keccak.assert_called_once()
+    mock_to_hex.assert_called_with("result_of_keccak")
+    mock_send.assert_called_once()
+    mock_sign.assert_called_once()
+    assert mock_sign.call_args[1]['private_key'] == "ronin:from_private_ronin"
+    mock_checksum.assert_has_calls(calls=[
+         call(SLP_CONTRACT),
+        call('0xfrom_ronin'),       
+        call('0xto_ronin')])
+    mock_transaction_receipt.assert_called_with("transaction_hash")
+    mock_replacement_tx.assert_called_with(123)
+    assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP failed. "
+            "Trying to replace it with a 0 value tx and re-try." in caplog.text)
+    with open(LOG_FILE_PATH) as f:
+        log_file = f.readlines()
+        assert len(log_file) == 1
+    assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP failed. "
+            "Trying to replace it with a 0 value tx and re-try.") in log_file[0]
+    assert str(s) == "No payments made!"
+    cleanup_log_file()

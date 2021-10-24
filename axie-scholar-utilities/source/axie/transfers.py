@@ -1,7 +1,8 @@
 import sys
-import asyncio
 import logging
 import json
+from datetime import datetime, timedelta
+from time import sleep
 
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -26,12 +27,8 @@ class Transfer:
         self.from_private = from_private
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.axie_id = axie_id
-        if not nonce:
-            self.nonce = get_nonce(self.from_acc)
-        else:
-            self.nonce = max(get_nonce(self.from_acc), nonce)
 
-    async def execute(self):
+    def execute(self):
         # Load ABI
         with open('axie/axie_abi.json', encoding='utf-8') as f:
             axie_abi = json.load(f)
@@ -39,6 +36,8 @@ class Transfer:
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
             abi=axie_abi
         )
+        # Get Nonce
+        nonce = get_nonce(self.from_acc)
         # Build transaction
         transaction = axie_contract.functions.safeTransferFrom(
             Web3.toChecksumAddress(self.from_acc),
@@ -50,7 +49,7 @@ class Transfer:
             "from": Web3.toChecksumAddress(self.from_acc),
             "gasPrice": self.w3.toWei("0", "gwei"),
             "value": 0,
-            "nonce": self.nonce
+            "nonce": nonce
         })
         # Sign Transaction
         signed = self.w3.eth.account.sign_transaction(
@@ -61,8 +60,14 @@ class Transfer:
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
-        # Wait for transaction to finish
+        # Wait for transaction to finish or timeout
+        start_time = datetime.now()
         while True:
+            # We will wait for max 10min for this trasnfer to happen
+            if datetime.now() - start_time > timedelta(minutes=10):
+                success = False
+                logging.info(f"Important: Transfer {self}, timed out!")
+                break
             try:
                 recepit = self.w3.eth.get_transaction_receipt(hash)
                 if recepit["status"] == 1:
@@ -72,8 +77,8 @@ class Transfer:
                 break
             except exceptions.TransactionNotFound:
                 logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{self.nonce})...")
-                # Sleep 5 seconds not to constantly send requests!
-                await asyncio.sleep(5)
+                # Sleep 10 seconds not to constantly send requests!
+                sleep(10)
         if success:
             logging.info(f"Important: {self} completed! Hash: {hash} - "
                          f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
@@ -123,22 +128,19 @@ class AxieTransferManager:
         transfers = []
         logging.info("Preparing transfers")
         for acc in self.transfers_file:
-            nonce = None
             for axie in acc['Transfers']:
                 if not self.secure or (self.secure and axie['ReceiverAddress'] in self.secrets_file):
                     t = Transfer(
                         to_acc=axie['ReceiverAddress'],
                         from_private=self.secrets_file[acc['AccountAddress']],
                         from_acc=acc['AccountAddress'],
-                        axie_id=axie['AxieId'],
-                        nonce=nonce
+                        axie_id=axie['AxieId']
                     )
-                    nonce = t.nonce + 1
                     transfers.append(t)
         self.execute_transfers(transfers)
 
     def execute_transfers(self, transfers):
         logging.info("Starting to transfer axies")
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(asyncio.gather(*[transfer.execute() for transfer in transfers]))
+        for t in transfers:
+            t.execute()
         logging.info("Axie Transfers Finished")
