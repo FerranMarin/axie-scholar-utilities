@@ -32,7 +32,6 @@ class Axies:
                 _index=i
             ).call()
             morph_date, body_shape = self.get_morph_date_and_body(axie)
-            print(morph_date, body_shape)
             if not morph_date and not body_shape:
                 logging.info(f"Something went wrong getting info for Axie {axie}, skipping it")
             elif self.now >= morph_date and not body_shape:
