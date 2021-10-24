@@ -280,9 +280,12 @@ def run_cli():
             accs_list = accs.split(',')
             for acc in accs_list:
                 axies_to_morph = Axies(acc).find_axies_to_morph()
-                axm = AxieMorphingManager(axies_to_morph, acc, secrets_file_path)
-                axm.verify_inputs()
-                axm.execute()
+                if axies_to_morph:
+                    axm = AxieMorphingManager(axies_to_morph, acc, secrets_file_path)
+                    axm.verify_inputs()
+                    axm.execute()
+                else:
+                    logging.critical("No axies to be morphed found")
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['axie_breeding']:

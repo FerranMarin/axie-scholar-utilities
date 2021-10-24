@@ -769,6 +769,23 @@ def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axi
     assert mock_morphing_execute.call_count == 2
 
 
+@patch("axie.AxieMorphingManager.__init__", return_value=None)
+@patch("axie.Axies.__init__", return_value=None)
+@patch("axie.Axies.find_axies_to_morph", return_value=[])
+@patch("axie.AxieMorphingManager.execute")
+@patch("axie.AxieMorphingManager.verify_inputs")
+def test_axie_morphing_none(mock_veritfy_inputs, mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir): # noqa
+    f = tmpdir.join("file2.json")
+    f.write('{"ronin:<account_s1_address>": "hello"}')
+    with patch.object(sys, 'argv', ["", "axie_morphing", str(f), "foo,bar,1"]):
+        cli.run_cli()
+    mock_axies_init.assert_has_calls([call('foo'), call('bar'), call("1")])
+    assert mock_find_axies.call_count == 3
+    mock_morphingmanager.assert_not_called()
+    mock_veritfy_inputs.assert_not_called()
+    mock_morphing_execute.assert_not_called()
+
+
 def test_axiebreeding_file_check_fail(caplog):
     with patch.object(sys, 'argv', ["", "axie_breeding", "s_file.json", "b_file.json"]):
         cli.run_cli()
