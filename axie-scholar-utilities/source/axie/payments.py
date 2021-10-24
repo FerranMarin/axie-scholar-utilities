@@ -47,6 +47,9 @@ class Payment:
         )
 
     def send_replacement_tx(self, nonce):
+        # check nonce is still available, do nothing if nonce is not available anymore
+        if nonce != get_nonce(self.from_acc):
+            return
         # build replacement tx
         replacement_tx = self.contract.functions.transfer(
             Web3.toChecksumAddress(self.from_acc),
