@@ -8,14 +8,14 @@ In these pages we will cover all the information you need to install and use axi
 ## Install Using Docker
 This is the recomended way of installing and using my tool. Follow one of these links for installing with docker:
 
-- [Windows and Docker installation](./pages/install_docker_win.html)
-- [MacOs and Docker installation](./pages/install_docker_mac.html)
+- [Windows and Docker installation](https://ferranmarin.github.io/axie-scholar-utilities/pages/install_docker_win.html)
+- [MacOs and Docker installation](https://ferranmarin.github.io/axie-scholar-utilities/pages/install_docker_mac.html)
 
 ## Install Using Poetry
 If for some reason you want to install using python and poetry, you will need to follow these links:
 
-- [Windows and Poetry installation](./pages/install_poetry_win.html)
-- [MacOs and Poetry installation](./pages/install_poetry_mac.html)
+- [Windows and Poetry installation](https://ferranmarin.github.io/axie-scholar-utilities/pages/install_poetry_win.html)
+- [MacOs and Poetry installation](https://ferranmarin.github.io/axie-scholar-utilities/pages/install_poetry_mac.html)
 
 
 # How to use the tool
@@ -33,9 +33,9 @@ Depending on how you've installed the tool, to run the commands you will need to
 
 To read the instructions on how to run these commands:
 
-- [Commands for Docker and Docker Hub](./pages/docker_hub_cmds.html)
-- [Commands for Docker-compose](./pages/docker_compose_cmds.html)
-- [Commands for Poetry](./pages/poetry_cmds.html)
+- [Commands for Docker and Docker Hub](https://ferranmarin.github.io/axie-scholar-utilities/pages/docker_hub_cmds.html)
+- [Commands for Docker-compose](https://ferranmarin.github.io/axie-scholar-utilities/pages/docker_compose_cmds.html)
+- [Commands for Poetry](https://ferranmarin.github.io/axie-scholar-utilities/pages/poetry_cmds.html)
 
 
 # File Format
