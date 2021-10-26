@@ -75,7 +75,7 @@ class Payment:
             # We will wait for max 5min for this replacement tx to happen
             if datetime.now() - start_time > timedelta(minutes=5):
                 success = False
-                logging.info(f"Replacement transaction, timed out!")
+                logging.info("Replacement transaction, timed out!")
                 break
             try:
                 receipt = self.w3.eth.get_transaction_receipt(new_hash)

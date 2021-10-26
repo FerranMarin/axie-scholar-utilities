@@ -1,7 +1,8 @@
 import sys
 import json
-import asyncio
 import logging
+from time import sleep
+from datetime import datetime, timedelta
 
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -13,16 +14,12 @@ from axie.payments import Payment, PaymentsSummary, CREATOR_FEE_ADDRESS
 
 
 class Breed:
-    def __init__(self, sire_axie, matron_axie, address, private_key, nonce=None):
+    def __init__(self, sire_axie, matron_axie, address, private_key):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
         self.private_key = private_key
-        if not nonce:
-            self.nonce = get_nonce(self.address)
-        else:
-            self.nonce = max(get_nonce(self.address), nonce)
 
     def execute(self):
         # Prepare transaction
@@ -32,6 +29,8 @@ class Breed:
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
             abi=axie_abi
         )
+        # Get Nonce
+        nonce = get_nonce(self.address)
         # Build transaction
         transaction = axie_contract.functions.breedAxies(
             self.sire_axie,
@@ -40,7 +39,7 @@ class Breed:
             "chainId": 2020,
             "gas": 500000,
             "gasPrice": self.w3.toWei("0", "gwei"),
-            "nonce": self.nonce
+            "nonce": nonce
         })
         # Sign transaction
         signed = self.w3.eth.account.sign_transaction(
@@ -51,14 +50,28 @@ class Breed:
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
         hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
-        # Wait for transaction to finish
+        # Wait for transaction to finish or timeout
         logging.info("{self} about to start!")
-        try:
-            recepit = self.w3.eth.wait_for_transaction_receipt(hash, timeout=300, poll_latency=5)
-        except exceptions.TimeExhausted:
-            logging.info("{self}, Transaction could not be processed within 5min, skipping it!")
+        start_time = datetime.now()
+        while True:
+            # We will wait for max 10minutes for this tx to respond
+            if datetime.now() - start_time > timedelta(minutes=10):
+                success = False
+                logging.info(f"Transaction {self}, timed out!")
+                break
+            try:
+                recepit = self.w3.eth.get_transaction_receipt(hash)
+                if recepit["status"] == 1:
+                    success = True
+                else:
+                    success = False
+                break
+            except exceptions.TransactionNotFound:
+                # Sleep 10s while waiting
+                sleep(10)
+                logging.info(f"Waiting for transactions '{self}' to finish (Nonce: {nonce})...")
 
-        if recepit['status'] == 1:
+        if success:
             logging.info("Important: {self} completed successfully")
         else:
             logging.info("Important: {self} failed")

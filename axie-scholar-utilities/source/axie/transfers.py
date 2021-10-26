@@ -21,7 +21,7 @@ logger.addHandler(file_handler)
 
 
 class Transfer:
-    def __init__(self, from_acc, from_private, to_acc, axie_id, nonce=None):
+    def __init__(self, from_acc, from_private, to_acc, axie_id):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
@@ -76,7 +76,7 @@ class Transfer:
                     success = False
                 break
             except exceptions.TransactionNotFound:
-                logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{self.nonce})...")
+                logging.info(f"Waiting for transfer '{self}' to finish (Nonce:{nonce})...")
                 # Sleep 10 seconds not to constantly send requests!
                 sleep(10)
         if success:
