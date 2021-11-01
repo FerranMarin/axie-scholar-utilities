@@ -16,7 +16,8 @@ from axie.utils import (
     Singleton,
     ImportantLogsFilter,
     SLP_CONTRACT,
-    RONIN_PROVIDER_FREE
+    RONIN_PROVIDER_FREE,
+    TIMEOUT_MINS
 )
 
 CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
@@ -73,7 +74,7 @@ class Payment:
         start_time = datetime.now()
         while True:
             # We will wait for max 5min for this replacement tx to happen
-            if datetime.now() - start_time > timedelta(minutes=5):
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
                 logging.info("Replacement transaction, timed out!")
                 break
@@ -122,7 +123,7 @@ class Payment:
         start_time = datetime.now()
         while True:
             # We will wait for max 10minutes for this tx to respond, if it does not, we will re-try
-            if datetime.now() - start_time > timedelta(minutes=10):
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
                 logging.info(f"Transaction {self}, timed out!")
                 break

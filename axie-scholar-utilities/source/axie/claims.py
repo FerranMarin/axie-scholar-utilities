@@ -62,7 +62,7 @@ class Claim(AxieGraphQL):
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         if not jwt:
-            logging.critical(f"Important: Skipping claiming, we could not get the JWT for account {self.account}")
+            logging.critical(f"Important: Skipping claiming, we could not get the JWT for account {self.account.replace('0x', 'ronin:')}")
             return
         headers = {
             "User-Agent": self.user_agent,

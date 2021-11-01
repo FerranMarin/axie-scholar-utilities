@@ -9,7 +9,7 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
 from axie.schemas import breeding_schema
-from axie.utils import get_nonce, load_json, RONIN_PROVIDER_FREE, AXIE_CONTRACT, check_balance
+from axie.utils import get_nonce, load_json, RONIN_PROVIDER_FREE, AXIE_CONTRACT, check_balance, TIMEOUT_MINS
 from axie.payments import Payment, PaymentsSummary, CREATOR_FEE_ADDRESS
 
 
@@ -55,7 +55,7 @@ class Breed:
         start_time = datetime.now()
         while True:
             # We will wait for max 10minutes for this tx to respond
-            if datetime.now() - start_time > timedelta(minutes=10):
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
                 logging.info(f"Transaction {self}, timed out!")
                 break

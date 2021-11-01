@@ -9,7 +9,7 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
 from axie.schemas import transfers_schema
-from axie.utils import get_nonce, load_json, ImportantLogsFilter, RONIN_PROVIDER_FREE, AXIE_CONTRACT
+from axie.utils import get_nonce, load_json, ImportantLogsFilter, RONIN_PROVIDER_FREE, AXIE_CONTRACT, TIMEOUT_MINS
 
 
 logger = logging.getLogger()
@@ -64,7 +64,7 @@ class Transfer:
         start_time = datetime.now()
         while True:
             # We will wait for max 10min for this trasnfer to happen
-            if datetime.now() - start_time > timedelta(minutes=10):
+            if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
                 logging.info(f"Important: Transfer {self}, timed out!")
                 break

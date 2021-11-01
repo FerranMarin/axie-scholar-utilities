@@ -10,6 +10,7 @@ from requests.packages.urllib3.util.retry import Retry
 from web3 import Web3
 
 
+TIMEOUT_MINS = 5
 AXIE_CONTRACT = "0x32950db2a7164ae833121501c797d79e7b79d74c"
 AXS_CONTRACT = "0x97a9107c1793bc407d6f527b77e7fff4d812bece"
 SLP_CONTRACT = "0xa8754b9fa15fc18bb59458815510e40a12cd2014"
