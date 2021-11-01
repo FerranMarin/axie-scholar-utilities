@@ -91,7 +91,8 @@ class Payment:
 
         if success:
             logging.info(f"Successfuly replaced transaction with nonce: {nonce}")
-            logging.info(f"Trying again to execute transaction {self}")
+            logging.info(f"Trying again to execute transaction {self} in 10 seconds")
+            sleep(10)
             self.execute()
         else:
             logging.info(f"Important: Replacement transaction failed. Means we could not complete tx {self}")
