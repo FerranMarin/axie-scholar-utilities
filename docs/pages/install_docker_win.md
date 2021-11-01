@@ -65,6 +65,7 @@ If you go this route, I recomend also setting up these alias in your terminal to
     }
 
 Be aware, that this aliases will require the EXACT file names to work.
+To learn how to run the commands, please follow this [link](../pages/docker_hub_cmds.html)
 
 # Build docker image from repository
 
