@@ -24,13 +24,9 @@ class Axies:
         return check_balance(self.acc, 'axies')
 
     def find_axies_to_morph(self):
-        num_axies = self.number_of_axies()
+        axie_list = self.get_axies()
         axies = []
-        for i in range(num_axies):
-            axie = self.contract.functions.tokenOfOwnerByIndex(
-                _owner=Web3.toChecksumAddress(self.acc),
-                _index=i
-            ).call()
+        for axie in axie_list:
             morph_date, body_shape = self.get_morph_date_and_body(axie)
             if not morph_date and not body_shape:
                 logging.info(f"Something went wrong getting info for Axie {axie}, skipping it")
@@ -40,6 +36,17 @@ class Axies:
                 logging.info(f"Axie {axie} cannot be morphed until {morph_date}")
             else:
                 logging.info(f"Axie {axie} is already an adult!")
+        return axies
+
+    def get_axies(self):
+        num_axies = self.number_of_axies()
+        axies = []
+        for i in range(num_axies):
+            axie = self.contract.functions.tokenOfOwnerByIndex(
+                _owner=Web3.toChecksumAddress(self.acc),
+                _index=i
+            ).call()
+            axies.append(axie)
         return axies
 
     def get_morph_date_and_body(self, axie_id):

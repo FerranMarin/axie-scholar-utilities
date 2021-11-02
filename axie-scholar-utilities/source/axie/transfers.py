@@ -9,6 +9,7 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
 from axie.schemas import transfers_schema
+from axie.axies import Axies
 from axie.utils import get_nonce, load_json, ImportantLogsFilter, RONIN_PROVIDER_FREE, AXIE_CONTRACT, TIMEOUT_MINS
 
 
@@ -128,15 +129,21 @@ class AxieTransferManager:
         transfers = []
         logging.info("Preparing transfers")
         for acc in self.transfers_file:
+            axies_in_acc = Axies(acc['AccountAddress']).get_axies()
+            print(axies_in_acc)
             for axie in acc['Transfers']:
                 if not self.secure or (self.secure and axie['ReceiverAddress'] in self.secrets_file):
-                    t = Transfer(
-                        to_acc=axie['ReceiverAddress'],
-                        from_private=self.secrets_file[acc['AccountAddress']],
-                        from_acc=acc['AccountAddress'],
-                        axie_id=axie['AxieId']
-                    )
-                    transfers.append(t)
+                    # Check axie in account
+                    if axie['AxieId'] in axies_in_acc:
+                        t = Transfer(
+                            to_acc=axie['ReceiverAddress'],
+                            from_private=self.secrets_file[acc['AccountAddress']],
+                            from_acc=acc['AccountAddress'],
+                            axie_id=axie['AxieId']
+                        )
+                        transfers.append(t)
+                    else:
+                        logging.info(f"Axie ({axie['AxieId']}) not in account ({acc['AccountAddress']}), skipping.")
         self.execute_transfers(transfers)
 
     def execute_transfers(self, transfers):

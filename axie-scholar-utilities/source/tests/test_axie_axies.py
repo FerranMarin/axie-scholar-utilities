@@ -42,6 +42,24 @@ def test_number_of_axies(mocked_checksum, mocked_contract, mocked_balance_of):
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
 
 
+@patch("web3.eth.Eth.contract.functions.tokenOfOwnerByIndex")
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("axie.Axies.number_of_axies", return_value=5)
+def test_get_axies(mocked_number_of_axies, mocked_checksum, mocked_contract, _):
+    with patch.object(builtins,
+                      "open",
+                      mock_open(read_data='{"foo": "bar"}')):
+        a = Axies("ronin:abc1")
+    axies = a.get_axies()
+    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+    mocked_number_of_axies.assert_called()
+    mocked_checksum.assert_has_calls(calls=[
+        call(AXIE_CONTRACT), call(a.acc)
+    ])
+    assert len(axies) == 5
+
+
 @freeze_time('2021-01-14 01:10:05')
 @patch("web3.eth.Eth.contract.functions.tokenOfOwnerByIndex")
 @patch("axie.Axies.get_morph_date_and_body", return_value=(None, None))
