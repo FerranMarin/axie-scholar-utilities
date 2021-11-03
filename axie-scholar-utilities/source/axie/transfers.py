@@ -13,9 +13,11 @@ from axie.axies import Axies
 from axie.utils import get_nonce, load_json, ImportantLogsFilter, RONIN_PROVIDER_FREE, AXIE_CONTRACT, TIMEOUT_MINS
 
 
+today = int(datetime.now().timestamp())
+log_file = f'transfer_results_{today}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('results.log', mode='w')
+file_handler = logging.FileHandler(log_file, mode='w')
 file_handler.setLevel(logging.INFO)
 file_handler.addFilter(ImportantLogsFilter())
 logger.addHandler(file_handler)
