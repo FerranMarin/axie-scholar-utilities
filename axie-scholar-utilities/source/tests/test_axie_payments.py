@@ -1,14 +1,26 @@
+import os
 import sys
 import builtins
 import logging
 
-import pytest
 from mock import patch, call, mock_open
+from glob import glob
+import pytest
 
 from axie import AxiePaymentsManager
 from axie.payments import Payment, PaymentsSummary
 from axie.utils import SLP_CONTRACT
 from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
+
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup(request):
+    """Cleanup a testing directory once we are finished."""
+    def remove_log_files():
+        files = glob(LOG_FILE_PATH+'*.log')
+        for f in files:
+            os.remove(f)
+    request.addfinalizer(remove_log_files)
 
 
 @patch("axie.payments.load_json")
@@ -718,7 +730,8 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    cleanup_log_file()
+    log_file= glob(LOG_FILE_PATH+'transfer_results_*.log')[0][9:]
+    cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
     with patch.object(builtins,
@@ -748,12 +761,12 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
     assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
             'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)
     assert str(s) == "Paid 1 managers, 10 SLP.\n"
-    with open(LOG_FILE_PATH) as f:
-        log_file = f.readlines()
-        assert len(log_file) == 1
+    with open(log_file) as f:
+        lf = f.readlines()
+        assert len(lf) == 1
     assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! "
-            "Hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash") in log_file[0]
-    cleanup_log_file()
+            "Hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash") in lf[0]
+    cleanup_log_file(log_file)
 
 
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
@@ -776,7 +789,8 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    cleanup_log_file()
+    log_file= glob(LOG_FILE_PATH+'transfer_results_*.log')[0][9:]
+    cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
     with patch.object(builtins,
@@ -806,10 +820,10 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
     mock_replacement_tx.assert_called_with(123)
     assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP failed. "
             "Trying to replace it with a 0 value tx and re-try." in caplog.text)
-    with open(LOG_FILE_PATH) as f:
-        log_file = f.readlines()
-        assert len(log_file) == 1
+    with open(log_file) as f:
+        lf = f.readlines()
+        assert len(lf) == 1
     assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP failed. "
-            "Trying to replace it with a 0 value tx and re-try.") in log_file[0]
+            "Trying to replace it with a 0 value tx and re-try.") in lf[0]
     assert str(s) == "No payments made!"
-    cleanup_log_file()
+    cleanup_log_file(log_file)

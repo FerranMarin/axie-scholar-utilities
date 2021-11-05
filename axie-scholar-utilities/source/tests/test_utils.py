@@ -1,15 +1,15 @@
-LOG_FILE_PATH = '/opt/app/results.log'
+LOG_FILE_PATH = '/opt/app/'
 
 
-def cleanup_log_file():
+def cleanup_log_file(file_name):
     """ Cleans up log file to avoid logs leaking from test to test. Called
     at the end of the test as a teardown """
-    with open(LOG_FILE_PATH, 'w') as f:
+    with open(LOG_FILE_PATH+file_name, 'w') as f:
         f.write('')
 
 
-async def async_cleanup_log_file():
+async def async_cleanup_log_file(file_name):
     """ Cleans up log file to avoid logs leaking from test to test. Called
     at the end of the test as a teardown """
-    with open(LOG_FILE_PATH, 'w') as f:
+    with open(LOG_FILE_PATH+file_name, 'w') as f:
         f.write('')

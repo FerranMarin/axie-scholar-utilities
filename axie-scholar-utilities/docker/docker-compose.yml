@@ -8,7 +8,6 @@ services:
       target: production
     volumes:
       - ../docker/files:/opt/app/files
-      - ../docker/files/results.log:/opt/app/results.log
     image: axie-scholar-utilities
   tests:
     build:

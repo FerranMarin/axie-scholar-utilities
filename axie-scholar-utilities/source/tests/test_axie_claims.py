@@ -1,18 +1,20 @@
 import sys
 import json
 import builtins
+from glob import glob
 from datetime import datetime, timedelta
 
 import pytest
 from mock import patch, mock_open, call
 import requests_mock
+from freezegun import freeze_time
 from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
 from axie.claims import Claim
 from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE
-from tests.test_utils import LOG_FILE_PATH, async_cleanup_log_file
+from tests.test_utils import async_cleanup_log_file, LOG_FILE_PATH
 
 
 @patch("axie.AxieClaimsManager.load_secrets_and_acc_name", return_value=("foo", "bar"))
@@ -417,7 +419,8 @@ async def test_claim_execution(mocked_provider,
                                mock_to_hex,
                                caplog):
     # Make sure file is clean to start
-    await async_cleanup_log_file()
+    log_file= glob(LOG_FILE_PATH+'claim_results_*.log')[0][9:]
+    await async_cleanup_log_file(log_file)
     with patch.object(builtins,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):
@@ -452,11 +455,11 @@ async def test_claim_execution(mocked_provider,
     mock_to_hex.assert_called_with("result_of_keccak")
     assert "Account test_acc (ronin:foo) has 456 unclaimed SLP" in caplog.text
     assert "SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in caplog.text
-    with open(LOG_FILE_PATH) as f:
-        log_file = f.readlines()
-        assert len(log_file) == 1
-    assert "Important: SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in log_file[0]
-    await async_cleanup_log_file()
+    with open(log_file) as f:
+        lf = f.readlines()
+        assert len(lf) == 1
+    assert "Important: SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in lf[0]
+    await async_cleanup_log_file(log_file)
 
 
 @pytest.mark.asyncio
