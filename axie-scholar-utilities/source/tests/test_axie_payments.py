@@ -17,7 +17,7 @@ from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 def cleanup(request):
     """Cleanup a testing directory once we are finished."""
     def remove_log_files():
-        files = glob(LOG_FILE_PATH+'*.log')
+        files = glob(LOG_FILE_PATH+'logs/*.log')
         for f in files:
             os.remove(f)
     request.addfinalizer(remove_log_files)
@@ -730,7 +730,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'transfer_results_*.log')[0][9:]
+    log_file= glob(LOG_FILE_PATH+'logs/transfer_results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
@@ -789,7 +789,7 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'transfer_results_*.log')[0][9:]
+    log_file= glob(LOG_FILE_PATH+'logs/transfer_results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()

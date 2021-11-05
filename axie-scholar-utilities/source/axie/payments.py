@@ -24,7 +24,7 @@ from axie.utils import (
 CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
 
 today = int(datetime.now().timestamp())
-log_file = f'payment_results_{today}.log'
+log_file = f'logs/payment_results_{today}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')

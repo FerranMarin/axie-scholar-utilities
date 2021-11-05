@@ -21,7 +21,7 @@ from axie.utils import (
 
 
 today = int(datetime.now().timestamp())
-log_file = f'claim_results_{today}.log'
+log_file = f'logs/claim_results_{today}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(log_file, mode='w')
