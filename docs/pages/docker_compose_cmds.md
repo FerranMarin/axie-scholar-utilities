@@ -4,11 +4,10 @@ For this to work, you will need a folder called **files** inside the docker fold
 
 - payments.json
 - secrets.json
-- results.log
 
 Check the format on the index page of this wiki, but in general what I recommend you do is:
 
-1. Download the payments file from [here](https://axie.management/tracker/payments). I recomend re-naming the file to payments.json. If you do not get it from there, you will need to build it yourself. If you are planning to use percent payments, in that case, please just have a payments.json that only contains this inside:
+1. Download the payments file from [here](https://axie.management/tracker/payments). I recomend re-naming the file to payments.json. If you do not get it from there, you will need to build it yourself.For that you need to have a payments.json that only contains this inside:
 
         { }
 
@@ -16,7 +15,7 @@ Check the format on the index page of this wiki, but in general what I recommend
 
         { }
 
-3. A file named results.log that is empty.
+3. Result log files will be placed inside a folder `logs` inside files folder. No need to create it before hand.
 
 ## Secret Generation
 
@@ -54,7 +53,7 @@ To payout from the scholar accounts, you need to run this command from the docke
 
     docker-compose run scholar-utilities payout files/payments.json files/secrets.json
 
-This will execute the payments defined in payments.json. Results.log will be updated with the logs relevant to payments so you can easily copy paste them to send them to your scholars.
+This will execute the payments defined in payments.json. A log file will be generated with the logs relevant to payments so you can easily copy paste them to send them to your scholars.
 
 If you do not want to confirm account by account, you can run this other command (result will be the same):
 

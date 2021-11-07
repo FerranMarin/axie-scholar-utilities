@@ -21,8 +21,8 @@ from axie.utils import (
 from axie.payments import Payment, PaymentsSummary, CREATOR_FEE_ADDRESS
 
 
-today = int(datetime.now().timestamp())
-log_file = f'logs/breeding_results_{today}.log'
+now = int(datetime.now().timestamp())
+log_file = f'logs/breeding_results_{now}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')

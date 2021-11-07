@@ -20,8 +20,8 @@ from axie.utils import (
 )
 
 
-today = int(datetime.now().timestamp())
-log_file = f'logs/claim_results_{today}.log'
+now = int(datetime.now().timestamp())
+log_file = f'logs/claim_results_{now}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(log_file, mode='w')
