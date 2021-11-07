@@ -2,6 +2,7 @@ import sys
 import asyncio
 import json
 import logging
+from datetime import datetime
 
 
 from requests.exceptions import RetryError
@@ -19,9 +20,11 @@ from axie.utils import (
 )
 
 
+now = int(datetime.now().timestamp())
+log_file = f'logs/claim_results_{now}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('results.log', mode='w')
+file_handler = logging.FileHandler(log_file, mode='w')
 file_handler.setLevel(logging.INFO)
 file_handler.addFilter(ImportantLogsFilter())
 logger.addHandler(file_handler)

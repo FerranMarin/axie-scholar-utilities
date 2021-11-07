@@ -1,11 +1,22 @@
 import sys
 import logging
+from datetime import datetime
 
 from eth_account.messages import encode_defunct
 from requests.exceptions import RetryError
 from web3 import Web3
 
-from axie.utils import load_json, AxieGraphQL
+from axie.utils import load_json, AxieGraphQL, ImportantLogsFilter
+
+
+now = int(datetime.now().timestamp())
+log_file = f'logs/morphing_results_{now}.log'
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')
+file_handler.setLevel(logging.INFO)
+file_handler.addFilter(ImportantLogsFilter())
+logger.addHandler(file_handler)
 
 
 class Morph(AxieGraphQL):

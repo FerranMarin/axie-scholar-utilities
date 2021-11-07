@@ -33,3 +33,9 @@ Remember that is done with the following command:
 
 If you use either poetry or docker-compose you will need to get the new code either by downloading it from the [releases page](https://github.com/FerranMarin/axie-scholar-utilities/releases) or by using the git pull command. Later one, only reserved to those who know how to use git.
 Remember for this one to move your files folder from the old unziped code to the new one and re-build the image / re-install dependencies!
+
+## Which is the recommended way of installing / setting up this tool?
+
+If you are using Windows, I recommend downloading the code and going the docker-compose route (where you build the image locally).
+If you are using MacOs, I recommend simply pulling the image and using the aliases.
+Despite that, one can use whatever feels is best for their use case.

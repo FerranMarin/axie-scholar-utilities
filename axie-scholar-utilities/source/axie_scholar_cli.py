@@ -43,6 +43,7 @@ from axie import (
 from axie.utils import load_json
 
 # Setup logger
+os.makedirs('logs', exist_ok=True)
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 ch = logging.StreamHandler(sys.stdout)

@@ -9,8 +9,26 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 
 from axie.schemas import breeding_schema
-from axie.utils import get_nonce, load_json, RONIN_PROVIDER_FREE, AXIE_CONTRACT, check_balance, TIMEOUT_MINS
+from axie.utils import (
+    get_nonce,
+    load_json,
+    RONIN_PROVIDER_FREE,
+    AXIE_CONTRACT,
+    check_balance,
+    TIMEOUT_MINS,
+    ImportantLogsFilter
+)
 from axie.payments import Payment, PaymentsSummary, CREATOR_FEE_ADDRESS
+
+
+now = int(datetime.now().timestamp())
+log_file = f'logs/breeding_results_{now}.log'
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')
+file_handler.setLevel(logging.INFO)
+file_handler.addFilter(ImportantLogsFilter())
+logger.addHandler(file_handler)
 
 
 class Breed:
@@ -72,9 +90,9 @@ class Breed:
                 logging.info(f"Waiting for transactions '{self}' to finish (Nonce: {nonce})...")
 
         if success:
-            logging.info("Important: {self} completed successfully")
+            logging.info(f"Important: {self} completed successfully")
         else:
-            logging.info("Important: {self} failed")
+            logging.info(f"Important: {self} failed")
 
     def __str__(self):
         return (f"Breeding axie {self.sire_axie} with {self.matron_axie} in account "

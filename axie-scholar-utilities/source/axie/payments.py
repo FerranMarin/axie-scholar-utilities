@@ -20,11 +20,14 @@ from axie.utils import (
     TIMEOUT_MINS
 )
 
+
 CREATOR_FEE_ADDRESS = "ronin:9fa1bc784c665e683597d3f29375e45786617550"
 
+now = int(datetime.now().timestamp())
+log_file = f'logs/payment_results_{now}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler('results.log', mode='w')
+file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')
 file_handler.setLevel(logging.INFO)
 file_handler.addFilter(ImportantLogsFilter())
 logger.addHandler(file_handler)

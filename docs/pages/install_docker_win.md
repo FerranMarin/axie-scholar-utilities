@@ -21,47 +21,47 @@ If you go this route, I recomend also setting up these alias in your terminal to
     }
     # Alias to generate payments
     function axie-utils-gen-payments {
-        docker run -it -v payments.csv:/opt/app/files/payments.csv -v payments.json:/opt/app/files/payments.json epith/axie-scholar-utilities generate_payments files/payments.csv files/payments.json
+        docker run -it -v "$pwd\payments.csv":/opt/app/files/payments.csv -v "$pwd\payments.json":/opt/app/files/payments.json epith/axie-scholar-utilities generate_payments files/payments.csv files/payments.json
     }
     # Alias to mass update secrets
     function axie-utils-mass-update {
-        docker run -it -v update.csv:/opt/app/files/update.csv -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities mass_update_secrets files/update.csv files/secrets.json
+        docker run -it -v "$pwd\update.csv":/opt/app/files/update.csv -v "$pwd\secrets.json":/opt/app/files/secrets.json epith/axie-scholar-utilities mass_update_secrets files/update.csv files/secrets.json
     }
     # Alias to execute claims
     function axie-utils-claim {
-        docker run -it -v payments.json:/opt/app/files/payments.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities claim files/payments.json files/secrets.json
+        docker run -it -v "$pwd\payments.json":/opt/app/files/payments.json -v "$pwd\secrets.json":/opt/app/files/secrets.json -v "$pwd\logs":/opt/app/logs epith/axie-scholar-utilities claim files/payments.json files/secrets.json
     }
     # Alias to execute payments
     function axie-utils-payout {
-        docker run -it -v payments.json:/opt/app/files/payments.json  -v secrets.json:/opt/app/files/secrets.json -v results.log:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json
+        docker run -it -v "$pwd\payments.json":/opt/app/files/payments.json  -v "$pwd\secrets.json":/opt/app/files/secrets.json -v "$pwd\logs":/opt/app/logs epith/axie-scholar-utilities payout files/payments.json files/secrets.json
     }
     # Alias to execute auto-payments (no confirmation)
     function axie-utils-auto-payout {
-        docker run -it -v payments.json:/opt/app/files/payments.json -v secrets.json:/opt/app/files/secrets.json -v results.log:/opt/app/results.log epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y
+        docker run -it -v "$pwd\payments.json":/opt/app/files/payments.json -v "$pwd\secrets.json":/opt/app/files/secrets.json -v "$pwd\logs":/opt/app/logs epith/axie-scholar-utilities payout files/payments.json files/secrets.json -y
     }
     # Alias to execute axie transfers
     function axie-utils-transfer-axies {
-        docker run -it -v payments.json:/opt/app/files/transfers.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json
+        docker run -it -v "$pwd\payments.json":/opt/app/files/transfers.json -v "$pwd\secrets.json":/opt/app/files/secrets.json -v "$pwd\logs":/opt/app/logs epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json
     }
     #Alias to generate transfers file
     function axie-utils-gen-transfers {
-        docker run -it -v transfers.csv:/opt/app/files/transfers.csv -v transfers.json:/opt/app/files/transfers.json epith/axie-scholar-utilities generate_transfer_axies files/transfers.csv files/transfers.json
+        docker run -it -v "$pwd\transfers.csv":/opt/app/files/transfers.csv -v "$pwd\transfers.json":/opt/app/files/transfers.json epith/axie-scholar-utilities generate_transfer_axies files/transfers.csv files/transfers.json
     }
     # Alias to execute generate_qr
     function axie-utils-gen-QR {
-        docker run -it -v payments.json:/opt/app/files/transfers.json -v secrets.json:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json
+        docker run -it -v "$pwd\payments.json":/opt/app/files/transfers.json -v "$pwd\secrets.json":/opt/app/files/secrets.json -v "$pwd":/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json
     }
     #Alias to generate breedings file
     function axie-utils-gen-breedings {
-        docker run -it -v breedings.csv:/opt/app/files/breedings.csv -v breedings.json:/opt/app/files/breedings.json epith/axie-scholar-utilities generate_breedings files/breedings.csv files/breedings.json
+        docker run -it -v "$pwd\breedings.csv":/opt/app/files/breedings.csv -v "$pwd\breedings.json":/opt/app/files/breedings.json epith/axie-scholar-utilities generate_breedings files/breedings.csv files/breedings.json
     }
     # Alias to breed axies
     function axie-utils-axie-breeding {
-        docker run -it -v breedings.json:/opt/app/files/breedings.json -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_breeding files/breedings.json files/secrets.json
+        docker run -it -v "$pwd\breedings.json":/opt/app/files/breedings.json -v "$pwd\secrets.json":/opt/app/files/secrets.json -v "$pwd\logs":/opt/app/logs epith/axie-scholar-utilities axie_breeding files/breedings.json files/secrets.json
     }
     # Alias to morph axies
     function axie-utils-axie-morphing {
-        docker run -it -v secrets.json:/opt/app/files/secrets.json epith/axie-scholar-utilities axie_morphing files/secrets.json
+        docker run -it -v "$pwd\secrets.json":/opt/app/files/secrets.json -v "$pwd\logs":/opt/app/logs epith/axie-scholar-utilities axie_morphing files/secrets.json
     }
 
 Be aware, that this aliases will require the EXACT file names to work.

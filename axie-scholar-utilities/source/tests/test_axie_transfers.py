@@ -1,4 +1,5 @@
 import builtins
+from glob import glob
 
 from mock import patch, call, mock_open
 
@@ -130,7 +131,8 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                       mocked_get_transaction_count,
                                       caplog):
     # Make sure file is clean to start
-    cleanup_log_file()
+    log_file= glob(LOG_FILE_PATH+'logs/transfer_results_*.log')[0][9:]
+    cleanup_log_file(log_file)
     t = Transfer(
         "ronin:from_ronin",
         "0xsecret",
@@ -159,6 +161,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
     assert ("Axie Transfer of axie (123) from account (ronin:from_ronin) to account "
             "(ronin:to_ronin) completed! Hash: transaction_hash - "
             "Explorer: https://explorer.roninchain.com/tx/transaction_hash" in caplog.text)
-    with open(LOG_FILE_PATH) as f:
-        log_file = f.readlines()
-        assert len(log_file) == 1
+    with open(log_file) as f:
+        lf = f.readlines()
+        assert len(lf) == 1
+    cleanup_log_file(log_file)
