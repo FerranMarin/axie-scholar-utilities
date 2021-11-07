@@ -1,0 +1,8 @@
+Name,AccountAddress,ScholarPayoutAddress,ScholarPercent,ScholarPayout,TrainerPayoutAddress,TrainerPercent,ScholarPayout 
+Test1,ronin:abc1,ronin:abc_scholar1,50,
+Test2,ronin:abc2,ronin:abc_scholar2,50,
+Test3,ronin:abc3,ronin:abc_scholar3,50,
+Test4,ronin:abc4,ronin:abc_scholar4,50,
+Test5,ronin:abc5,ronin:abc_scholar5,50,100
+Test6,ronin:abc6,ronin:abc_scholar6,50,100,ronin:abc_trainer6,5
+Test7,ronin:abc7,ronin:abc_scholar7,50,100,ronin:abc_trainer7,0,230
