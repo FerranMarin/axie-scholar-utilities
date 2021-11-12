@@ -25,7 +25,7 @@ RONIN_PROVIDER_FREE = "https://proxy.roninchain.com/free-gas-rpc"
 
 class TrezorPayment:
 
-    def __init__(self, name, from_acc, bip_path, to_acc, amount):
+    def __init__(self, name, client, from_acc, bip_path, to_acc, amount):
         self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
         self.name = name
         self.from_acc = from_acc.replace("ronin:", "0x")
@@ -37,7 +37,7 @@ class TrezorPayment:
             address=Web3.toChecksumAddress(SLP_CONTRACT),
             abi=slb_abi
         )
-        self.client = get_default_client()
+        self.client = client
         self.bip_path = bip_path
         self.gwei = self.w3.toWei('0', 'gwei')
         self.gas = 250000

@@ -5,6 +5,7 @@ from trezorlib.tools import parse_path
 from trezorlib import ethereum
 
 from axie.utils import load_json
+from trezor_utils import CustomUI
 
 
 class TrezorAccountsSetup:
@@ -27,15 +28,16 @@ class TrezorAccountsSetup:
 
         while non_configured_accs:
             pf = input("Please input one of your passphrases: ")
+            custom_ui = CustomUI(passphrase=pf)
             num_accs = 0
             while num_accs == 0:
-                num_inp = input("Please input number of accounts in that passphrase: ")
+                num_inp = input("Please input number of accounts in that passphrase (1-50): ")
                 try:
                     num_accs = int(num_inp)
                 except ValueError:
                     pass
             for i in range(num_accs):
-                client = get_default_client()
+                client = get_default_client(ui=custom_ui)
                 bip_path = f"m/44'/60'/0'/0/{i}"
                 address = ethereum.get_address(client, parse_path(bip_path), True)
                 if address in non_configured_accs:

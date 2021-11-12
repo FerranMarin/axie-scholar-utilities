@@ -1,19 +1,9 @@
-class CustomUI:
-    def __init__(self, always_prompt=False, passphrase_on_host=True, passphrase=None):
-        self.pinmatrix_shown = False
-        self.prompt_shown = False
-        self.always_prompt = always_prompt
-        self.passphrase_on_host = passphrase_on_host
-        self.passphrase = passphrase if passphrase else ""
+from trezorlib.ui import ClickUI
 
-    def button_request(self, code):
-        if not self.prompt_shown:
-            print("Please confirm action on your Trezor device.")
-        
-        print(code)
+class CustomUI(ClickUI):
+    def __init__(self, passphrase=None, *args, **kwargs):
+        self.passphrase = passphrase
+        super().__init__(*args, **kwargs)
 
-    def get_pin(self, code=None):
-        return None
-
-    def get_passphrase(self, available_on_device):
+    def get_passphrase(self, *args, **kwargs):
         return self.passphrase

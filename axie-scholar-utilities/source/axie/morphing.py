@@ -22,8 +22,8 @@ logger.addHandler(file_handler)
 class Morph(AxieGraphQL):
 
     def __init__(self, axie, **kwargs):
-        super(Morph, self).__init__(**kwargs)
         self.axie = axie
+        super().__init__(**kwargs)
 
     def execute(self):
         jwt = self.get_jwt()
