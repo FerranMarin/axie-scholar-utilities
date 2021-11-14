@@ -1,14 +1,12 @@
-import os
-import json
 import logging
 
 import requests
 from requests.adapters import HTTPAdapter
 from requests.exceptions import RetryError
-from eth_account.messages import encode_defunct
+from hexbytes import HexBytes
+from trezorlib import ethereum
 from trezorlib.ui import ClickUI
 from trezorlib.tools import parse_path 
-from web3 import Web3
 
 from axie.utils import RETRIES
 
@@ -53,9 +51,8 @@ class TrezorAxieGraphQL:
         msg = self.create_random_msg()
         if not msg:
             return None
-        signed_msg = Web3().eth.account.sign_message(encode_defunct(text=msg),
-                                                     private_key=self.private_key)
-        hex_msg = signed_msg['signature'].hex()
+        signed_msg = ethereum.sign_message(self.client, self.bip32_path, msg)
+        hex_msg = HexBytes(signed_msg.signature).hex()
         payload = {
             "operationName": "CreateAccessTokenWithSignature",
             "variables": {
