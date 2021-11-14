@@ -132,7 +132,6 @@ class AxieTransferManager:
         logging.info("Preparing transfers")
         for acc in self.transfers_file:
             axies_in_acc = Axies(acc['AccountAddress']).get_axies()
-            print(axies_in_acc)
             for axie in acc['Transfers']:
                 if not self.secure or (self.secure and axie['ReceiverAddress'] in self.secrets_file):
                     # Check axie in account
