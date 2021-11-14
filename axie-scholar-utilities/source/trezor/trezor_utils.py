@@ -29,7 +29,7 @@ class TrezorAxieGraphQL:
         self.user_agent = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) "
                            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36")
         self.client = kwargs.get('account')
-        self.bip32_path = parse_path(kwargs.get('account'))
+        self.bip_path = parse_path(kwargs.get('bip_path'))
 
     def create_random_msg(self):
         payload = {
@@ -51,7 +51,7 @@ class TrezorAxieGraphQL:
         msg = self.create_random_msg()
         if not msg:
             return None
-        signed_msg = ethereum.sign_message(self.client, self.bip32_path, msg)
+        signed_msg = ethereum.sign_message(self.client, self.bip_path, msg)
         hex_msg = HexBytes(signed_msg.signature).hex()
         payload = {
             "operationName": "CreateAccessTokenWithSignature",

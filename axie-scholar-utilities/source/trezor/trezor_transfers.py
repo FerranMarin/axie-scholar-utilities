@@ -35,13 +35,13 @@ class TrezorTransfer:
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.axie_id = axie_id
         self.client = client
-        self.bip32_path = bip_path
+        self.bip_path = bip_path
         self.gwei = self.w3.toWei('0', 'gwei')
         self.gas = 250000
 
     def execute(self):
         # Load ABI
-        with open('axie/axie_abi.json', encoding='utf-8') as f:
+        with open('trezor/axie_abi.json', encoding='utf-8') as f:
             axie_abi = json.load(f)
         axie_contract = self.w3.eth.contract(
             address=Web3.toChecksumAddress(AXIE_CONTRACT),
@@ -152,7 +152,7 @@ class TrezorAxieTransferManager:
                             to_acc=axie['ReceiverAddress'],
                             client=get_default_client(
                                 CustomUI(passphrase=self.trezor_config[acc['AccountAddress']]['passphrase'])),
-                            bip_path=parse_path(self.trezor_config[acc['AccountAddress']]['passphrase']),
+                            bip_path=parse_path(self.trezor_config[acc['AccountAddress']]['bip_path']),
                             from_acc=acc['AccountAddress'],
                             axie_id=axie['AxieId']
                         )
