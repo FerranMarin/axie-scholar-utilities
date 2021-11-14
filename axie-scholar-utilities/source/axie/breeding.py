@@ -22,7 +22,7 @@ from axie.payments import Payment, PaymentsSummary, CREATOR_FEE_ADDRESS
 
 
 now = int(datetime.now().timestamp())
-log_file = f'logs/breeding_results_{now}.log'
+log_file = f'logs/results_{now}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')

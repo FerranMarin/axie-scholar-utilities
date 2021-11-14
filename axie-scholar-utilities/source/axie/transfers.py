@@ -14,7 +14,7 @@ from axie.utils import get_nonce, load_json, ImportantLogsFilter, RONIN_PROVIDER
 
 
 now = int(datetime.now().timestamp())
-log_file = f'logs/transfer_results_{now}.log'
+log_file = f'logs/results_{now}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(log_file, mode='w')

@@ -10,7 +10,7 @@ from axie.utils import load_json, AxieGraphQL, ImportantLogsFilter
 
 
 now = int(datetime.now().timestamp())
-log_file = f'logs/morphing_results_{now}.log'
+log_file = f'logs/results_{now}.log'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')
