@@ -49,7 +49,7 @@ If you go this route, I recomend also setting up these alias in your terminal to
     }
     # Alias to execute generate_qr
     function axie-utils-gen-QR {
-        docker run -it -v $pwd\payments.json:/opt/app/files/transfers.json -v $pwd\secrets.json:/opt/app/files/secrets.json -v ${pwd}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json
+        docker run -it -v $pwd\transfers.json:/opt/app/files/transfers.json -v $pwd\secrets.json:/opt/app/files/secrets.json -v ${pwd}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json
     }
     #Alias to generate breedings file
     function axie-utils-gen-breedings {
