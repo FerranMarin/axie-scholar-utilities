@@ -10,6 +10,15 @@ services:
       - ../docker/files:/opt/app/files
       - ../docker/files/logs:/opt/app/logs
     image: axie-scholar-utilities
+  trezor-scholar-utilities:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile 
+      target: production-trezor
+    volumes:
+      - ../docker/files:/opt/app/files
+      - ../docker/files/logs:/opt/app/logs
+    image: trezor-axie-scholar-utilities
   tests:
     build:
       context: ..

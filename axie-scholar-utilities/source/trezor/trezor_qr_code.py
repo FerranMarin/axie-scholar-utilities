@@ -11,7 +11,7 @@ from axie.utils import load_json
 from trezor.trezor_utils import TrezorAxieGraphQL, CustomUI
 
 
-class QRCode(TrezorAxieGraphQL):
+class TrezorQRCode(TrezorAxieGraphQL):
 
     def __init__(self, acc_name, path, **kwargs):
         self.acc_name = acc_name
@@ -26,10 +26,10 @@ class QRCode(TrezorAxieGraphQL):
         qr.save(self.path)
 
 
-class QRCodeManager:
+class TrezorQRCodeManager:
 
     def __init__(self, payments_file, trezor_config):
-        self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(trezor_config, payments_file)
+        self.secrets_file, self.acc_names = self.load_trezor_config_and_acc_name(trezor_config, payments_file)
         self.path = os.path.dirname(trezor_config)
 
     def load_trezor_config_and_acc_name(self, trezor_config, payments_file):
@@ -60,7 +60,7 @@ class QRCodeManager:
 
     def execute(self):
         qrcode_list = [
-            QRCode(
+            TrezorQRCode(
                 account=acc,
                 client=get_default_client(CustomUI(self.trezor_config[acc]['passphrase'])),
                 bip_path=parse_path(self.trezor_config[acc]['bip_path']),

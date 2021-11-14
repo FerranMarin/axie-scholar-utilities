@@ -56,7 +56,7 @@ class TrezorTransfer:
             self.axie_id
         ).buildTransaction({
             "chainId": 2020,
-            "gas": 500000,
+            "gas": self.gas,
             "from": Web3.toChecksumAddress(self.from_acc),
             "gasPrice": self.w3.toWei("0", "gwei"),
             "value": 0,

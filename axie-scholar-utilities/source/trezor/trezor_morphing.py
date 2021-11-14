@@ -60,7 +60,7 @@ class TrezorMorph(TrezorAxieGraphQL):
             logging.critical(f"Important! Axie {self.axie} in {self.account} is not ready to be morphed!")
 
 
-class AxieMorphingManager:
+class TrezorAxieMorphingManager:
 
     def __init__(self, axie_list, account, trezor_config):
         self.axie_list = axie_list

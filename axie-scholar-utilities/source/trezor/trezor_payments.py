@@ -67,7 +67,7 @@ class TrezorPayment:
             0
         ).buildTransaction({
             "chainId": 2020,
-            "gas": 500000,
+            "gas": self.gas,
             "gasPrice": self.w3.toWei("0", "gwei"),
             "nonce": nonce
         })
