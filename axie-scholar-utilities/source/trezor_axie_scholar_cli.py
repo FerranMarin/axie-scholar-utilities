@@ -178,14 +178,17 @@ def run_cli():
             logging.critical("Please review your file paths and re-try.")
     elif args['config_trezor']:
         # Generate Secrets
-        logging.info('I shall help you generate your secrets file')
+        logging.info('I shall help you configure your trezor device to use this tool!')
         payments_file_path = args['<payments_file>']
         config_file_path = args.get('<config_file>')
+        logging.info(payments_file_path)
+        logging.info(config_file_path)
         if (config_file_path and check_file(config_file_path) and check_file(payments_file_path) or
            not config_file_path and check_file(payments_file_path)):
-            logging.info('If you do not know how to get your private keys, check: '
-                         'https://ferranmarin.github.io/axie-scholar-utilities/pages/faq.html')
-            TrezorAccountsSetup(payments_file_path, config_file_path)
+            logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
+                         'have configured the tool for all the accounts present in payments.json')
+            tas = TrezorAccountsSetup(payments_file_path, config_file_path)
+            tas.update_trezor_config()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_transfer_axies']:

@@ -27,7 +27,7 @@ class TrezorAccountsSetup:
                 non_configured_accs.append(tc)
 
         while non_configured_accs:
-            pf = input("Please input one of your passphrases: ")
+            pf = input("Please input one of your passphrases (can be empty): ")
             custom_ui = CustomUI(passphrase=pf)
             num_accs = 0
             while num_accs == 0:
