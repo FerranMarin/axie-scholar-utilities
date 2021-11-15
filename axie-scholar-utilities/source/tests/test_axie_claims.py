@@ -419,7 +419,7 @@ async def test_claim_execution(mocked_provider,
                                mock_to_hex,
                                caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/claim_results_*.log')[0][9:]
+    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     await async_cleanup_log_file(log_file)
     with patch.object(builtins,
                       "open",
