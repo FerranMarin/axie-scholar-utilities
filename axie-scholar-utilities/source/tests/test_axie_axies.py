@@ -7,7 +7,7 @@ import requests_mock
 import pytest
 
 from axie import Axies
-from axie.utils import AXIE_CONTRACT
+from axie.utils import AXIE_CONTRACT, RONIN_PROVIDER, USER_AGENT
 
 
 @freeze_time('2021-01-14 01:10:05')
@@ -19,7 +19,10 @@ def test_axies_init(mocked_provider, mocked_checksum, mocked_contract):
                       "open",
                       mock_open(read_data='{"foo": "bar"}')):
         a = Axies("ronin:abc1")
-    mocked_provider.assert_called()
+    mocked_provider.assert_called_with(
+        RONIN_PROVIDER,
+        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+    )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     assert a.acc == "0xabc1"

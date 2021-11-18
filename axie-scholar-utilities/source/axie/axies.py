@@ -5,12 +5,15 @@ from datetime import datetime, timedelta
 from web3 import Web3
 import requests
 
-from axie.utils import check_balance, RONIN_PROVIDER, AXIE_CONTRACT
+from axie.utils import check_balance, RONIN_PROVIDER, AXIE_CONTRACT, USER_AGENT
 
 
 class Axies:
     def __init__(self, account):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER))
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         self.acc = account.replace("ronin:", "0x")
         with open("axie/axie_abi.json") as f:
             axie_abi = json.load(f)

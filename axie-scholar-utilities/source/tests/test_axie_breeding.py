@@ -7,7 +7,7 @@ from mock import patch, mock_open, call
 from axie import AxieBreedManager
 from axie.breeding import Breed, AXIE_CONTRACT
 from axie.payments import PaymentsSummary, CREATOR_FEE_ADDRESS
-from axie.utils import RONIN_PROVIDER_FREE
+from axie.utils import RONIN_PROVIDER_FREE, USER_AGENT
 
 
 @patch("axie.breeding.load_json", return_value={"foo": "bar"})
@@ -271,7 +271,10 @@ def test_breed_execute(mocked_provider,
         b = Breed(sire_axie=123, matron_axie=456, address=acc, private_key=private_acc)
         b.execute()
     mock_get_nonce.assert_called_once()
-    mocked_provider.assert_called_with(RONIN_PROVIDER_FREE)
+    mocked_provider.assert_called_with(
+        RONIN_PROVIDER_FREE,
+        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+    )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
     mocked_sign_transaction.assert_called_once()
