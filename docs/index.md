@@ -1,5 +1,5 @@
 ## Welcome to Axie Scholar Utilities Wiki
-[![Build Status](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities.svg?branch=main)](https://app.travis-ci.com/FerranMarin/axie-scholar-utilities)
+[![CI to Docker Hub](https://github.com/FerranMarin/axie-scholar-utilities/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/FerranMarin/axie-scholar-utilities/actions/workflows/test.yml)
 [![Docker Image](https://img.shields.io/badge/docker%20image-available-blue)](https://hub.docker.com/r/epith/axie-scholar-utilities)
 
 In these pages we will cover all the information you need to install and use axie scholar utilities tool.
