@@ -16,7 +16,8 @@ from axie.utils import (
     AXIE_CONTRACT,
     check_balance,
     TIMEOUT_MINS,
-    ImportantLogsFilter
+    ImportantLogsFilter,
+    USER_AGENT
 )
 from axie.payments import Payment, PaymentsSummary, CREATOR_FEE_ADDRESS
 
@@ -33,7 +34,10 @@ logger.addHandler(file_handler)
 
 class Breed:
     def __init__(self, sire_axie, matron_axie, address, private_key):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER_FREE,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
@@ -55,7 +59,7 @@ class Breed:
             self.matron_axie
         ).buildTransaction({
             "chainId": 2020,
-            "gas": 500000,
+            "gas": 492874,
             "gasPrice": self.w3.toWei("0", "gwei"),
             "nonce": nonce
         })

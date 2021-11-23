@@ -767,7 +767,7 @@ python-versions = "*"
 
 [[package]]
 name = "web3"
-version = "5.24.0"
+version = "5.25.0"
 description = "Web3.py"
 category = "main"
 optional = false
@@ -790,10 +790,10 @@ requests = ">=2.16.0,<3.0.0"
 websockets = ">=9.1,<10"
 
 [package.extras]
-dev = ["eth-tester[py-evm] (==v0.5.0-beta.4)", "py-geth (>=3.5.0,<4)", "flake8 (==3.8.3)", "isort (>=4.2.15,<4.3.5)", "mypy (==0.812)", "mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-solc (>=0.4.0)", "pytest (>=4.4.0,<5.0.0)", "sphinx (>=3.0,<4)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel", "bumpversion", "flaky (>=3.7.0,<4)", "hypothesis (>=3.31.2,<6)", "pytest-asyncio (>=0.10.0,<0.11)", "pytest-mock (>=1.10,<2)", "pytest-pythonpath (>=0.3)", "pytest-watch (>=4.2,<5)", "pytest-xdist (>=1.29,<2)", "setuptools (>=38.6.0)", "tox (>=1.8.0)", "tqdm (>4.32,<5)", "twine (>=1.13,<2)", "pluggy (==0.13.1)", "when-changed (>=0.3.0,<0.4)"]
-docs = ["mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-geth (>=3.5.0,<4)", "py-solc (>=0.4.0)", "pytest (>=4.4.0,<5.0.0)", "sphinx (>=3.0,<4)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel"]
+dev = ["eth-tester[py-evm] (==v0.6.0-beta.4)", "py-geth (>=3.6.0,<4)", "flake8 (==3.8.3)", "isort (>=4.2.15,<4.3.5)", "mypy (==0.812)", "mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-solc (>=0.4.0)", "pytest (>=4.4.0,<5.0.0)", "sphinx (>=3.0,<4)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel", "bumpversion", "flaky (>=3.7.0,<4)", "hypothesis (>=3.31.2,<6)", "pytest-asyncio (>=0.10.0,<0.11)", "pytest-mock (>=1.10,<2)", "pytest-pythonpath (>=0.3)", "pytest-watch (>=4.2,<5)", "pytest-xdist (>=1.29,<2)", "setuptools (>=38.6.0)", "tox (>=1.8.0)", "tqdm (>4.32,<5)", "twine (>=1.13,<2)", "pluggy (==0.13.1)", "when-changed (>=0.3.0,<0.4)"]
+docs = ["mock", "sphinx-better-theme (>=0.1.4)", "click (>=5.1)", "configparser (==3.5.0)", "contextlib2 (>=0.5.4)", "py-geth (>=3.6.0,<4)", "py-solc (>=0.4.0)", "pytest (>=4.4.0,<5.0.0)", "sphinx (>=3.0,<4)", "sphinx-rtd-theme (>=0.1.9)", "toposort (>=1.4)", "towncrier (==18.5.0)", "urllib3", "wheel"]
 linter = ["flake8 (==3.8.3)", "isort (>=4.2.15,<4.3.5)", "mypy (==0.812)"]
-tester = ["eth-tester[py-evm] (==v0.5.0-beta.4)", "py-geth (>=3.5.0,<4)"]
+tester = ["eth-tester[py-evm] (==v0.6.0-beta.4)", "py-geth (>=3.6.0,<4)"]
 
 [[package]]
 name = "websockets"
@@ -818,7 +818,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "b8ac005a0f1f91481565ae8884e948e12bc792aeb68081c697d8def16ee509a8"
+content-hash = "226f28360a8d846c0082917b6ad739693de782f9402ff34bc4e54b821999ae2c"
 
 [metadata.files]
 aiohttp = [
@@ -1424,8 +1424,8 @@ varint = [
     {file = "varint-1.0.2.tar.gz", hash = "sha256:a6ecc02377ac5ee9d65a6a8ad45c9ff1dac8ccee19400a5950fb51d594214ca5"},
 ]
 web3 = [
-    {file = "web3-5.24.0-py3-none-any.whl", hash = "sha256:69389a8f6d5d3effc7d07f50f4801d0a88b9530ec0757a54ca1dafe425f0c23e"},
-    {file = "web3-5.24.0.tar.gz", hash = "sha256:6535618b07a8d3d7496374a3b7714cfade4f94e6dc085a518718d4c6f776ac3f"},
+    {file = "web3-5.25.0-py3-none-any.whl", hash = "sha256:24fdedb85eac0068f7c964e8b6713a5623e4a1e0d95ebabd1939fef933007c02"},
+    {file = "web3-5.25.0.tar.gz", hash = "sha256:0e9ae7db064a3efee611af0c18d921cc7a4b320380a1f734b0c837518e62484b"},
 ]
 websockets = [
     {file = "websockets-9.1-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:d144b350045c53c8ff09aa1cfa955012dd32f00c7e0862c199edcabb1a8b32da"},

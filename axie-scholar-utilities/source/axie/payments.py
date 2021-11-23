@@ -17,7 +17,8 @@ from axie.utils import (
     ImportantLogsFilter,
     SLP_CONTRACT,
     RONIN_PROVIDER_FREE,
-    TIMEOUT_MINS
+    TIMEOUT_MINS,
+    USER_AGENT
 )
 
 
@@ -35,7 +36,10 @@ logger.addHandler(file_handler)
 
 class Payment:
     def __init__(self, name, payment_type, from_acc, from_private, to_acc, amount, summary):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER_FREE,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         self.name = name
         self.payment_type = payment_type
         self.from_acc = from_acc.replace("ronin:", "0x")
@@ -60,7 +64,7 @@ class Payment:
             0
         ).buildTransaction({
             "chainId": 2020,
-            "gas": 500000,
+            "gas": 492874,
             "gasPrice": self.w3.toWei("0", "gwei"),
             "nonce": nonce
         })
@@ -110,7 +114,7 @@ class Payment:
             self.amount
         ).buildTransaction({
             "chainId": 2020,
-            "gas": 250000,
+            "gas": 246437,
             "gasPrice": self.w3.toWei("0", "gwei"),
             "nonce": nonce
         })

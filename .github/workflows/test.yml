@@ -1,0 +1,35 @@
+name: CI to Docker Hub
+on:
+  push: { branches: main }
+
+jobs:
+  test-and-push:
+    name: Run tests
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE_FILE: axie-scholar-utilities/docker/docker-compose.yml
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+
+    steps:
+    - name: Check Out Repo 
+      uses: actions/checkout@v2
+    
+    - name: Build test docker images
+      run: docker-compose build tests
+    
+    - name: Run tests
+      run: docker-compose run tests
+    
+    - name: Build prod docker image
+      run: docker-compose build scholar-utilities
+    
+    - name: Tag image
+      run: docker tag axie-scholar-utilities epith/axie-scholar-utilities
+
+    - name: Login to DockerHub
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      
+    - name: Pust to DockerHub
+      run: docker push epith/axie-scholar-utilities
+    

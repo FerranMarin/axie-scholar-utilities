@@ -10,7 +10,8 @@ from axie.utils import (
     AXS_CONTRACT,
     AXIE_CONTRACT,
     WETH_CONTRACT,
-    BALANCE_ABI
+    BALANCE_ABI,
+    USER_AGENT
 )
 
 
@@ -20,7 +21,10 @@ from axie.utils import (
 @patch("web3.Web3.HTTPProvider", return_value='foo')
 def test_check_balance_slp(mock_provider, mock_contract, mock_checksum, _):
     result = check_balance("ronin:abc")
-    mock_provider.assert_called_with(RONIN_PROVIDER)
+    mock_provider.assert_called_with(
+        RONIN_PROVIDER,
+        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+    )
     mock_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xabc")])
     mock_contract.assert_called_with(address="checksum", abi=BALANCE_ABI)
     assert result == 1
@@ -32,7 +36,10 @@ def test_check_balance_slp(mock_provider, mock_contract, mock_checksum, _):
 @patch("web3.Web3.HTTPProvider", return_value='foo')
 def test_check_balance_slp_explicit(mock_provider, mock_contract, mock_checksum, _):
     result = check_balance("ronin:abc", 'slp')
-    mock_provider.assert_called_with(RONIN_PROVIDER)
+    mock_provider.assert_called_with(
+        RONIN_PROVIDER,
+        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+    )
     mock_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xabc")])
     mock_contract.assert_called_with(address="checksum", abi=BALANCE_ABI)
     assert result == 1
@@ -44,7 +51,10 @@ def test_check_balance_slp_explicit(mock_provider, mock_contract, mock_checksum,
 @patch("web3.Web3.HTTPProvider", return_value='foo')
 def test_check_balance_axs(mock_provider, mock_contract, mock_checksum, _):
     result = check_balance("ronin:abc", "axs")
-    mock_provider.assert_called_with(RONIN_PROVIDER)
+    mock_provider.assert_called_with(
+        RONIN_PROVIDER,
+        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+    )
     mock_checksum.assert_has_calls([call(AXS_CONTRACT), call("0xabc")])
     mock_contract.assert_called_with(address="checksum", abi=BALANCE_ABI)
     assert result == 1
@@ -56,7 +66,10 @@ def test_check_balance_axs(mock_provider, mock_contract, mock_checksum, _):
 @patch("web3.Web3.HTTPProvider", return_value='foo')
 def test_check_balance_weth(mock_provider, mock_contract, mock_checksum, _):
     result = check_balance("ronin:abc", "weth")
-    mock_provider.assert_called_with(RONIN_PROVIDER)
+    mock_provider.assert_called_with(
+        RONIN_PROVIDER,
+        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+    )
     mock_checksum.assert_has_calls([call(WETH_CONTRACT), call("0xabc")])
     mock_contract.assert_called_with(address="checksum", abi=BALANCE_ABI)
     assert result == 1.0
@@ -68,7 +81,10 @@ def test_check_balance_weth(mock_provider, mock_contract, mock_checksum, _):
 @patch("web3.Web3.HTTPProvider", return_value='foo')
 def test_check_balance_axie(mock_provider, mock_contract, mock_checksum, _):
     result = check_balance("ronin:abc", "axies")
-    mock_provider.assert_called_with(RONIN_PROVIDER)
+    mock_provider.assert_called_with(
+        RONIN_PROVIDER,
+        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+    )
     mock_checksum.assert_has_calls([call(AXIE_CONTRACT), call("0xabc")])
     mock_contract.assert_called_with(address="checksum", abi=BALANCE_ABI)
     assert result == 1

@@ -10,7 +10,15 @@ from web3 import Web3, exceptions
 
 from axie.schemas import transfers_schema
 from axie.axies import Axies
-from axie.utils import get_nonce, load_json, ImportantLogsFilter, RONIN_PROVIDER_FREE, AXIE_CONTRACT, TIMEOUT_MINS
+from axie.utils import (
+    get_nonce,
+    load_json,
+    ImportantLogsFilter,
+    RONIN_PROVIDER_FREE,
+    AXIE_CONTRACT,
+    TIMEOUT_MINS,
+    USER_AGENT
+)
 
 
 now = int(datetime.now().timestamp())
@@ -25,7 +33,10 @@ logger.addHandler(file_handler)
 
 class Transfer:
     def __init__(self, from_acc, from_private, to_acc, axie_id):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER_FREE,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
         self.to_acc = to_acc.replace("ronin:", "0x")
@@ -48,7 +59,7 @@ class Transfer:
             self.axie_id
         ).buildTransaction({
             "chainId": 2020,
-            "gas": 500000,
+            "gas": 492874,
             "from": Web3.toChecksumAddress(self.from_acc),
             "gasPrice": self.w3.toWei("0", "gwei"),
             "value": 0,

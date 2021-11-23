@@ -33,7 +33,10 @@ logger.addHandler(file_handler)
 class Claim(AxieGraphQL):
     def __init__(self, acc_name, **kwargs):
         super(Claim, self).__init__(**kwargs)
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER_FREE,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": self.user_agent}}))
         with open("axie/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
@@ -95,7 +98,7 @@ class Claim(AxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': 1000000, 'gasPrice': 0, 'nonce': nonce})
+        ).buildTransaction({'gas': 492874, 'gasPrice': 0, 'nonce': nonce})
         # Sign claim
         signed_claim = self.w3.eth.account.sign_transaction(
             claim,
