@@ -7,7 +7,7 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     env:
-      COMPOSE_FILE: .axie-scholar-utilities/docker/docker-compose.yml
+      COMPOSE_FILE: ./axie-scholar-utilities/docker/docker-compose.yml
 
     steps:
     - name: Build docker images
@@ -20,7 +20,7 @@ jobs:
     name: Push to DockerHub
     runs-on: ubuntu-latest
     env:
-      COMPOSE_FILE: .axie-scholar-utilities/docker/docker-compose.yml
+      COMPOSE_FILE: ./axie-scholar-utilities/docker/docker-compose.yml
       DOCKER_USER: ${{ secrets.DOCKER_USER }}
       DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
     
