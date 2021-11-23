@@ -1,4 +1,4 @@
-name: Test
+name: CI to Docker Hub
 on:
   push: { branches: main }
 
@@ -7,9 +7,12 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     env:
-      COMPOSE_FILE: axie-scholar-utilities/axie-scholar-utilities/docker/docker-compose.yml
+      COMPOSE_FILE: axie-scholar-utilities/docker/docker-compose.yml
 
     steps:
+    - name: Check Out Repo 
+      uses: actions/checkout@v2
+    
     - name: Build docker images
       run: docker-compose build tests
     
@@ -25,6 +28,9 @@ jobs:
       DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
     
     steps:
+    - name: Check Out Repo 
+      uses: actions/checkout@v2
+    
     - name: Build docker image
       run: docker-compose build scholar-utilities
     
