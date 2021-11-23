@@ -46,7 +46,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         self.acc_name = acc_name
         self.request = requests.Session()
         self.gwei = self.w3.toWei('0', 'gwei')
-        self.gas = 250000
+        self.gas = 492874
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"

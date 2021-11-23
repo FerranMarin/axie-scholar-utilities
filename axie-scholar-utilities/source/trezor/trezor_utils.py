@@ -8,7 +8,7 @@ from trezorlib import ethereum
 from trezorlib.ui import ClickUI
 from trezorlib.tools import parse_path 
 
-from axie.utils import RETRIES
+from axie.utils import RETRIES, USER_AGENT
 
 
 class CustomUI(ClickUI):
@@ -26,8 +26,7 @@ class TrezorAxieGraphQL:
         self.account = kwargs.get('account').replace("ronin:", "0x")
         self.request = requests.Session()
         self.request.mount('https://', HTTPAdapter(max_retries=RETRIES))
-        self.user_agent = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) "
-                           "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36")
+        self.user_agent = USER_AGENT
         self.client = kwargs.get('account')
         self.bip_path = parse_path(kwargs.get('bip_path'))
 
