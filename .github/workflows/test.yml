@@ -3,35 +3,25 @@ on:
   push: { branches: main }
 
 jobs:
-  test:
+  test-and-push:
     name: Run tests
     runs-on: ubuntu-latest
     env:
       COMPOSE_FILE: axie-scholar-utilities/docker/docker-compose.yml
-
-    steps:
-    - name: Check Out Repo 
-      uses: actions/checkout@v2
-    
-    - name: Build docker images
-      run: docker-compose build tests
-    
-    - name: Build docker images
-      run: docker-compose run tests
-
-  docker-push:
-    name: Push to DockerHub
-    runs-on: ubuntu-latest
-    env:
-      COMPOSE_FILE: ./axie-scholar-utilities/docker/docker-compose.yml
       DOCKER_USER: ${{ secrets.DOCKER_USER }}
       DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-    
+
     steps:
     - name: Check Out Repo 
       uses: actions/checkout@v2
     
-    - name: Build docker image
+    - name: Build test docker images
+      run: docker-compose build tests
+    
+    - name: Run tests
+      run: docker-compose run tests
+    
+    - name: Build prod docker image
       run: docker-compose build scholar-utilities
     
     - name: Tag image
