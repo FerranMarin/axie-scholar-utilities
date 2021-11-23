@@ -21,7 +21,8 @@ from axie.utils import (
     ImportantLogsFilter,
     SLP_CONTRACT,
     RONIN_PROVIDER_FREE,
-    TIMEOUT_MINS
+    TIMEOUT_MINS,
+    USER_AGENT
 )
 from trezor.trezor_utils import CustomUI
 
@@ -41,7 +42,10 @@ logger.addHandler(file_handler)
 class TrezorPayment:
 
     def __init__(self, name, client, bip_path, from_acc, to_acc, amount):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER_FREE,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         self.name = name
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.to_acc = to_acc.replace("ronin:", "0x")

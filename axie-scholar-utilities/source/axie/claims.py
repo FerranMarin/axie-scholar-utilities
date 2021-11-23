@@ -32,7 +32,7 @@ logger.addHandler(file_handler)
 
 class Claim(AxieGraphQL):
     def __init__(self, acc_name, **kwargs):
-        super(Claim, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,

@@ -18,7 +18,8 @@ from axie.utils import (
     load_json,
     ImportantLogsFilter,
     SLP_CONTRACT,
-    RONIN_PROVIDER_FREE
+    RONIN_PROVIDER_FREE,
+    USER_AGENT
 )
 from trezor.trezor_utils import TrezorAxieGraphQL, CustomUI
 
@@ -35,8 +36,11 @@ logger.addHandler(file_handler)
 
 class TrezorClaim(TrezorAxieGraphQL):
     def __init__(self, acc_name, **kwargs):
-        super(Claim, self).__init__(**kwargs)
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+        super().__init__(**kwargs)
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER_FREE,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         with open("axie/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(

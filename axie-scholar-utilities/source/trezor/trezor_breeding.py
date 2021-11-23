@@ -21,6 +21,7 @@ from axie.utils import (
     ImportantLogsFilter
 )
 from axie.payments import PaymentsSummary, CREATOR_FEE_ADDRESS
+from axie.utils import USER_AGENT
 from trezor.trezor_payments import TrezorPayment
 from trezor.trezor_utils import CustomUI
 
@@ -37,7 +38,10 @@ logger.addHandler(file_handler)
 
 class TrezorBreed:
     def __init__(self, sire_axie, matron_axie, address, client, bip_path):
-        self.w3 = Web3(Web3.HTTPProvider(RONIN_PROVIDER_FREE))
+        self.w3 = Web3(
+            Web3.HTTPProvider(
+                RONIN_PROVIDER_FREE,
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")

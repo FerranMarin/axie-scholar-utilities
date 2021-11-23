@@ -73,7 +73,7 @@ class TrezorAxieGraphQL:
             logging.critical(f"Error! Getting JWT! Error: {e}")
             return None
         if 200 <= response.status_code <= 299:
-            if (not response.json()['data'].get('createAccessTokenWithSignature') or
+            if (not response.json().get('data') or not response.json()['data'].get('createAccessTokenWithSignature') or
                not response.json()['data']['createAccessTokenWithSignature'].get('accessToken')):
                 logging.critical("Could not retreive JWT, probably your private key for this account is wrong. "
                                  f"Account: {self.account.replace('0x','ronin:')} \n AccountName: {self.acc_name}")
