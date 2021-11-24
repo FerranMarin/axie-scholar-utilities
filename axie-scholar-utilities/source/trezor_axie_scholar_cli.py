@@ -181,8 +181,6 @@ def run_cli():
         logging.info('I shall help you configure your trezor device to use this tool!')
         payments_file_path = args['<payments_file>']
         config_file_path = args.get('<config_file>')
-        logging.info(payments_file_path)
-        logging.info(config_file_path)
         if (config_file_path and check_file(config_file_path) and check_file(payments_file_path) or
            not config_file_path and check_file(payments_file_path)):
             logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
