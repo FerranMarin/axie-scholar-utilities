@@ -50,6 +50,7 @@ class TrezorAccountsSetup:
                         self.trezor_config[address] = {"passphrase": pf, "bip_path": bip_path}
                     else:
                         self.trezor_config[address] = {"passphrase": None, "bip_path": bip_path}
+                non_configured_accs.pop(address)
         
         file_path = self.trezor_config_file if self.trezor_config_file else 'trezor_config.json'
         with open(file_path, 'w', encoding='utf-8') as f:
