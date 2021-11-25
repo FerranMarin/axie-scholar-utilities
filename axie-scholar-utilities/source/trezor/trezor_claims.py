@@ -163,11 +163,9 @@ class TrezorAxieClaimsManager:
 
     def verify_inputs(self):
         validation_success = True
-        # Check secrets file is not empty
         if not self.trezor_config:
-            logging.warning("No secrets contained in secrets file")
+            logging.warning("No configuration found for trezor")
             validation_success = False
-        # Check keys and secrets have proper format
         for acc in self.trezor_config:
             if not acc.startswith("ronin:"):
                 logging.critical(f"Public address {acc} needs to start with ronin:")
@@ -182,7 +180,7 @@ class TrezorAxieClaimsManager:
                 account=acc,
                 client=get_default_client(CustomUI(self.trezor_config[acc]['passphrase'])),
                 bip_path=parse_path(self.trezor_config[acc]['bip_path']),
-                acc_name=self.acc_names[acc]) for acc in self.secrets_file]
+                acc_name=self.acc_names[acc]) for acc in self.trezor_config]
         logging.info("Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))

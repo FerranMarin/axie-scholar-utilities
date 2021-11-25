@@ -45,11 +45,9 @@ class TrezorQRCodeManager:
 
     def verify_inputs(self):
         validation_success = True
-        # Check secrets file is not empty
         if not self.trezor_config:
-            logging.warning("No secrets contained in secrets file")
+            logging.warning("No configuration found for trezor")
             validation_success = False
-        # Check keys and secrets have proper format
         for acc in self.trezor_config:
             if not acc.startswith("ronin:"):
                 logging.critical(f"Public address {acc} needs to start with ronin:")
