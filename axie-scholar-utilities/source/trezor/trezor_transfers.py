@@ -140,7 +140,7 @@ class TrezorAxieTransferManager:
             validation_success = False
         # Check we have private keys for all accounts
         for acc in self.transfers_file:
-            if acc["AccountAddress"] not in self.trezor_config:
+            if acc["AccountAddress"].lower() not in self.trezor_config:
                 logging.critical(f"Account '{acc['AccountAddress']}' is not present in trezor config file, "
                                  "please re-run trezor setup command.")
                 validation_success = False
@@ -154,17 +154,17 @@ class TrezorAxieTransferManager:
         transfers = []
         logging.info("Preparing transfers")
         for acc in self.transfers_file:
-            axies_in_acc = Axies(acc['AccountAddress']).get_axies()
+            axies_in_acc = Axies(acc['AccountAddress'].lower()).get_axies()
             for axie in acc['Transfers']:
-                if not self.secure or (self.secure and axie['ReceiverAddress'] in self.trezor_config):
+                if not self.secure or (self.secure and axie['ReceiverAddress'].lower() in self.trezor_config):
                     # Check axie in account
                     if axie['AxieId'] in axies_in_acc:
                         t = TrezorTransfer(
-                            to_acc=axie['ReceiverAddress'],
+                            to_acc=axie['ReceiverAddress'].lower(),
                             client=get_default_client(
-                                CustomUI(passphrase=self.trezor_config[acc['AccountAddress']]['passphrase'])),
-                            bip_path=parse_path(self.trezor_config[acc['AccountAddress']]['bip_path']),
-                            from_acc=acc['AccountAddress'],
+                                CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase'])),
+                            bip_path=parse_path(self.trezor_config[acc['AccountAddress'].lower()]['bip_path']),
+                            from_acc=acc['AccountAddress'].lower(),
                             axie_id=axie['AxieId']
                         )
                         transfers.append(t)

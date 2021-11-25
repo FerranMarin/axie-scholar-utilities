@@ -64,7 +64,7 @@ class TrezorAxieMorphingManager:
 
     def __init__(self, axie_list, account, trezor_config):
         self.axie_list = axie_list
-        self.account = account
+        self.account = account.lower()
         self.trezor_config = load_json(trezor_config)
 
     def verify_inputs(self):

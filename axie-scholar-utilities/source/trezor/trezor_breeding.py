@@ -115,7 +115,7 @@ class TrezorAxieBreedManager:
     def __init__(self, breeding_file, trezor_config, payment_account):
         self.trezor_config = load_json(trezor_config)
         self.breeding_file = load_json(breeding_file)
-        self.payment_account = payment_account
+        self.payment_account = payment_account.lower()
         self.breeding_costs = 0
 
     def verify_inputs(self):
@@ -128,7 +128,7 @@ class TrezorAxieBreedManager:
                              f'For attribute in: {list(ex.path)}')
             validation_error = True
         for acc in self.breeding_file:
-            if acc['AccountAddress'] not in self.trezor_config:
+            if acc['AccountAddress'].lower() not in self.trezor_config:
                 logging.critical(f"Account '{acc['AccountAddress']}' is not present in trezor config, please re-run setup.")
                 validation_error = True
         if self.payment_account not in self.trezor_config:
@@ -166,9 +166,9 @@ class TrezorAxieBreedManager:
             b = TrezorBreed(
                 sire_axie=bf['Sire'],
                 matron_axie=bf['Matron'],
-                address=bf['AccountAddress'],
-                client=get_default_client(CustomUI(self.trezor_config[bf['AccountAddress']]['passphrase'])),
-                bip_path=parse_path(self.trezor_config[bf['AccountAddress']]['bip_path'])
+                address=bf['AccountAddress'].lower(),
+                client=get_default_client(CustomUI(self.trezor_config[bf['AccountAddress'].lower()]['passphrase'])),
+                bip_path=parse_path(self.trezor_config[bf['AccountAddress'].lower()]['bip_path'])
             )
             b.execute()
         logging.info("Done breeding axies")

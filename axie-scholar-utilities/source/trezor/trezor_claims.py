@@ -156,7 +156,7 @@ class TrezorAxieClaimsManager:
         refined_config = {}
         acc_names = {}
         for scholar in payments['Scholars']:
-            key = scholar['AccountAddress']
+            key = scholar['AccountAddress'].lower()
             refined_config[key] = config[key]
             acc_names[key] = scholar['Name']
         return refined_config, acc_names

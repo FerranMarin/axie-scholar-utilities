@@ -41,7 +41,7 @@ logger.addHandler(file_handler)
 
 class TrezorPayment:
 
-    def __init__(self, name, client, bip_path, from_acc, to_acc, amount):
+    def __init__(self, name, client, bip_path, from_acc, to_acc, amount, summary):
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
@@ -60,6 +60,7 @@ class TrezorPayment:
         self.bip_path = bip_path
         self.gwei = self.w3.toWei('0', 'gwei')
         self.gas = 250000
+        self.summary = summary
 
     def send_replacement_tx(self, nonce):
         # check nonce is still available, do nothing if nonce is not available anymore
@@ -200,8 +201,6 @@ class TrezorAxiePaymentsManager:
         logging.info("Validating file inputs...")
         validation_success = True
         # Validate payments file
-        amount_msg = None
-        percent_msg = None
         try:
             validate(self.payments_file, payments_percent_schema)
         except ValidationError as ex:
@@ -224,7 +223,7 @@ class TrezorAxiePaymentsManager:
 
         # Check we have trezor configs for all accounts
         for acc in self.payments_file["Scholars"]:
-            if acc["AccountAddress"] not in self.trezor_config:
+            if acc["AccountAddress"].lower() not in self.trezor_config:
                 logging.critical(f"Account '{acc['Name']}' is not present in trezor config file, please re-run setup.")
                 validation_success = False
         if not validation_success:
@@ -251,7 +250,7 @@ class TrezorAxiePaymentsManager:
         for acc in self.scholar_accounts:
             client = get_default_client(CustomUI(passphrase=self.trezor_config[acc]['passphrase']))
             bip_path = parse_path(self.trezor_config[acc]['bip_path'])
-            acc_balance = check_balance(acc['AccountAddress'])
+            acc_balance = check_balance(acc['AccountAddress'].lower())
             total_payments = 0
             acc_payments = []
             # Scholar Payment
@@ -263,9 +262,8 @@ class TrezorAxiePaymentsManager:
                 "scholar",
                 client,
                 bip_path,
-                acc["AccountAddress"],
-                self.secrets_file[acc["AccountAddress"]],
-                acc["ScholarPayoutAddress"],
+                acc["AccountAddress"].lower(),
+                acc["ScholarPayoutAddress"].lower(),
                 scholar_amount,
                 self.summary
             ))
@@ -281,9 +279,8 @@ class TrezorAxiePaymentsManager:
                         "trainer",
                         client,
                         bip_path,
-                        acc["AccountAddress"],
-                        self.secrets_file[acc["AccountAddress"]],
-                        acc["TrainerPayoutAddress"],
+                        acc["AccountAddress"].lower(),
+                        acc["TrainerPayoutAddress"].lower(),
                         trainer_amount,
                         self.summary
                     ))
@@ -299,9 +296,8 @@ class TrezorAxiePaymentsManager:
                                 "donation",
                                 client,
                                 bip_path,
-                                acc["AccountAddress"],
-                                self.secrets_file[acc["AccountAddress"]],
-                                dono["AccountAddress"],
+                                acc["AccountAddress"].lower(),
+                                dono["AccountAddress"].lower(),
                                 dono_amount,
                                 self.summary
                             ))
@@ -315,8 +311,7 @@ class TrezorAxiePaymentsManager:
                             "donation",
                             client,
                             bip_path,
-                            acc["AccountAddress"],
-                            self.secrets_file[acc["AccountAddress"]],
+                            acc["AccountAddress"].lower(),
                             CREATOR_FEE_ADDRESS,
                             fee_amount,
                             self.summary
@@ -330,9 +325,8 @@ class TrezorAxiePaymentsManager:
                     "manager",
                     client,
                     bip_path,
-                    acc["AccountAddress"],
-                    self.secrets_file[acc["AccountAddress"]],
-                    self.manager_acc,
+                    acc["AccountAddress"].lower(),
+                    self.manager_acc.lower(),
                     manager_payout,
                     self.summary
                 ))
