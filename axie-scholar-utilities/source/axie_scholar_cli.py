@@ -28,6 +28,7 @@ import sys
 import csv
 import json
 import logging
+import urllib.parse
 
 from docopt import docopt
 
@@ -176,7 +177,9 @@ def mass_update_secret_file(csv_file_path, secrets_file_path):
     with open(csv_file_path, encoding='utf-8') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
-            new_secrets[row[0]] = row[1]
+            acc = urllib.parse.quote_plus(row[0]).lower()
+            secret = urllib.parse.quote_plus(row[1]).lower()
+            new_secrets[acc] = secret
 
     old_secrets = load_json(secrets_file_path)
     merge = {**new_secrets, **old_secrets}
