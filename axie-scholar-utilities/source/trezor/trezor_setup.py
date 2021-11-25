@@ -10,7 +10,7 @@ from trezor.trezor_utils import CustomUI
 
 
 class TrezorAccountsSetup:
-    
+
     def __init__(self, payments_file, trezor_config_file=None):
         self.trezor_config_file = trezor_config_file
         self.trezor_config = load_json(trezor_config_file) if trezor_config_file else {}
@@ -20,7 +20,7 @@ class TrezorAccountsSetup:
         account_list = []
         for acc in self.payments['Scholars']:
             account_list.append(acc['AccountAddress'].lower())
-        
+
         non_configured_accs = account_list.copy()
 
         for tc in self.trezor_config:
@@ -42,12 +42,9 @@ class TrezorAccountsSetup:
                 bip_path = f"m/44'/60'/0'/0/{i}"
                 address = ethereum.get_address(client, parse_path(bip_path), True).lower().replace('0x', 'ronin:')
                 if address in non_configured_accs:
-                    if pf:
-                        self.trezor_config[address] = {"passphrase": pf, "bip_path": bip_path}
-                    else:
-                        self.trezor_config[address] = {"passphrase": None, "bip_path": bip_path}
+                    self.trezor_config[address] = {"passphrase": pf, "bip_path": bip_path}
                     non_configured_accs.remove(address)
-        
+
         logging.info('Gathered all accounts config, saving trezor_config file')
         file_path = self.trezor_config_file if self.trezor_config_file else 'trezor_config.json'
         with open(file_path, 'w', encoding='utf-8') as f:
