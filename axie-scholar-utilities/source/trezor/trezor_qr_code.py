@@ -29,7 +29,7 @@ class TrezorQRCode(TrezorAxieGraphQL):
 class TrezorQRCodeManager:
 
     def __init__(self, payments_file, trezor_config):
-        self.secrets_file, self.acc_names = self.load_trezor_config_and_acc_name(trezor_config, payments_file)
+        self.trezor_config, self.acc_names = self.load_trezor_config_and_acc_name(trezor_config, payments_file)
         self.path = os.path.dirname(trezor_config)
 
     def load_trezor_config_and_acc_name(self, trezor_config, payments_file):
