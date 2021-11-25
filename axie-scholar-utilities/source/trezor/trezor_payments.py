@@ -248,7 +248,7 @@ class TrezorAxiePaymentsManager:
     
     def prepare_payout(self):
         for acc in self.scholar_accounts:
-            client = get_default_client(CustomUI(passphrase=self.trezor_config[acc]['passphrase']))
+            client = get_default_client(ui=CustomUI(passphrase=self.trezor_config[acc]['passphrase']))
             bip_path = parse_path(self.trezor_config[acc]['bip_path'])
             acc_balance = check_balance(acc['AccountAddress'].lower())
             total_payments = 0

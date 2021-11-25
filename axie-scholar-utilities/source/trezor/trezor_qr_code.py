@@ -60,7 +60,7 @@ class TrezorQRCodeManager:
         qrcode_list = [
             TrezorQRCode(
                 account=acc,
-                client=get_default_client(CustomUI(self.trezor_config[acc]['passphrase'])),
+                client=get_default_client(ui=CustomUI(self.trezor_config[acc]['passphrase'])),
                 bip_path=parse_path(self.trezor_config[acc]['bip_path']),
                 path=self.path
             ) for acc in self.trezor_config

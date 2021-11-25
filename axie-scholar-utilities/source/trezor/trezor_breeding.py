@@ -167,7 +167,7 @@ class TrezorAxieBreedManager:
                 sire_axie=bf['Sire'],
                 matron_axie=bf['Matron'],
                 address=bf['AccountAddress'].lower(),
-                client=get_default_client(CustomUI(self.trezor_config[bf['AccountAddress'].lower()]['passphrase'])),
+                client=get_default_client(ui=CustomUI(self.trezor_config[bf['AccountAddress'].lower()]['passphrase'])),
                 bip_path=parse_path(self.trezor_config[bf['AccountAddress'].lower()]['bip_path'])
             )
             b.execute()
@@ -177,7 +177,7 @@ class TrezorAxieBreedManager:
         p = TrezorPayment(
             "Breeding Fee",
             "donation",
-            get_default_client(CustomUI(self.trezor_config[self.payment_account]['passphrase'])),
+            get_default_client(ui=CustomUI(self.trezor_config[self.payment_account]['passphrase'])),
             parse_path(self.trezor_config[self.payment_account]['bip_path']),
             self.payment_account,
             CREATOR_FEE_ADDRESS,

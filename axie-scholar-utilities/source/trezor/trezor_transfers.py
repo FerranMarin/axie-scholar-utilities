@@ -162,7 +162,7 @@ class TrezorAxieTransferManager:
                         t = TrezorTransfer(
                             to_acc=axie['ReceiverAddress'].lower(),
                             client=get_default_client(
-                                CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase'])),
+                                ui=CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase'])),
                             bip_path=parse_path(self.trezor_config[acc['AccountAddress'].lower()]['bip_path']),
                             from_acc=acc['AccountAddress'].lower(),
                             axie_id=axie['AxieId']
