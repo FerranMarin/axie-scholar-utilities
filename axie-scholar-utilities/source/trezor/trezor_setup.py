@@ -26,7 +26,7 @@ class TrezorAccountsSetup:
 
         for tc in self.trezor_config:
             if tc in account_list:
-                non_configured_accs.pop(tc)
+                non_configured_accs.remove(tc)
 
         while non_configured_accs:
             pf = input("Please input one of your passphrases (can be empty): ")
@@ -50,7 +50,7 @@ class TrezorAccountsSetup:
                         self.trezor_config[address] = {"passphrase": pf, "bip_path": bip_path}
                     else:
                         self.trezor_config[address] = {"passphrase": None, "bip_path": bip_path}
-                non_configured_accs.pop(address)
+                non_configured_accs.remove(address)
         
         file_path = self.trezor_config_file if self.trezor_config_file else 'trezor_config.json'
         with open(file_path, 'w', encoding='utf-8') as f:
