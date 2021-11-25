@@ -168,7 +168,7 @@ class TrezorAxieBreedManager:
                 matron_axie=bf['Matron'],
                 address=bf['AccountAddress'].lower(),
                 client=get_default_client(ui=CustomUI(self.trezor_config[bf['AccountAddress'].lower()]['passphrase'])),
-                bip_path=parse_path(self.trezor_config[bf['AccountAddress'].lower()]['bip_path'])
+                bip_path=self.trezor_config[bf['AccountAddress'].lower()]['bip_path']
             )
             b.execute()
         logging.info("Done breeding axies")

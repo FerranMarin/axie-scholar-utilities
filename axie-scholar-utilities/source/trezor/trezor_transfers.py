@@ -46,7 +46,7 @@ class TrezorTransfer:
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.axie_id = axie_id
         self.client = client
-        self.bip_path = bip_path
+        self.bip_path = parse_path(bip_path)
         self.gwei = self.w3.toWei('0', 'gwei')
         self.gas = 250000
 
@@ -163,7 +163,7 @@ class TrezorAxieTransferManager:
                             to_acc=axie['ReceiverAddress'].lower(),
                             client=get_default_client(
                                 ui=CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase'])),
-                            bip_path=parse_path(self.trezor_config[acc['AccountAddress'].lower()]['bip_path']),
+                            bip_path=self.trezor_config[acc['AccountAddress'].lower()]['bip_path'],
                             from_acc=acc['AccountAddress'].lower(),
                             axie_id=axie['AxieId']
                         )
