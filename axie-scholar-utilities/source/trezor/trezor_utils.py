@@ -27,7 +27,7 @@ class TrezorAxieGraphQL:
         self.request = requests.Session()
         self.request.mount('https://', HTTPAdapter(max_retries=RETRIES))
         self.user_agent = USER_AGENT
-        self.client = kwargs.get('account')
+        self.client = kwargs.get('client')
         self.bip_path = parse_path(kwargs.get('bip_path'))
 
     def create_random_msg(self):
