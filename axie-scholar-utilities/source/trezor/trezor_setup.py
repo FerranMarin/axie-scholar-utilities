@@ -29,6 +29,7 @@ class TrezorAccountsSetup:
                 non_configured_accs.remove(tc)
 
         while non_configured_accs:
+            print(non_configured_accs)
             pf = input("Please input one of your passphrases (can be empty): ")
             if pf:
                 ui = CustomUI(passphrase=pf)
