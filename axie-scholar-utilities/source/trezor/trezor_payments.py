@@ -120,13 +120,12 @@ class TrezorPayment:
             self.execute()
         else:
             logging.info(f"Important: Replacement transaction failed. Means we could not complete tx {self}")
-       
 
     def execute(self):
-         # Get Nonce
+        # Get Nonce
         nonce = get_nonce(self.from_acc)
         # Build transaction
-        send_tx =  self.contract.functions.transfer(
+        send_tx = self.contract.functions.transfer(
             Web3.toChecksumAddress(self.to_acc),
             self.amount
         ).buildTransaction({
@@ -174,7 +173,7 @@ class TrezorPayment:
 
         if success:
             logging.info(f"Important: Transaction {self} completed! Hash: {hash} - "
-                  f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
             self.summary.increase_payout(
                 amount=self.amount,
                 address=self.to_acc.replace('0x', 'ronin:'),
@@ -196,7 +195,7 @@ class TrezorAxiePaymentsManager:
         self.donations = None
         self.auto = auto
         self.summary = PaymentsSummary()
-    
+
     def verify_inputs(self):
         logging.info("Validating file inputs...")
         validation_success = True
@@ -234,7 +233,7 @@ class TrezorAxiePaymentsManager:
         self.manager_acc = self.payments_file["Manager"]
         self.scholar_accounts = self.payments_file["Scholars"]
         logging.info("Files correctly validated!")
-    
+
     def check_acc_has_enough_balance(self, account, balance):
         account_balance = check_balance(account)
         if account_balance < balance:
@@ -245,11 +244,12 @@ class TrezorAxiePaymentsManager:
             logging.info(f'These payments will leave {account_balance - balance} SLP in your wallet.'
                          'Cancel payments and adjust payments if you want to leave 0 SLP in it.')
         return True
-    
+
     def prepare_payout(self):
         for acc in self.scholar_accounts:
-            client = get_default_client(ui=CustomUI(passphrase=self.trezor_config[acc]['passphrase']))
-            bip_path = parse_path(self.trezor_config[acc]['bip_path'])
+            client = get_default_client(
+                ui=CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase']))
+            bip_path = parse_path(self.trezor_config[acc['AccountAddress'].lower()]['bip_path'])
             acc_balance = check_balance(acc['AccountAddress'].lower())
             total_payments = 0
             acc_payments = []
