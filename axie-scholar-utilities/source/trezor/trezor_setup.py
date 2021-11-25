@@ -20,7 +20,7 @@ class TrezorAccountsSetup:
     def update_trezor_config(self):
         account_list = []
         for acc in self.payments['Scholars']:
-            account_list.append(acc['AccountAddress'])
+            account_list.append(acc['AccountAddress'].lower())
         
         non_configured_accs = account_list.copy()
 
@@ -31,10 +31,7 @@ class TrezorAccountsSetup:
         while non_configured_accs:
             print(non_configured_accs)
             pf = input("Please input one of your passphrases (can be empty): ")
-            if pf:
-                ui = CustomUI(passphrase=pf)
-            else:
-                ui = ClickUI()
+            ui = CustomUI(passphrase=pf)
             num_accs = 0
             while num_accs == 0:
                 num_inp = input("Please input number of accounts in that passphrase (1-50): ")
