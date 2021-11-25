@@ -44,7 +44,7 @@ class TrezorAccountsSetup:
             for i in range(num_accs):
                 client = get_default_client(ui=ui)
                 bip_path = f"m/44'/60'/0'/0/{i}"
-                address = ethereum.get_address(client, parse_path(bip_path), True)
+                address = ethereum.get_address(client, parse_path(bip_path), True).replace('0x', 'ronin:')
                 if address in non_configured_accs:
                     if pf:
                         self.trezor_config[address] = {"passphrase": pf, "bip_path": bip_path}
