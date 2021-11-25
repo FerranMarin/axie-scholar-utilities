@@ -7,7 +7,6 @@ from trezorlib import ethereum
 
 from axie.utils import load_json
 from trezor.trezor_utils import CustomUI
-from trezorlib.ui import ClickUI
 
 
 class TrezorAccountsSetup:
@@ -29,7 +28,6 @@ class TrezorAccountsSetup:
                 non_configured_accs.remove(tc)
 
         while non_configured_accs:
-            print(non_configured_accs)
             pf = input("Please input one of your passphrases (can be empty): ")
             ui = CustomUI(passphrase=pf)
             num_accs = 0
@@ -50,6 +48,8 @@ class TrezorAccountsSetup:
                         self.trezor_config[address] = {"passphrase": None, "bip_path": bip_path}
                     non_configured_accs.remove(address)
         
+        logging.info('Gathered all accounts config, saving trezor_config file')
         file_path = self.trezor_config_file if self.trezor_config_file else 'trezor_config.json'
         with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(self.trezor_config, f, indent=4)     
+            json.dump(self.trezor_config, f, indent=4)
+        logging.info('Frezor_config file saved!')
