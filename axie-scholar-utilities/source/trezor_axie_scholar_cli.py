@@ -177,7 +177,7 @@ def run_cli():
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['config_trezor']:
-        # Generate Secrets
+        # Configure Trezor
         logging.info('I shall help you configure your trezor device to use this tool!')
         payments_file_path = args['<payments_file>']
         config_file_path = args.get('<config_file>')
@@ -275,9 +275,9 @@ def run_cli():
         # Generate QR codes
         logging.info('I shall generate QR codes')
         payments_file_path = args['<payments_file>']
-        secrets_file_path = args['<secrets_file>']
-        if check_file(payments_file_path) and check_file(secrets_file_path):
-            qr = TrezorQRCodeManager(payments_file_path, secrets_file_path)
+        config_file_path = args['<config_file>']
+        if check_file(payments_file_path) and check_file(config_file_path):
+            qr = TrezorQRCodeManager(payments_file_path, config_file_path)
             qr.execute()
         else:
             logging.critical("Please review your file paths and re-try.")

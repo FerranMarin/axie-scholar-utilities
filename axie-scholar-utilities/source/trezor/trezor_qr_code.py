@@ -59,6 +59,7 @@ class TrezorQRCodeManager:
     def execute(self):
         qrcode_list = [
             TrezorQRCode(
+                acc_name=self.acc_names[acc],
                 account=acc,
                 client=get_default_client(ui=CustomUI(self.trezor_config[acc]['passphrase'])),
                 bip_path=self.trezor_config[acc]['bip_path'],
