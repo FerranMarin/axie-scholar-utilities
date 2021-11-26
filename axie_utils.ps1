@@ -42,6 +42,34 @@ function axie-utils-gen-breedings {
 function axie-utils-axie-breeding {
     docker run -it -v $pwd\breedings.json:/opt/app/files/breedings.json -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities axie_breeding files/breedings.json files/secrets.json
 }
+# Alias to morph axies by ronin addresses
+function axie-utils-axie-morphing($ronin_list) {
+    docker run -it -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities axie_morphing files/secrets.json $ronin_list
+}
+
+
+
+function validate_ronin_addresses($ronin_list, $i = 0) {
+
+    if($i -ge $ronin_list.length) {
+        return;
+    }
+
+    $ronin_address = $ronin_list[$i] -split ":"
+    $type = $ronin_address[0]
+    $address = $ronin_address[1]
+
+    if($type -ne "ronin") {
+        Throw "Address in position " + ($i + 1) + " is not a valid Ronin Address. It should start with 'ronin'."
+    }
+
+    if($address.length -ne 40) {
+        Throw "Ronin Address in position " + ($i + 1) + " is not a valid Ronin Address. A ronin address should have 40 characters."
+    }
+
+    validate_ronin_addresses $ronin_list ($i + 1)
+}
+
 
 $running = 1
 
@@ -63,7 +91,7 @@ while ($running -ne 0) {
     Write-Host "9. Generate QR Code"
     Write-Host "10. Generate Breedings File"
     Write-Host "11. Execute Breed Axies"
-    Write-Host "12. Execute Morph Axies"
+    Write-Host "12. Execute Morph Axies by Ronin Addresses"
     Write-Host "0. Exit"
     Write-Host "====================================="
     $choice = Read-Host "Choose an option: "
@@ -115,8 +143,9 @@ while ($running -ne 0) {
             pause
         }
         12 { 
-            $ronin_list = Read-Host "Ronin list where axies to morph are (separate with a comma): "
-            docker run -it -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities axie_morphing files/secrets.json $ronin_list
+            $ronin_list = Read-Host "Ronin Addresses list where axies to morph are (separate with a comma)"
+            validate_ronin_addresses ($ronin_list -split ",")
+            axie-utils-axie-morphing $ronin_list
             pause
         }
     }
