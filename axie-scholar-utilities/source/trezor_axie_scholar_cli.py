@@ -225,7 +225,7 @@ def run_cli():
         # Morph axies from all accounts given
         logging.info('I shall morph all axies I can!')
         accs = args['<list_of_accounts>']
-        config_file_path = args['<configs_file>']
+        config_file_path = args['<config_file>']
         if check_file(config_file_path):
             accs_list = accs.split(',')
             for acc in accs_list:
