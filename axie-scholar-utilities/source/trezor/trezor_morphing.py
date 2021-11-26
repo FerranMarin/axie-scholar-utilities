@@ -4,9 +4,10 @@ from datetime import datetime
 
 from hexbytes import HexBytes
 from trezorlib import ethereum
+from trezorlib.client import get_default_client
 from requests.exceptions import RetryError
 
-from axie.utils import load_json, ImportantLogsFilter
+from axie.utils import load_json, ImportantLogsFilter, CustomUI
 from trezor.trezor_utils import TrezorAxieGraphQL
 
 now = int(datetime.now().timestamp())
@@ -75,6 +76,10 @@ class TrezorAxieMorphingManager:
     def execute(self):
         logging.info(f"About to start morphing axies for account {self.account}")
         for axie in self.axie_list:
-            m = TrezorMorph(axie=axie, account=self.account, private_key=self.secrets[self.account])
+            m = TrezorMorph(
+                axie=axie,
+                account=self.account,
+                client=get_default_client(ui=CustomUI(self.trezor_config[self.account]['passphrase'])),
+                bip_path=self.trezor_config[self.account]['bip_path'])
             m.execute()
         logging.info(f"Done morphing axies for account {self.account}")

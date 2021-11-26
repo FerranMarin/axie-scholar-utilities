@@ -21,7 +21,7 @@ class CustomUI(ClickUI):
 
 
 class TrezorAxieGraphQL:
-    
+
     def __init__(self, **kwargs):
         self.account = kwargs.get('account').replace("ronin:", "0x")
         self.request = requests.Session()
