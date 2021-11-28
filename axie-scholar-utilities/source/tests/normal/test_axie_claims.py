@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 import pytest
 from mock import patch, mock_open, call
 import requests_mock
-from freezegun import freeze_time
 from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
 
