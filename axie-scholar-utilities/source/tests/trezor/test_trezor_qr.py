@@ -4,7 +4,6 @@ import json
 from datetime import datetime
 
 from mock import patch, call
-from trezorlib.client import get_default_client
 from trezorlib.tools import parse_path 
 
 from trezor import TrezorQRCodeManager
