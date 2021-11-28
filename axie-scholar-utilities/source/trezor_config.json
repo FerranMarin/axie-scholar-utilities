@@ -1,0 +1,6 @@
+{
+    "ronin:<account_s1_address>01234567890123456789": {
+        "passphrase": 1,
+        "bip_path": "m/44'/60'/0'/0/0"
+    }
+}

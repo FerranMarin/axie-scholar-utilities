@@ -6,7 +6,7 @@ from docopt import docopt, DocoptExit
 from mock import patch, call
 import pytest
 
-import axie_scholar_cli as cli
+import trezor_axie_scholar_cli as cli
 
 
 @pytest.mark.parametrize("params, expected_result",
@@ -19,18 +19,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'generate_breedings': False,
                               'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": True}),
                             (["payout", "file1", "file2", "-y"],
@@ -41,18 +40,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'generate_breedings': False,
                               'axie_breeding': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": True}),
                             (["payout", "file1", "file2", "--yes"],
@@ -63,18 +61,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": True}),
                             (["claim", "file1", "file2"],
@@ -85,21 +82,20 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": True,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
-                            (["generate_secrets", "file1"],
+                            (["config_trezor", "file1"],
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
@@ -107,21 +103,20 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
-                              "<secrets_file>": None,
+                              "<config_file>": None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": True,
+                              "config_trezor": True,
                               'generate_payments': False,
                               "payout": False}),
-                            (["generate_secrets", "file1", "file2"],
+                            (["config_trezor", "file1", "file2"],
                              {"--help": False,
                               "--version": False,
                               "--yes": False,
@@ -129,18 +124,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": True,
+                              "config_trezor": True,
                               'generate_payments': False,
                               "payout": False}),
                             (["transfer_axies", "file1", "file2"],
@@ -151,18 +145,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': "file1",
                               'transfer_axies': True,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               'generate_transfer_axies': False,
                               "claim": False,
                               "generate_QR": False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["transfer_axies", "file1", "file2", "--safe-mode"],
@@ -173,40 +166,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': "file1",
                               'transfer_axies': True,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
-                              'generate_payments': False,
-                              "payout": False}),
-                            (["mass_update_secrets", "file1", "file2"],
-                             {"--help": False,
-                              "--version": False,
-                              "--yes": False,
-                              "--safe-mode": False,
-                              '<list_of_accounts>': None,
-                              'axie_morphing': False,
-                              "<payments_file>": None,
-                              "<secrets_file>": "file2",
-                              '<transfers_file>': None,
-                              'transfer_axies': False,
-                              '<csv_file>': "file1",
-                              'mass_update_secrets': True,
-                              '<breedings_file>': None,
-                              'axie_breeding': False,
-                              'generate_breedings': False,
-                              "claim": False,
-                              "generate_QR": False,
-                              'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_payments", "file1", "file2"],
@@ -217,18 +187,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file2",
-                              "<secrets_file>": None,
+                              "<config_file>": None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': True,
                               "payout": False}),
                             (["generate_payments", "file1"],
@@ -239,18 +208,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": None,
+                              "<config_file>": None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': True,
                               "payout": False}),
                             (["axie_morphing", "file1", "a,b,c"],
@@ -261,18 +229,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': "a,b,c",
                               'axie_morphing': True,
                               "<payments_file>": None,
-                              "<secrets_file>": "file1",
+                              "<config_file>": "file1",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["axie_breeding", "file1", "file2"],
@@ -283,18 +250,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': "file1",
                               'axie_breeding': True,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_QR", "file1", "file2"],
@@ -305,18 +271,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": "file1",
-                              "<secrets_file>": "file2",
+                              "<config_file>": "file2",
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': None,
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": True,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_breedings", "file1", "file2"],
@@ -327,18 +292,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": None,
+                              "<config_file>": None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
-                              'mass_update_secrets': False,
                               '<breedings_file>': "file2",
                               'axie_breeding': False,
                               'generate_breedings': True,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_breedings", "file1"],
@@ -349,18 +313,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": None,
+                              "<config_file>": None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': True,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': False,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_transfer_axies", "file1", "file2"],
@@ -371,18 +334,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": None,
+                              "<config_file>": None,
                               '<transfers_file>': "file2",
                               'transfer_axies': False,
                               '<csv_file>': "file1",
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': True,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False}),
                             (["generate_transfer_axies", "file1"],
@@ -393,18 +355,17 @@ import axie_scholar_cli as cli
                               '<list_of_accounts>': None,
                               'axie_morphing': False,
                               "<payments_file>": None,
-                              "<secrets_file>": None,
+                              "<config_file>": None,
                               '<transfers_file>': None,
                               'transfer_axies': False,
                               '<csv_file>': "file1",
-                              'mass_update_secrets': False,
                               '<breedings_file>': None,
                               'axie_breeding': False,
                               'generate_breedings': False,
                               "claim": False,
                               "generate_QR": False,
                               'generate_transfer_axies': True,
-                              "generate_secrets": False,
+                              "config_trezor": False,
                               'generate_payments': False,
                               "payout": False})
                          ])
@@ -418,9 +379,8 @@ def test_parses_params(params, expected_result):
                             (["a", "b", "c"]),
                             (["generate_QR"]),
                             (["generate_QR", "file1"]),
-                            (["mass_update_secrets"]),
-                            (["mass_update_secrets", "file1"]),
-                            (["mass_update_secrets", "file1", "file2", "file3"]),
+                            (["config_trezor"]),
+                            (["config_trezor", "file1", "file2", "file3"]),
                             (["payout", "file1"]),
                             (["transfer_axies"]),
                             (["transfer_axies", "file1"]),
@@ -449,7 +409,7 @@ def test_wrong_inputs(params):
 
 
 def test_payout_file_check_fail(caplog):
-    with patch.object(sys, 'argv', ["", "payout", "p_file.json", "s_file.json"]):
+    with patch.object(sys, 'argv', ["", "payout", "p_file.json", "c_file.json"]):
         cli.run_cli()
     assert "Please provide a correct path to the file. Path provided: p_file.json" in caplog.text
     assert "Please review your file paths and re-try." in caplog.text
@@ -469,52 +429,44 @@ def test_generate_transfers_file_check_fail(caplog):
     assert "Please review your file paths and re-try." in caplog.text
 
 
-def test_secret_gen_file_check_fail(caplog):
-    with patch.object(sys, 'argv', ["", "generate_secrets", "p_file.json", "s_file.json"]):
+def test_config_trezor_file_check_fail(caplog):
+    with patch.object(sys, 'argv', ["", "config_trezor", "p_file.json", "c_file.json"]):
         cli.run_cli()
-    assert "Please provide a correct path to the file. Path provided: s_file.json" in caplog.text
+    assert "Please provide a correct path to the file. Path provided: c_file.json" in caplog.text
     assert "Please review your file paths and re-try." in caplog.text
 
 
-def test_secret_gen_file_check_fail_only_payment_file(caplog):
-    with patch.object(sys, 'argv', ["", "generate_secrets", "p_file.json"]):
+def test_config_trezor_file_check_fail_only_payment_file(caplog):
+    with patch.object(sys, 'argv', ["", "config_trezor", "p_file.json"]):
         cli.run_cli()
     assert "Please provide a correct path to the file. Path provided: p_file.json" in caplog.text
     assert "Please review your file paths and re-try." in caplog.text
 
 
-def test_generate_secrets_no_secrets_file(tmpdir):
+@patch('trezor.TrezorAccountsSetup.update_trezor_config')
+@patch('trezor.TrezorAccountsSetup.__init__', return_value=None)
+def test_config_trezor_no_config_file(mock_account_setup, mock_update_config, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
              '{"Name": "Acc2", "AccountAddress": "ronin:<account_s2_address>"}]}')
-    f2 = tmpdir.join("secrets.json")
-    with patch.object(builtins, 'input', lambda _: 'some_input'):
-        cli.generate_secrets_file(f1.strpath)
-    assert f2.read() == ('{\n    "ronin:<account_s1_address>": "some_input",\n'
-                         '    "ronin:<account_s2_address>": "some_input"\n}')
+    with patch.object(sys, 'argv', ["", "config_trezor", f1.strpath]):
+        cli.run_cli()
+    mock_account_setup.assert_called_with(f1.strpath, None)
+    mock_update_config.assert_called()
 
 
-def test_generate_secrets_no_secrets_file_other_folder(tmpdir):
+@patch('trezor.TrezorAccountsSetup.update_trezor_config')
+@patch('trezor.TrezorAccountsSetup.__init__', return_value=None)
+def test_config_trezor_config_file(mock_account_setup, mock_update_config, tmpdir):
     f1 = tmpdir.mkdir("other_folder").join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
              '{"Name": "Acc2", "AccountAddress": "ronin:<account_s2_address>"}]}')
-    f2 = tmpdir.join("other_folder/secrets.json")
-    with patch.object(builtins, 'input', lambda _: 'some_input'):
-        cli.generate_secrets_file(f1.strpath)
-    assert f2.read() == ('{\n    "ronin:<account_s1_address>": "some_input",\n'
-                         '    "ronin:<account_s2_address>": "some_input"\n}')
-
-
-def test_generate_secrets_already_there(tmpdir):
-    f1 = tmpdir.join("file1.json")
-    f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
-             '{"Name": "Acc2", "AccountAddress": "ronin:<account_s2_address>"}]}')
-    f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello", "ronin:<account_s2_address>": "test"}')
-    expected_out = f2.read()
-    with patch.object(builtins, 'input', lambda _: 'some_input'):
-        cli.generate_secrets_file(f1.strpath, f2.strpath)
-    assert f2.read() == expected_out
+    f2 = tmpdir.join("trezor_config.json")
+    f2.write('{}')
+    with patch.object(sys, 'argv', ["", "config_trezor", f1.strpath, f2.strpath]):
+        cli.run_cli()
+    mock_account_setup.assert_called_with(f1.strpath, f2.strpath)
+    mock_update_config.assert_called()
 
 
 def test_generate_payments_file(tmpdir):
@@ -644,26 +596,15 @@ def test_generate_transfer_file(tmpdir):
     ]
 
 
-def test_generate_secrets_partially_there(tmpdir):
-    f1 = tmpdir.join("file1.json")
-    f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"},'
-             '{"Name": "Acc2", "AccountAddress": "ronin:<account_s2_address>"}]}')
-    f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
-    with patch.object(builtins, 'input', lambda _: 'some_input'):
-        cli.generate_secrets_file(f1.strpath, f2.strpath)
-    assert f2.read() == ('{\n    "ronin:<account_s1_address>": "hello",\n'
-                         '    "ronin:<account_s2_address>": "some_input"\n}')
-
-
-@patch("axie.AxiePaymentsManager.__init__", return_value=None)
-@patch("axie.AxiePaymentsManager.verify_inputs")
-@patch("axie.AxiePaymentsManager.prepare_payout")
+@patch("trezor.TrezorAxiePaymentsManager.__init__", return_value=None)
+@patch("trezor.TrezorAxiePaymentsManager.verify_inputs")
+@patch("trezor.TrezorAxiePaymentsManager.prepare_payout")
 def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, mocked_paymentsmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"}]}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "payout", str(f1), str(f2)]):
         cli.run_cli()
     mock_prepare_payout.assert_called_with()
@@ -671,14 +612,15 @@ def test_payout_takes_auto_parameter(mock_prepare_payout, mock_verify_input, moc
     mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=False)
 
 
-@patch("axie.AxiePaymentsManager.__init__", return_value=None)
-@patch("axie.AxiePaymentsManager.verify_inputs")
-@patch("axie.AxiePaymentsManager.prepare_payout")
+@patch("trezor.TrezorAxiePaymentsManager.__init__", return_value=None)
+@patch("trezor.TrezorAxiePaymentsManager.verify_inputs")
+@patch("trezor.TrezorAxiePaymentsManager.prepare_payout")
 def test_payout_takes_auto_parameter_yes(mock_prepare_payout, mock_verify_inputs, mocked_paymentsmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"Scholars":[{"Name": "Acc1", "AccountAddress": "ronin:<account_s1_address>"}]}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "payout", str(f1), str(f2), "-y"]):
         cli.run_cli()
     mock_prepare_payout.assert_called_with()
@@ -686,14 +628,15 @@ def test_payout_takes_auto_parameter_yes(mock_prepare_payout, mock_verify_inputs
     mocked_paymentsmanager.assert_called_with(str(f1), str(f2), auto=True)
 
 
-@patch("axie.AxieClaimsManager.__init__", return_value=None)
-@patch("axie.AxieClaimsManager.prepare_claims")
-@patch("axie.AxieClaimsManager.verify_inputs")
+@patch("trezor.TrezorAxieClaimsManager.__init__", return_value=None)
+@patch("trezor.TrezorAxieClaimsManager.prepare_claims")
+@patch("trezor.TrezorAxieClaimsManager.verify_inputs")
 def test_claim(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "claim", str(f1), str(f2)]):
         cli.run_cli()
     mock_verify_inputs.assert_called_with()
@@ -715,14 +658,15 @@ def test_transfer_file_check_fail(caplog):
     assert "Please review your file paths and re-try." in caplog.text
 
 
-@patch("axie.AxieTransferManager.__init__", return_value=None)
-@patch("axie.AxieTransferManager.prepare_transfers")
-@patch("axie.AxieTransferManager.verify_inputs")
+@patch("trezor.TrezorAxieTransferManager.__init__", return_value=None)
+@patch("trezor.TrezorAxieTransferManager.prepare_transfers")
+@patch("trezor.TrezorAxieTransferManager.verify_inputs")
 def test_transfer(mock_verify_inputs, mock_prepare_transfers, mock_transfersmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "transfer_axies", str(f1), str(f2)]):
         cli.run_cli()
     mock_verify_inputs.assert_called_with()
@@ -730,14 +674,15 @@ def test_transfer(mock_verify_inputs, mock_prepare_transfers, mock_transfersmana
     mock_transfersmanager.assert_called_with(str(f1), str(f2), secure=False)
 
 
-@patch("axie.AxieTransferManager.__init__", return_value=None)
-@patch("axie.AxieTransferManager.prepare_transfers")
-@patch("axie.AxieTransferManager.verify_inputs")
+@patch("trezor.TrezorAxieTransferManager.__init__", return_value=None)
+@patch("trezor.TrezorAxieTransferManager.prepare_transfers")
+@patch("trezor.TrezorAxieTransferManager.verify_inputs")
 def test_transfer_secure(mock_verify_inputs, mock_prepare_transfers, mock_transfersmanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "transfer_axies", str(f1), str(f2), "--safe-mode"]):
         cli.run_cli()
     mock_verify_inputs.assert_called_with()
@@ -752,14 +697,15 @@ def test_axie_morphing_file_check_fail(caplog):
     assert "Please review your file paths and re-try." in caplog.text
 
 
-@patch("axie.AxieMorphingManager.__init__", return_value=None)
+@patch("trezor.TrezorAxieMorphingManager.__init__", return_value=None)
 @patch("axie.Axies.__init__", return_value=None)
 @patch("axie.Axies.find_axies_to_morph", return_value=[1, 2, 3])
-@patch("axie.AxieMorphingManager.execute")
-@patch("axie.AxieMorphingManager.verify_inputs")
+@patch("trezor.TrezorAxieMorphingManager.execute")
+@patch("trezor.TrezorAxieMorphingManager.verify_inputs")
 def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir): # noqa
     f = tmpdir.join("file2.json")
-    f.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "axie_morphing", str(f), "foo,bar"]):
         cli.run_cli()
     mock_axies_init.assert_has_calls([call('foo'), call('bar')])
@@ -769,14 +715,15 @@ def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axi
     assert mock_morphing_execute.call_count == 2
 
 
-@patch("axie.AxieMorphingManager.__init__", return_value=None)
+@patch("trezor.TrezorAxieMorphingManager.__init__", return_value=None)
 @patch("axie.Axies.__init__", return_value=None)
 @patch("axie.Axies.find_axies_to_morph", return_value=[])
-@patch("axie.AxieMorphingManager.execute")
-@patch("axie.AxieMorphingManager.verify_inputs")
+@patch("trezor.TrezorAxieMorphingManager.execute")
+@patch("trezor.TrezorAxieMorphingManager.verify_inputs")
 def test_axie_morphing_none(mock_veritfy_inputs, mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir): # noqa
     f = tmpdir.join("file2.json")
-    f.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "axie_morphing", str(f), "foo,bar,1"]):
         cli.run_cli()
     mock_axies_init.assert_has_calls([call('foo'), call('bar'), call("1")])
@@ -793,15 +740,16 @@ def test_axiebreeding_file_check_fail(caplog):
     assert "Please review your file paths and re-try." in caplog.text
 
 
-@patch("axie.AxieBreedManager.__init__", return_value=None)
-@patch("axie.AxieBreedManager.execute")
-@patch("axie.AxieBreedManager.verify_inputs")
+@patch("trezor.TrezorAxieBreedManager.__init__", return_value=None)
+@patch("trezor.TrezorAxieBreedManager.execute")
+@patch("trezor.TrezorAxieBreedManager.verify_inputs")
 def test_breeding(mock_verify_inputs, mock_execute_breeding, mock_breedingmanager, tmpdir):
     acc = "ronin:45a1bc784c665e123597d3f29375e45786611234"
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "axie_breeding", str(f1), str(f2)]):
         with patch.object(builtins, 'input', lambda _: acc):
             cli.run_cli()
@@ -817,13 +765,14 @@ def test_qrcode_file_check_fail(caplog):
     assert "Please review your file paths and re-try." in caplog.text
 
 
-@patch("axie.QRCodeManager.__init__", return_value=None)
-@patch("axie.QRCodeManager.execute")
+@patch("trezor.TrezorQRCodeManager.__init__", return_value=None)
+@patch("trezor.TrezorQRCodeManager.execute")
 def test_qrcode(mock_execute, mock_qrcodemanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
     with patch.object(sys, 'argv', ["", "generate_QR", str(f1), str(f2)]):
         cli.run_cli()
     mock_execute.assert_called_with()

@@ -14,6 +14,7 @@ from axie.utils import (
     USER_AGENT
 )
 
+#TODO
 
 @patch("web3.eth.Eth.contract.functions.balanceOf.call", return_value=1)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")

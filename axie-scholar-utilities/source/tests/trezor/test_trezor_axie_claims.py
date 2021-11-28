@@ -16,6 +16,8 @@ from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
 from tests.test_utils import async_cleanup_log_file, LOG_FILE_PATH
 
 
+#TODO
+
 @patch("axie.AxieClaimsManager.load_secrets_and_acc_name", return_value=("foo", "bar"))
 def test_claims_manager_init(mocked_load_secrets_and_acc_name):
     secrets_file = "sample_secrets_file.json"

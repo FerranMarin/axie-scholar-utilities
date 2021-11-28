@@ -8,6 +8,8 @@ from axie.transfers import Transfer, AXIE_CONTRACT
 from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
 
 
+#TODO
+
 @patch("axie.transfers.load_json")
 def test_transfer_manager_init(mocked_load_json):
     transfers_file = "sample_transfers_file.json"

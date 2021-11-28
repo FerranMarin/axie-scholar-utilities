@@ -3,7 +3,6 @@ import sys
 import logging
 from datetime import datetime
 
-from trezorlib.tools import parse_path
 from trezorlib.client import get_default_client
 import qrcode
 
