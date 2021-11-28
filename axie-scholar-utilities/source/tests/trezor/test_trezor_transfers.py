@@ -1,6 +1,5 @@
 import builtins
 from glob import glob
-from os import path
 
 from mock import patch, call, mock_open
 
