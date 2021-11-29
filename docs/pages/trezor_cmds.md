@@ -29,7 +29,7 @@ This will ask for your manager ronin and then create a payments file according t
 
 To configure your trezor device to run the rest of commands, you simply need to execute this command from the source folder.
 
-    poetry run python trezor_axie_scholar_cli.py generate_secrets payments.json trezor_config.json
+    poetry run python trezor_axie_scholar_cli.py config_trezor payments.json trezor_config.json
 
 This will update the trezor_config.json either from an emtpy one with only {}, or one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
 
