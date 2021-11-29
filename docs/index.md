@@ -38,7 +38,7 @@ To read the instructions on how to run these commands:
 - [Commands for Docker and Docker Hub](./pages/docker_hub_cmds.html)
 - [Commands for Docker-compose](./pages/docker_compose_cmds.html)
 - [Commands for Poetry](./pages/poetry_cmds.html)
-
+- [Commands for Trezor (Poetry)](./pages/trezor_cmds.html)
 
 # File Format
 This tool depends on various files. To learn more about them follow this [link](./pages/file_formats.html).
