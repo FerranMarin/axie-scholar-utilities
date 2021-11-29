@@ -131,6 +131,7 @@ Be careful when writing the accounts, if multiple they need to be separeted only
 If instead of using this commands you are on **windows** (sorry macOs and Linux users!).
 You can put this file in the docker folder and simply click it.
 
-<a href='../assets/docker_compose_script.ps1'> Download Link </a>
+
+[Download Link](../downloadables/docker_compose_script.ps1)
 
 **Caution**: Be aware, for this file to work you must name the files exactly how I name them in my examples!
