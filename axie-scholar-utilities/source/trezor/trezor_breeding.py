@@ -1,5 +1,6 @@
 import sys
 import json
+import rlp
 import logging
 from time import sleep
 from datetime import datetime, timedelta
@@ -9,6 +10,7 @@ from jsonschema.exceptions import ValidationError
 from web3 import Web3, exceptions
 from trezorlib.client import get_default_client
 from trezorlib.tools import parse_path
+from trezorlib import ethereum
 
 from axie.schemas import breeding_schema
 from axie.utils import (
@@ -46,7 +48,7 @@ class TrezorBreed:
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
         self.client = client
-        self.bip_path = bip_path
+        self.bip_path = parse_path(bip_path)
         self.gwei = self.w3.toWei('0', 'gwei')
         self.gas = 250000      
 
@@ -61,7 +63,7 @@ class TrezorBreed:
         # Get Nonce
         nonce = get_nonce(self.address)
         # Build transaction
-        transaction = axie_contract.functions.breedAxies(
+        breed_tx = axie_contract.functions.breedAxies(
             self.sire_axie,
             self.matron_axie
         ).buildTransaction({
@@ -70,15 +72,24 @@ class TrezorBreed:
             "gasPrice": self.w3.toWei("0", "gwei"),
             "nonce": nonce
         })
-        # Sign transaction
-        signed = self.w3.eth.account.sign_transaction(
-            transaction,
-            private_key=self.private_key
+        data = self.w3.toBytes(hexstr=breed_tx['data'])
+        to = self.w3.toBytes(hexstr=AXIE_CONTRACT)
+        sig = ethereum.sign_tx(
+            self.client,
+            n=self.bip_path,
+            nonce=nonce,
+            gas_price=self.gwei,
+            gas_limit=self.gas,
+            to=AXIE_CONTRACT,
+            value=0,
+            data=data,
+            chain_id=2020
         )
+        transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
-        self.w3.eth.send_raw_transaction(signed.rawTransaction)
+        self.w3.eth.send_raw_transaction(transaction)
         # get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        hash = self.w3.toHex(self.w3.keccak(transaction))
         # Wait for transaction to finish or timeout
         logging.info("{self} about to start!")
         start_time = datetime.now()

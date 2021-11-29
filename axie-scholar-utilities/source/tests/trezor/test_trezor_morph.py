@@ -2,10 +2,8 @@ import sys
 import json
 
 from mock import patch, call
-import mock
 import requests_mock
 from hexbytes import HexBytes
-from eth_account.messages import encode_defunct
 
 from trezor import TrezorAxieMorphingManager
 from trezor.trezor_morphing import TrezorMorph
