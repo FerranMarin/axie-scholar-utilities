@@ -5,6 +5,8 @@
 In these pages we will cover all the information you need to install and use axie scholar utilities tool.
 
 # How to install this tool
+If you are planning to use TREZOR, you must follow the Poetry installation.
+
 ## Install Using Docker
 This is the recomended way of installing and using my tool. Follow one of these links for installing with docker:
 

@@ -17,14 +17,6 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 3. Result log files will be placed inside a folder `logs` where you ran this code. No need to create it before hand.
 
-## Secret Generation
-
-To help in generating secrets, you simply need to execute this command from the folder you have the previously mentioned 3 files.
-
-    axie-utils-gen-secrets payments.json secrets.json
-
-This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
-
 ## Payments Generation
 
 To help in generating payments json, you simply need to execute this command from the folder you have the 2 files mentioned below payments.csv and payments.json.
@@ -32,6 +24,14 @@ To help in generating payments json, you simply need to execute this command fro
     axie-utils-gen-payments payments.csv payments.json
 
 This will ask for your manager ronin and then create a payments file according to what you setup in payments.csv. 
+
+## Secret Generation
+
+To help in generating secrets, you simply need to execute this command from the folder you have the previously mentioned 3 files.
+
+    axie-utils-gen-secrets payments.json secrets.json
+
+This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
 
 ## Mass Update Secrets
 
@@ -55,7 +55,7 @@ To payout from the scholar accounts, the command is the following (You need to r
 
 This will execute the payments defined in payments.json. A log file will be generatted with the logs relevant to payments so you can easily copy paste them to send them to your scholars.
 
-If you do now want to confirm account by account, you can run this other command (result will be the same):
+If you do not want to confirm account by account, you can run this other command (result will be the same):
 
     axie-utils-auto-payout payments.json secrets.json
 
@@ -123,3 +123,12 @@ This command will automatically find your axies to morph and morph them. It need
     axie-utils-axie-morphing secrets.json ronin:abc1,ronin:abc2
 
 Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACE!)
+
+# Alternative Method
+
+If instead of using this commands you are on **windows** (sorry macOs and Linux users!).
+You can put this file in the folder with the rest of the files and simply click it.
+
+[Download Link](../downloads/docker_hub_script.ps1)
+
+**Caution**: Be aware, for this file to work you must name the files exactly how I name them in my examples!

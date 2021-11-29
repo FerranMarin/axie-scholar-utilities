@@ -27,3 +27,5 @@ To run my tool you will need Python3 (the language it is written in) to be insta
 
 
 To learn how to run the commands, please follow this [link](../pages/poetry_cmds.html)
+
+TREZOR USERS, follow this other [LINK](../pages/trezor_cmds.html)
