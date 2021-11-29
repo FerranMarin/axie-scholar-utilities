@@ -3,12 +3,14 @@ import sys
 import logging
 from datetime import datetime
 
+from trezorlib.client import get_default_client
 import qrcode
 
-from axie.utils import AxieGraphQL, load_json
+from axie.utils import load_json
+from trezor.trezor_utils import TrezorAxieGraphQL, CustomUI
 
 
-class QRCode(AxieGraphQL):
+class TrezorQRCode(TrezorAxieGraphQL):
 
     def __init__(self, acc_name, path, **kwargs):
         self.acc_name = acc_name
@@ -23,49 +25,45 @@ class QRCode(AxieGraphQL):
         qr.save(self.path)
 
 
-class QRCodeManager:
+class TrezorQRCodeManager:
 
-    def __init__(self, payments_file, secrets_file):
-        self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(secrets_file, payments_file)
-        self.path = os.path.dirname(secrets_file)
+    def __init__(self, payments_file, trezor_config):
+        self.trezor_config, self.acc_names = self.load_trezor_config_and_acc_name(trezor_config, payments_file)
+        self.path = os.path.dirname(trezor_config)
 
-    def load_secrets_and_acc_name(self, secrets_file, payments_file):
-        secrets = load_json(secrets_file)
+    def load_trezor_config_and_acc_name(self, trezor_config, payments_file):
+        config = load_json(trezor_config)
         payments = load_json(payments_file)
-        refined_secrets = {}
+        refined_config = {}
         acc_names = {}
         for scholar in payments['Scholars']:
-            key = scholar['AccountAddress']
-            refined_secrets[key] = secrets[key]
+            key = scholar['AccountAddress'].lower()
+            refined_config[key] = config[key]
             acc_names[key] = scholar['Name']
-        return refined_secrets, acc_names
+        return refined_config, acc_names
 
     def verify_inputs(self):
         validation_success = True
-        # Check secrets file is not empty
-        if not self.secrets_file:
-            logging.warning("No secrets contained in secrets file")
+        if not self.trezor_config:
+            logging.warning("No configuration found for trezor")
             validation_success = False
-        # Check keys and secrets have proper format
-        for acc in self.secrets_file:
+        for acc in self.trezor_config:
             if not acc.startswith("ronin:"):
                 logging.critical(f"Public address {acc} needs to start with ronin:")
                 validation_success = False
-            if len(self.secrets_file[acc]) != 66 or self.secrets_file[acc][:2] != "0x":
-                logging.critical(f"Private key for account {acc} is not valid, please review it!")
-                validation_success = False
         if not validation_success:
             sys.exit()
-        logging.info("Secret file correctly validated")
+        logging.info("Files correctly validated")
 
     def execute(self):
         qrcode_list = [
-            QRCode(
-                account=acc,
-                private_key=self.secrets_file[acc],
+            TrezorQRCode(
                 acc_name=self.acc_names[acc],
+                account=acc,
+                client=get_default_client(ui=CustomUI(self.trezor_config[acc]['passphrase'])),
+                bip_path=self.trezor_config[acc]['bip_path'],
                 path=self.path
-            ) for acc in self.secrets_file
+            ) for acc in self.trezor_config
         ]
         for qr in qrcode_list:
             qr.generate_qr()

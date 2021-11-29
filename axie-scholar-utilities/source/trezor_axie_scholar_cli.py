@@ -1,22 +1,21 @@
-""" Axie Scholar Utilities CLI.
-This tool will help you perform various actions.
-They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR,
-transfer_axies, axie_morphing, axie_breeding, generate_breedings
+""" Trezor Axie Scholar Utilities CLI.
+This tool will help you perform various actions. If you use a trezor device.
+They are: payout, claim, generate_payments, generate_QR, transfer_axies, axie_morphing,
+axie_breeding, generate_breedings
 
 Usage:
-    axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
-    axie_scholar_cli.py claim <payments_file> <secrets_file>
-    axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
-    axie_scholar_cli.py mass_update_secrets <csv_file> <secrets_file>
-    axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
-    axie_scholar_cli.py generate_QR <payments_file> <secrets_file>
-    axie_scholar_cli.py axie_morphing <secrets_file> <list_of_accounts>
-    axie_scholar_cli.py axie_breeding <breedings_file> <secrets_file>
-    axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
-    axie_scholar_cli.py transfer_axies <transfers_file> <secrets_file> [--safe-mode]
-    axie_scholar_cli.py generate_transfer_axies <csv_file> [<transfers_file>]
-    axie_scholar_cli.py -h | --help
-    axie_scholar_cli.py --version
+    trezor_axie_scholar_cli.py payout <payments_file> <config_file> [-y]
+    trezor_axie_scholar_cli.py claim <payments_file> <config_file>
+    trezor_axie_scholar_cli.py config_trezor <payments_file> [<config_file>]
+    trezor_axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
+    trezor_axie_scholar_cli.py generate_QR <payments_file> <config_file>
+    trezor_axie_scholar_cli.py axie_morphing <config_file> <list_of_accounts>
+    trezor_axie_scholar_cli.py axie_breeding <breedings_file> <config_file>
+    trezor_axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
+    trezor_axie_scholar_cli.py transfer_axies <transfers_file> <config_file> [--safe-mode]
+    trezor_axie_scholar_cli.py generate_transfer_axies <csv_file> [<transfers_file>]
+    trezor_axie_scholar_cli.py -h | --help
+    trezor_axie_scholar_cli.py --version
 
 Options:
     -h --help   Shows this extra help options
@@ -31,16 +30,16 @@ import logging
 
 from docopt import docopt
 
-from axie import (
-    AxiePaymentsManager,
-    AxieClaimsManager,
-    AxieTransferManager,
-    Axies,
-    AxieMorphingManager,
-    AxieBreedManager,
-    QRCodeManager
+from axie import Axies
+from trezor import (
+    TrezorAccountsSetup,
+    TrezorAxiePaymentsManager,
+    TrezorAxieBreedManager,
+    TrezorAxieClaimsManager,
+    TrezorAxieTransferManager,
+    TrezorAxieMorphingManager,
+    TrezorQRCodeManager
 )
-from axie.utils import load_json
 
 # Setup logger
 os.makedirs('logs', exist_ok=True)
@@ -142,48 +141,6 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
 
     log.info('New payments file saved')
 
-
-def generate_secrets_file(payments_file_path, secrets_file_path=None):
-    if not secrets_file_path:
-        # Put secrets file in same folder where payments_file is
-        folder = os.path.dirname(payments_file_path)
-        secrets_file_path = os.path.join(folder, 'secrets.json')
-        with open(secrets_file_path, 'w', encoding='utf-8') as f:
-            f.write('{}')
-    payments = load_json(payments_file_path)
-    secrets = load_json(secrets_file_path)
-    changed = False
-    for acc in payments['Scholars']:
-        if acc['AccountAddress'] not in secrets:
-            changed = True
-            new_secret = ''
-            while new_secret == '':
-                msg = (f"Please provide private key for account {acc['Name']}. "
-                       f"({acc['AccountAddress']}):")
-                new_secret = input(msg)
-            secrets[acc['AccountAddress']] = new_secret
-    if changed:
-        logging.info('Saving secrets file')
-        with open(secrets_file_path, 'w', encoding='utf-8') as f:
-            json.dump(secrets, f, ensure_ascii=False, indent=4)
-        logging.info('File saved!')
-    else:
-        logging.info('Secrets file already had all needed secrets!')
-
-
-def mass_update_secret_file(csv_file_path, secrets_file_path):
-    new_secrets = {}
-    with open(csv_file_path, encoding='utf-8') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
-            new_secrets[row[0]] = row[1]
-
-    old_secrets = load_json(secrets_file_path)
-    merge = {**new_secrets, **old_secrets}
-    with open(secrets_file_path, 'w', encoding='utf-8') as f:
-        json.dump(merge,  f, ensure_ascii=False, indent=4)
-
-
 def check_file(file):
     if not os.path.isfile(file):
         logging.critical('Please provide a correct path to the file. '
@@ -198,46 +155,38 @@ def run_cli():
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
-        secrets_file_path = args['<secrets_file>']
-        if check_file(payments_file_path) and check_file(secrets_file_path):
+        config_file_path = args['<config_file>']
+        if check_file(payments_file_path) and check_file(config_file_path):
             logging.info('I shall pay my scholars!')
             if args['--yes']:
                 logging.info("Automatic acceptance active, it won't ask before each execution")
-            apm = AxiePaymentsManager(payments_file_path, secrets_file_path, auto=args['--yes'])
+            apm = TrezorAxiePaymentsManager(payments_file_path, config_file_path, auto=args['--yes'])
             apm.verify_inputs()
             apm.prepare_payout()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['claim']:
         payments_file_path = args['<payments_file>']
-        secrets_file_path = args['<secrets_file>']
-        if check_file(payments_file_path) and check_file(secrets_file_path):
+        config_file_path = args['<config_file>']
+        if check_file(payments_file_path) and check_file(config_file_path):
             # Claim SLP
             logging.info('I shall claim SLP')
-            acm = AxieClaimsManager(payments_file_path, secrets_file_path)
+            acm = TrezorAxieClaimsManager(payments_file_path, config_file_path)
             acm.verify_inputs()
             acm.prepare_claims()
         else:
             logging.critical("Please review your file paths and re-try.")
-    elif args['generate_secrets']:
-        # Generate Secrets
-        logging.info('I shall help you generate your secrets file')
+    elif args['config_trezor']:
+        # Configure Trezor
+        logging.info('I shall help you configure your trezor device to use this tool!')
         payments_file_path = args['<payments_file>']
-        secrets_file_path = args.get('<secrets_file>')
-        if (secrets_file_path and check_file(secrets_file_path) and check_file(payments_file_path) or
-           not secrets_file_path and check_file(payments_file_path)):
-            logging.info('If you do not know how to get your private keys, check: '
-                         'https://ferranmarin.github.io/axie-scholar-utilities/pages/faq.html')
-            generate_secrets_file(payments_file_path, secrets_file_path)
-        else:
-            logging.critical("Please review your file paths and re-try.")
-    elif args['mass_update_secrets']:
-        # Mass update secrets
-        logging.info('I shall help you mass update your secrets file')
-        csv_file_path = args['<csv_file>']
-        secrets_file_path = args['<secrets_file>']
-        if check_file(csv_file_path) and check_file(secrets_file_path):
-            mass_update_secret_file(csv_file_path, secrets_file_path)
+        config_file_path = args.get('<config_file>')
+        if (config_file_path and check_file(config_file_path) and check_file(payments_file_path) or
+           not config_file_path and check_file(payments_file_path)):
+            logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
+                         'have configured the tool for all the accounts present in payments.json')
+            tas = TrezorAccountsSetup(payments_file_path, config_file_path)
+            tas.update_trezor_config()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['generate_transfer_axies']:
@@ -254,10 +203,10 @@ def run_cli():
         # Make Axie Transfers
         logging.info('I shall send axies around')
         transfers_file_path = args['<transfers_file>']
-        secrets_file_path = args['<secrets_file>']
+        config_file_path = args['<config_file>']
         secure = args.get("--safe-mode", None)
-        if check_file(transfers_file_path) and check_file(secrets_file_path):
-            atm = AxieTransferManager(transfers_file_path, secrets_file_path, secure=secure)
+        if check_file(transfers_file_path) and check_file(config_file_path):
+            atm = TrezorAxieTransferManager(transfers_file_path, config_file_path, secure=secure)
             atm.verify_inputs()
             atm.prepare_transfers()
         else:
@@ -276,13 +225,13 @@ def run_cli():
         # Morph axies from all accounts given
         logging.info('I shall morph all axies I can!')
         accs = args['<list_of_accounts>']
-        secrets_file_path = args['<secrets_file>']
-        if check_file(secrets_file_path):
+        config_file_path = args['<config_file>']
+        if check_file(config_file_path):
             accs_list = accs.split(',')
             for acc in accs_list:
                 axies_to_morph = Axies(acc).find_axies_to_morph()
                 if axies_to_morph:
-                    axm = AxieMorphingManager(axies_to_morph, acc, secrets_file_path)
+                    axm = TrezorAxieMorphingManager(axies_to_morph, acc, config_file_path)
                     axm.verify_inputs()
                     axm.execute()
                 else:
@@ -293,8 +242,8 @@ def run_cli():
         # Breed axies
         logging.info('I shall breed your axies')
         breedings_file_path = args['<breedings_file>']
-        secrets_file_path = args['<secrets_file>']
-        if check_file(breedings_file_path) and check_file(secrets_file_path):
+        config_file_path = args['<config_file>']
+        if check_file(breedings_file_path) and check_file(config_file_path):
             payment_account = ''
             while payment_account == '':
                 msg = input("Provide ronin account that will pay the fee for breeding: ")
@@ -307,7 +256,7 @@ def run_cli():
                     payment_account = msg
                 else:
                     logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
-            abm = AxieBreedManager(breedings_file_path, secrets_file_path, payment_account)
+            abm = TrezorAxieBreedManager(breedings_file_path, config_file_path, payment_account)
             abm.verify_inputs()
             abm.execute()
         else:
@@ -326,9 +275,9 @@ def run_cli():
         # Generate QR codes
         logging.info('I shall generate QR codes')
         payments_file_path = args['<payments_file>']
-        secrets_file_path = args['<secrets_file>']
-        if check_file(payments_file_path) and check_file(secrets_file_path):
-            qr = QRCodeManager(payments_file_path, secrets_file_path)
+        config_file_path = args['<config_file>']
+        if check_file(payments_file_path) and check_file(config_file_path):
+            qr = TrezorQRCodeManager(payments_file_path, config_file_path)
             qr.execute()
         else:
             logging.critical("Please review your file paths and re-try.")

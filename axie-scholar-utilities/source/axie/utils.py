@@ -82,7 +82,7 @@ def get_nonce(account):
     w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
     nonce = w3.eth.get_transaction_count(
         Web3.toChecksumAddress(account.replace("ronin:", "0x"))
     )

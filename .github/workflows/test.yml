@@ -24,12 +24,11 @@ jobs:
     - name: Build prod docker image
       run: docker-compose build scholar-utilities
     
-    - name: Tag image
+    - name: Tag prod image
       run: docker tag axie-scholar-utilities epith/axie-scholar-utilities
 
     - name: Login to DockerHub
       run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       
-    - name: Pust to DockerHub
+    - name: Push prod image to DockerHub
       run: docker push epith/axie-scholar-utilities
-    

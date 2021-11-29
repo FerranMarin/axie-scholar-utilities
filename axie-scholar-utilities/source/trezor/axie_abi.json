@@ -1,0 +1,99 @@
+[{
+    "constant": false,
+    "inputs": [{
+          "internalType": "address",
+          "name": "_from",
+          "type": "address"
+       },
+       {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+       },
+       {
+          "internalType": "uint256",
+          "name": "_tokenId",
+          "type": "uint256"
+       }
+    ],
+    "name": "safeTransferFrom",
+    "outputs": [{
+       "internalType": "bool",
+       "name": "_success",
+       "type": "bool"
+    }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+ },
+ {
+    "constant": false,
+    "inputs": [{
+          "internalType": "uint256",
+          "name": "_sireId",
+          "type": "uint256"
+       },
+       {
+          "internalType": "uint256",
+          "name": "_matronId",
+          "type": "uint256"
+       }
+    ],
+    "name": "breedAxies",
+    "outputs": [{
+       "internalType": "bool",
+       "name": "_success",
+       "type": "bool"
+    }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+ },
+ {
+   "constant": true,
+   "inputs": [
+       {
+           "internalType": "address",
+           "name": "",
+           "type": "address"
+       }
+   ],
+   "name": "balanceOf",
+   "outputs": [
+       {
+           "internalType": "uint256",
+           "name": "",
+           "type": "uint256"
+       }
+   ],
+   "payable": false,
+   "stateMutability": "view",
+   "type": "function"
+ },
+ {
+     "constant": true,
+     "inputs": [
+         {
+             "internalType": "address",
+             "name": "_owner",
+             "type": "address"
+         },
+         {
+             "internalType": "uint256",
+             "name": "_index",
+             "type": "uint256"
+         }
+     ],
+     "name": "tokenOfOwnerByIndex",
+     "outputs": [
+         {
+             "internalType": "uint256",
+             "name": "",
+             "type": "uint256"
+         }
+     ],
+     "payable": false,
+     "stateMutability": "view",
+     "type": "function"
+   }
+ ]

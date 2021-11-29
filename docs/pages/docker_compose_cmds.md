@@ -17,14 +17,6 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 3. Result log files will be placed inside a folder `logs` inside files folder. No need to create it before hand.
 
-## Secret Generation
-
-To help in generating secrets, you simply need to execute this command from the docker folder.
-
-    docker-compose run scholar-utilities generate_secrets files/payments.json files/secrets.json
-
-This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts. If no file was present, this would create a new one.
-
 ## Payments Generation
 
 To help in generating payments json, you simply need to execute this command from the docker folder.
@@ -32,6 +24,14 @@ To help in generating payments json, you simply need to execute this command fro
     docker-compose run scholar-utilities generate_payments files/payments.csv files/payments.json
 
 This will ask for your manager ronin and then create a payments file according to what you setup in payments.csv. It can be named anything, just have it in the files folder and use the same name in the command.
+
+## Secret Generation
+
+To help in generating secrets, you simply need to execute this command from the docker folder.
+
+    docker-compose run scholar-utilities generate_secrets files/payments.json files/secrets.json
+
+This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts. If no file was present, this would create a new one.
 
 ## Mass Update Secrets
 
@@ -125,3 +125,12 @@ This command will automatically find your axies to morph and morph them. It need
     docker-compose run scholar-utilities axie_morphing files/secrets.json ronin:abc1,ronin:abc2
 
 Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACES!)
+
+# Alternative Method
+
+If instead of using this commands you are on **windows** (sorry macOs and Linux users!).
+You can put this file in the docker folder and simply click it.
+
+[Download Link](../downloads/docker_compose_script.ps1)
+
+**Caution**: Be aware, for this file to work you must name the files exactly how I name them in my examples!

@@ -730,7 +730,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/transfer_results_*.log')[0][9:]
+    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
@@ -789,7 +789,7 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/transfer_results_*.log')[0][9:]
+    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()

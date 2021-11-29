@@ -1,13 +1,15 @@
 import sys
 import asyncio
 import json
+import rlp
 import logging
 from datetime import datetime
-
 
 from requests.exceptions import RetryError
 from web3 import Web3, exceptions
 import requests
+from trezorlib.client import get_default_client
+from trezorlib import ethereum
 
 from axie.utils import (
     check_balance,
@@ -16,8 +18,9 @@ from axie.utils import (
     ImportantLogsFilter,
     SLP_CONTRACT,
     RONIN_PROVIDER_FREE,
-    AxieGraphQL
+    USER_AGENT
 )
+from trezor.trezor_utils import TrezorAxieGraphQL, CustomUI
 
 
 now = int(datetime.now().timestamp())
@@ -30,13 +33,13 @@ file_handler.addFilter(ImportantLogsFilter())
 logger.addHandler(file_handler)
 
 
-class Claim(AxieGraphQL):
+class TrezorClaim(TrezorAxieGraphQL):
     def __init__(self, acc_name, **kwargs):
         super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": self.user_agent}}))
+                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
         with open("axie/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
@@ -45,6 +48,8 @@ class Claim(AxieGraphQL):
         )
         self.acc_name = acc_name
         self.request = requests.Session()
+        self.gwei = self.w3.toWei('0', 'gwei')
+        self.gas = 492874
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
@@ -98,16 +103,24 @@ class Claim(AxieGraphQL):
             signature['amount'],
             signature['timestamp'],
             signature['signature']
-        ).buildTransaction({'gas': 492874, 'gasPrice': 0, 'nonce': nonce})
-        # Sign claim
-        signed_claim = self.w3.eth.account.sign_transaction(
-            claim,
-            private_key=self.private_key
+        ).buildTransaction({'gas': self.gas, 'gasPrice': 0, 'nonce': nonce})
+        data = self.w3.toBytes(hexstr=claim['data'])
+        to = self.w3.toBytes(hexstr=SLP_CONTRACT)
+        sig = ethereum.sign_tx(
+            self.client,
+            n=self.bip_path,
+            nonce=nonce,
+            gas_price=self.gwei,
+            gas_limit=self.gas,
+            to=SLP_CONTRACT,
+            value=0,
+            data=data,
+            chain_id=2020
         )
+        transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
-        self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
-        # Get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
+        self.w3.eth.send_raw_transaction(transaction)
+        hash = self.w3.toHex(self.w3.keccak(transaction))
         # Wait for transaction to finish
         while True:
             try:
@@ -125,50 +138,48 @@ class Claim(AxieGraphQL):
         if success:
             logging.info(f"Important: SLP Claimed! New balance for account {self.acc_name} "
                          f"({self.account.replace('0x', 'ronin:')}) is: {check_balance(self.account)}")
+            return
         else:
             logging.info(f"Important: Claim for account {self.acc_name} ({self.account.replace('0x', 'ronin:')}) "
                          "failed")
+            return
 
 
-class AxieClaimsManager:
-    def __init__(self, payments_file, secrets_file):
-        self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(secrets_file, payments_file)
+class TrezorAxieClaimsManager:
+    def __init__(self, payments_file, trezor_config):
+        self.trezor_config, self.acc_names = self.load_trezor_config_and_acc_name(trezor_config, payments_file)
 
-    def load_secrets_and_acc_name(self, secrets_file, payments_file):
-        secrets = load_json(secrets_file)
+    def load_trezor_config_and_acc_name(self, trezor_config, payments_file):
+        config = load_json(trezor_config)
         payments = load_json(payments_file)
-        refined_secrets = {}
+        refined_config = {}
         acc_names = {}
         for scholar in payments['Scholars']:
-            key = scholar['AccountAddress']
-            refined_secrets[key] = secrets[key]
+            key = scholar['AccountAddress'].lower()
+            refined_config[key] = config[key]
             acc_names[key] = scholar['Name']
-        return refined_secrets, acc_names
+        return refined_config, acc_names
 
     def verify_inputs(self):
         validation_success = True
-        # Check secrets file is not empty
-        if not self.secrets_file:
-            logging.warning("No secrets contained in secrets file")
+        if not self.trezor_config:
+            logging.warning("No configuration found for trezor")
             validation_success = False
-        # Check keys and secrets have proper format
-        for acc in self.secrets_file:
+        for acc in self.trezor_config:
             if not acc.startswith("ronin:"):
                 logging.critical(f"Public address {acc} needs to start with ronin:")
                 validation_success = False
-            if len(self.secrets_file[acc]) != 66 or self.secrets_file[acc][:2] != "0x":
-                logging.critical(f"Private key for account {acc} is not valid, please review it!")
-                validation_success = False
         if not validation_success:
             sys.exit()
-        logging.info("Secret file correctly validated")
+        logging.info("Files correctly validated")
 
     def prepare_claims(self):
         claims_list = [
-            Claim(
+            TrezorClaim(
                 account=acc,
-                private_key=self.secrets_file[acc],
-                acc_name=self.acc_names[acc]) for acc in self.secrets_file]
+                client=get_default_client(ui=CustomUI(self.trezor_config[acc]['passphrase'])),
+                bip_path=self.trezor_config[acc]['bip_path'],
+                acc_name=self.acc_names[acc]) for acc in self.trezor_config]
         logging.info("Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))

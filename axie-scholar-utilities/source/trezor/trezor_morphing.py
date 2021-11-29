@@ -2,12 +2,13 @@ import sys
 import logging
 from datetime import datetime
 
-from eth_account.messages import encode_defunct
+from hexbytes import HexBytes
+from trezorlib import ethereum
+from trezorlib.client import get_default_client
 from requests.exceptions import RetryError
-from web3 import Web3
 
-from axie.utils import load_json, AxieGraphQL, ImportantLogsFilter
-
+from axie.utils import load_json, ImportantLogsFilter
+from trezor.trezor_utils import TrezorAxieGraphQL, CustomUI
 
 now = int(datetime.now().timestamp())
 log_file = f'logs/results_{now}.log'
@@ -19,7 +20,7 @@ file_handler.addFilter(ImportantLogsFilter())
 logger.addHandler(file_handler)
 
 
-class Morph(AxieGraphQL):
+class TrezorMorph(TrezorAxieGraphQL):
 
     def __init__(self, axie, **kwargs):
         self.axie = axie
@@ -28,9 +29,8 @@ class Morph(AxieGraphQL):
     def execute(self):
         jwt = self.get_jwt()
         msg = f"axie_id={self.axie}&owner={self.account}"
-        signed_msg = Web3().eth.account.sign_message(encode_defunct(text=msg),
-                                                     private_key=self.private_key)
-        signature = signed_msg['signature'].hex()
+        signed_msg = ethereum.sign_message(self.client, self.bip_path, msg)
+        signature = HexBytes(signed_msg.signature).hex()
         headers = {
             "User-Agent": self.user_agent,
             "authorization": f"Bearer {jwt}"
@@ -61,21 +61,25 @@ class Morph(AxieGraphQL):
             logging.critical(f"Important! Axie {self.axie} in {self.account} is not ready to be morphed!")
 
 
-class AxieMorphingManager:
+class TrezorAxieMorphingManager:
 
-    def __init__(self, axie_list, account, secrets_file):
+    def __init__(self, axie_list, account, trezor_config):
         self.axie_list = axie_list
-        self.account = account
-        self.secrets = load_json(secrets_file)
+        self.account = account.lower()
+        self.trezor_config = load_json(trezor_config)
 
     def verify_inputs(self):
-        if self.account not in self.secrets:
-            logging.critical(f"Account '{self.account}' is not present in secret file, please add it.")
+        if self.account not in self.trezor_config:
+            logging.critical(f"Account '{self.account}' is not present in trezor config, please re-run trezor setup.")
             sys.exit()
 
     def execute(self):
         logging.info(f"About to start morphing axies for account {self.account}")
         for axie in self.axie_list:
-            m = Morph(axie=axie, account=self.account, private_key=self.secrets[self.account])
+            m = TrezorMorph(
+                axie=axie,
+                account=self.account,
+                client=get_default_client(ui=CustomUI(self.trezor_config[self.account]['passphrase'])),
+                bip_path=self.trezor_config[self.account]['bip_path'])
             m.execute()
         logging.info(f"Done morphing axies for account {self.account}")
