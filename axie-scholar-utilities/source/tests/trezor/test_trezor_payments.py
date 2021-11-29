@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import builtins
-import logging
 
 from mock import patch, call, mock_open
 from glob import glob

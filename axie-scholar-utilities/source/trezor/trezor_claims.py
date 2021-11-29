@@ -9,7 +9,6 @@ from requests.exceptions import RetryError
 from web3 import Web3, exceptions
 import requests
 from trezorlib.client import get_default_client
-from trezorlib.tools import parse_path
 from trezorlib import ethereum
 
 from axie.utils import (

@@ -8,7 +8,6 @@ from trezorlib.tools import parse_path
 
 from trezor import TrezorQRCodeManager
 from trezor.trezor_qr_code import TrezorQRCode
-from trezor.trezor_utils import CustomUI
 
 
 @patch("trezor.TrezorQRCodeManager.load_trezor_config_and_acc_name", return_value=("foo", "bar"))

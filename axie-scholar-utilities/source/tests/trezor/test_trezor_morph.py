@@ -3,16 +3,10 @@ import json
 
 from mock import patch, call
 import requests_mock
-from hexbytes import HexBytes
 
 from trezor import TrezorAxieMorphingManager
 from trezor.trezor_morphing import TrezorMorph
-
-
-class MockedSignedMsg:
-    
-    def __init__(self):
-        self.signature = HexBytes(b'123')
+from tests.test_utils import MockedSignedMsg
 
 
 @patch("trezor.trezor_morphing.load_json", return_value={"foo": "bar"})

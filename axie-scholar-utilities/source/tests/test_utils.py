@@ -1,3 +1,6 @@
+from hexbytes import HexBytes
+
+
 LOG_FILE_PATH = '/opt/app/'
 
 
@@ -13,3 +16,9 @@ async def async_cleanup_log_file(file_name):
     at the end of the test as a teardown """
     with open(LOG_FILE_PATH+file_name, 'w') as f:
         f.write('')
+
+
+class MockedSignedMsg:
+    
+    def __init__(self):
+        self.signature = HexBytes(b'123')
