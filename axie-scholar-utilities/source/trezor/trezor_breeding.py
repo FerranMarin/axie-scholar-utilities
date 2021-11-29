@@ -85,6 +85,10 @@ class TrezorBreed:
             data=data,
             chain_id=2020
         )
+        if sig.signature_r.startswith('0x00'):
+            sig.signature_r = '0x' + sig.signature_r[4:]
+        if sig.signature_s.startswith('0x00'):
+            sig.signature_s = '0x' + sig.signature_s[4:]
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
