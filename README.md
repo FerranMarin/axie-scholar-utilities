@@ -15,8 +15,9 @@ As of now it has the following commands:
 - Axie Breeding
 - QR Code Generation
 
-To know how to use it, install it, please visit the [wiki](https://ferranmarin.github.io/axie-scholar-utilities/)
+**WITH TREZOR SUPORT!**
 
+To know how to use it, install it, please visit the [wiki](https://ferranmarin.github.io/axie-scholar-utilities/)
 
 # How is this and future developments financed?
 
@@ -41,7 +42,6 @@ You can breed using multiple accounts and pay the fee with another one. More ins
 
 # Roadmap
 
-- Add capability to payout from accounts with Trezor (needs investigation)
 - Release a desktop app (even more convenient)
 - Integrate with Discord (via a self-hosted bot, it will be 100% yours!)
 - ...
