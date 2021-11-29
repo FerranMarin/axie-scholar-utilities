@@ -28,7 +28,7 @@ To run my tool you will need Python3 (the language it is written in) to be insta
 
 5. Install [Poetry](https://python-poetry.org/docs/#windows-powershell-install-instructions). We could use the standard PIP package manager for Python, but I like Poetry more as it fixes the versions down in a better way. To do so you run this command:
 
-        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+        curl -sSL https://install.python-poetry.org | python3 -
 
 6. Now it is time to download my code, there are multiple ways:
 

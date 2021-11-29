@@ -12,7 +12,7 @@ To run my tool you will need Python3 (the language it is written in) to be insta
 
 4. Install [Poetry](https://python-poetry.org/docs/#windows-powershell-install-instructions). We could use the standard PIP package manager for Python, but I like Poetry more as it fixes the versions down in a better way. To do so you need to open your Powershell and execute:
 
-        (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
+        (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
 
 5. Now it is time to download my code, there are multiple ways:
 
