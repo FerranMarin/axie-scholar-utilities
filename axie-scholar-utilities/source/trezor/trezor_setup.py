@@ -49,4 +49,4 @@ class TrezorAccountsSetup:
         file_path = self.trezor_config_file if self.trezor_config_file else 'trezor_config.json'
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(self.trezor_config, f, indent=4)
-        logging.info('Frezor_config file saved!')
+        logging.info('Trezor_config file saved!')

@@ -43,7 +43,7 @@ def test_trezor_setup_update_already_existing(tmpdir, caplog):
     tas = TrezorAccountsSetup(p_file.strpath, f2.strpath)
     tas.update_trezor_config()
     assert 'Gathered all accounts config, saving trezor_config file' in caplog.text
-    assert 'Frezor_config file saved!' in caplog.text
+    assert 'Trezor_config file saved!' in caplog.text
 
 @patch('trezor.trezor_setup.ethereum.get_address', return_value='ronin:<account_s1_address>01234567890123456789')
 @patch('trezor.trezor_setup.get_default_client')
@@ -64,4 +64,4 @@ def test_trezor_setup_update(mock_client, mock_get_address, tmpdir, caplog):
         mock_client.assert_called()
         mock_get_address.assert_called()
     assert 'Gathered all accounts config, saving trezor_config file' in caplog.text
-    assert 'Frezor_config file saved!' in caplog.text
+    assert 'Trezor_config file saved!' in caplog.text
