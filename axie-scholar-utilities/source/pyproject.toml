@@ -12,7 +12,7 @@ web3 = "^5.25.0"
 jsonschema = "^3.2.0"
 qrcode = "^7.3.1"
 Pillow = "^8.4.0"
-trezor = {extras = ["hidapi"], version = "^0.12.4"}
+trezor = {extras = ["hidapi"], version = "^0.13.0"}
 
 [tool.poetry.dev-dependencies]
 mock = "^4.0.3"
