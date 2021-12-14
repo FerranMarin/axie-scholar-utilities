@@ -198,7 +198,7 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
         c = Claim(account="ronin:foo", private_key="bar", acc_name="test_acc")
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -225,7 +225,7 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract):
             assert unclaimed == 12
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -246,7 +246,7 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
             assert unclaimed is None
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -264,6 +264,24 @@ def test_create_random_msg_fail_req():
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         status_code=500)
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
+        random_msg = c.create_random_msg()
+        assert random_msg is None
+
+
+def test_create_random_msg_fail_no_data_req():
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
+                        json={})
+        c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
+        random_msg = c.create_random_msg()
+        assert random_msg is None
+
+
+def test_create_random_msg_fail_wrong_data_req():
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
+                        json={"data": {"foo": "bar"}})
         c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
         random_msg = c.create_random_msg()
         assert random_msg is None
@@ -298,7 +316,7 @@ def test_get_jwt(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_
         assert req_mocker.request_history[0].json() == expected_payload
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_random_msg.assert_called_once()
@@ -319,7 +337,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
         assert jwt is None
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -369,7 +387,7 @@ def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_ms
         assert req_mocker.request_history[0].json() == expected_payload
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -405,7 +423,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
         assert jwt is None
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -439,7 +457,7 @@ async def test_claim_execution(mocked_provider,
                                mock_to_hex,
                                caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     await async_cleanup_log_file(log_file)
     with patch.object(builtins,
                       "open",
@@ -461,7 +479,7 @@ async def test_claim_execution(mocked_provider,
             await c.execute()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_has_calls([call(SLP_CONTRACT), call("0xfoo")])
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -530,7 +548,7 @@ async def test_execution_failed_get_blockchain(mocked_provider,
             await c.execute()
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
