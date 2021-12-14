@@ -19,6 +19,6 @@ async def async_cleanup_log_file(file_name):
 
 
 class MockedSignedMsg:
-    
+
     def __init__(self):
         self.signature = HexBytes(b'123')
