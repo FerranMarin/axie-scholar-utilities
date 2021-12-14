@@ -39,7 +39,7 @@ class TrezorClaim(TrezorAxieGraphQL):
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         with open("axie/slp_abi.json", encoding='utf-8') as f:
             slp_abi = json.load(f)
         self.slp_contract = self.w3.eth.contract(
@@ -73,7 +73,8 @@ class TrezorClaim(TrezorAxieGraphQL):
                      f"{unclaimed} unclaimed SLP")
         jwt = self.get_jwt()
         if not jwt:
-            logging.critical(f"Important: Skipping claiming, we could not get the JWT for account {self.account.replace('0x', 'ronin:')}")
+            logging.critical("Important: Skipping claiming, we could not get the JWT for account "
+                             f"{self.account.replace('0x', 'ronin:')}")
             return
         headers = {
             "User-Agent": self.user_agent,

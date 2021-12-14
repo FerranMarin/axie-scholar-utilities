@@ -43,14 +43,14 @@ class TrezorBreed:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
         self.client = client
         self.bip_path = parse_path(bip_path)
         self.gwei = self.w3.toWei('0', 'gwei')
-        self.gas = 250000      
+        self.gas = 250000
 
     def execute(self):
         # Prepare transaction
@@ -140,10 +140,12 @@ class TrezorAxieBreedManager:
             validation_error = True
         for acc in self.breeding_file:
             if acc['AccountAddress'].lower() not in self.trezor_config:
-                logging.critical(f"Account '{acc['AccountAddress']}' is not present in trezor config, please re-run setup.")
+                logging.critical(f"Account '{acc['AccountAddress']}' is not present in trezor config, "
+                                 "please re-run setup.")
                 validation_error = True
         if self.payment_account not in self.trezor_config:
-            logging.critical(f"Payment account '{self.payment_account}' is not present in trezor config, please re-run setup.")
+            logging.critical(f"Payment account '{self.payment_account}' is not present in trezor config, "
+                             "please re-run setup.")
             validation_error = True
         if validation_error:
             sys.exit()

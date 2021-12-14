@@ -6,7 +6,7 @@ from requests.exceptions import RetryError
 from hexbytes import HexBytes
 from trezorlib import ethereum
 from trezorlib.ui import ClickUI
-from trezorlib.tools import parse_path 
+from trezorlib.tools import parse_path
 
 from axie.utils import RETRIES, USER_AGENT
 

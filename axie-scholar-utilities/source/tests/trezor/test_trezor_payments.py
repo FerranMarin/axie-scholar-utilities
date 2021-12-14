@@ -271,7 +271,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                       mock_rlp,
                                       caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
@@ -279,14 +279,14 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
         p = TrezorPayment(
-        "random_account",
-        "manager",
-        "client",
-        "m/44'/60'/0'/0/0",
-        "ronin:from_ronin",
-        "ronin:to_ronin",
-        10,
-        s)
+            "random_account",
+            "manager",
+            "client",
+            "m/44'/60'/0'/0/0",
+            "ronin:from_ronin",
+            "ronin:to_ronin",
+            10,
+            s)
         p.execute()
     mock_file.assert_called_with("trezor/slp_abi.json", encoding='utf-8')
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -298,7 +298,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
     mock_rlp.assert_called()
     mock_checksum.assert_has_calls(calls=[
         call(SLP_CONTRACT),
-        call('0xfrom_ronin'),       
+        call('0xfrom_ronin'),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
@@ -336,7 +336,7 @@ def test_execute_calls_web3_functions_retry(mock_replacement_tx,
                                             mock_rlp,
                                             caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
@@ -344,14 +344,14 @@ def test_execute_calls_web3_functions_retry(mock_replacement_tx,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
         p = TrezorPayment(
-        "random_account",
-        "manager",
-        "client",
-        "m/44'/60'/0'/0/0",
-        "ronin:from_ronin",
-        "ronin:to_ronin",
-        10,
-        s)
+            "random_account",
+            "manager",
+            "client",
+            "m/44'/60'/0'/0/0",
+            "ronin:from_ronin",
+            "ronin:to_ronin",
+            10,
+            s)
         p.execute()
     mock_file.assert_called_with("trezor/slp_abi.json", encoding='utf-8')
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -363,7 +363,7 @@ def test_execute_calls_web3_functions_retry(mock_replacement_tx,
     mock_rlp.assert_called()
     mock_checksum.assert_has_calls(calls=[
         call(SLP_CONTRACT),
-        call('0xfrom_ronin'),       
+        call('0xfrom_ronin'),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     mock_replacement_tx.assert_called_with(123)
