@@ -718,26 +718,29 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "trezor"
-version = "0.12.4"
+version = "0.13.0"
 description = "Python library for communicating with Trezor Hardware Wallet"
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 
 [package.dependencies]
-attrs = "*"
 click = ">=7,<9"
 construct = ">=2.9"
 ecdsa = ">=0.9"
 hidapi = {version = ">=0.7.99.post20", optional = true, markers = "extra == \"hidapi\""}
 libusb1 = ">=1.6.4"
-mnemonic = ">=0.17"
+mnemonic = ">=0.20"
 requests = ">=2.4.0"
-typing-extensions = ">=3.7.4"
+typing-extensions = ">=3.10"
 
 [package.extras]
 ethereum = ["rlp (>=1.1.0)", "web3 (>=4.8)"]
+extra = ["pillow"]
+full = ["hidapi (>=0.7.99.post20)", "rlp (>=1.1.0)", "web3 (>=4.8)", "pyqt5", "pillow", "stellar-sdk (>=4.0.0,<6.0.0)"]
 hidapi = ["hidapi (>=0.7.99.post20)"]
+qt-widgets = ["pyqt5"]
+stellar = ["stellar-sdk (>=4.0.0,<6.0.0)"]
 
 [[package]]
 name = "typing-extensions"
@@ -821,7 +824,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "21499a1cd0c91eb6c8785d930b52e51da42e79d05df6dd9dda89402f412810ef"
+content-hash = "9a2ad55a4ae9b28affadc4a5156b1d409ffeee18ff1d0ed1218dc8ee1dd5a54b"
 
 [metadata.files]
 aiohttp = [
@@ -1411,8 +1414,8 @@ toolz = [
     {file = "toolz-0.11.2.tar.gz", hash = "sha256:6b312d5e15138552f1bda8a4e66c30e236c831b612b2bf0005f8a1df10a4bc33"},
 ]
 trezor = [
-    {file = "trezor-0.12.4-py3-none-any.whl", hash = "sha256:18becda0ab6867e0b73e87c03ecb167dd783e178328e6b0786f35a1bfb46dda1"},
-    {file = "trezor-0.12.4.tar.gz", hash = "sha256:3e180d9f9f8b69176b5ef36311b6161f5b793b538eb2dfd4babbb4d3fb1e374e"},
+    {file = "trezor-0.13.0-py3-none-any.whl", hash = "sha256:8c79aab2ea30440a4c6a1380c0373a848f11730bcde43b3de5280a927a8e82cc"},
+    {file = "trezor-0.13.0.tar.gz", hash = "sha256:4571aa09dbfe88b31eb2f16c7c359b4809621b75a04b7b5bc9dbffe17046c99a"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.0.1-py3-none-any.whl", hash = "sha256:7f001e5ac290a0c0401508864c7ec868be4e701886d5b573a9528ed3973d9d3b"},
