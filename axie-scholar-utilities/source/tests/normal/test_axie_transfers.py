@@ -154,8 +154,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
         call(AXIE_CONTRACT),
         call('0xfrom_ronin'),
         call('0xfrom_ronin'),
-        call('0xto_ronin'),
-        call('0xfrom_ronin')])
+        call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     mocked_get_transaction_count.assert_called()
     assert ("Axie Transfer of axie (123) from account (ronin:from_ronin) to account "

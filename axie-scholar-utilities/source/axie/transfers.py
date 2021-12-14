@@ -36,7 +36,7 @@ class Transfer:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.from_private = from_private
         self.to_acc = to_acc.replace("ronin:", "0x")
@@ -60,7 +60,6 @@ class Transfer:
         ).buildTransaction({
             "chainId": 2020,
             "gas": 492874,
-            "from": Web3.toChecksumAddress(self.from_acc),
             "gasPrice": self.w3.toWei("0", "gwei"),
             "value": 0,
             "nonce": nonce
