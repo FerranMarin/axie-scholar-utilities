@@ -168,12 +168,15 @@ class TrezorAxieTransferManager:
                             axie_id=axie['AxieId']
                         )
                         transfers.append(t)
+                        logging.info(f"Added transaction to the list: {t}")
                     else:
                         logging.info(f"Axie ({axie['AxieId']}) not in account ({acc['AccountAddress']}), skipping.")
+                else:
+                    logging.info(f"Receiver address {axie['ReceiverAddress']} not in secrets.json, skipping transfer.")
         self.execute_transfers(transfers)
 
     def execute_transfers(self, transfers):
         logging.info("Starting to transfer axies")
         for t in transfers:
             t.execute()
-        logging.info("Axie Transfers Finished")
+        logging.info("Axie transfers finished")
