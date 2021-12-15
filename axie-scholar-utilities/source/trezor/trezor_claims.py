@@ -60,7 +60,10 @@ class TrezorClaim(TrezorAxieGraphQL):
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
-            return int(response.json()['total'])
+            in_game_total = int(response.json()['total'])
+            wallet_total = check_balance(self.account)
+            if in_game_total > wallet_total:
+                return in_game_total - wallet_total
         return None
 
     async def execute(self):
