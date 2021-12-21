@@ -289,7 +289,7 @@ def test_breed_execute(mocked_provider,
     mock_get_nonce.assert_called_once()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})

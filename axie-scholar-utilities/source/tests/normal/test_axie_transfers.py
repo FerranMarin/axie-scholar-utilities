@@ -131,7 +131,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                       mocked_get_transaction_count,
                                       caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     t = Transfer(
         "ronin:from_ronin",
@@ -154,8 +154,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
         call(AXIE_CONTRACT),
         call('0xfrom_ronin'),
         call('0xfrom_ronin'),
-        call('0xto_ronin'),
-        call('0xfrom_ronin')])
+        call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     mocked_get_transaction_count.assert_called()
     assert ("Axie Transfer of axie (123) from account (ronin:from_ronin) to account "

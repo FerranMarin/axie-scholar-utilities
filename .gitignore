@@ -134,3 +134,4 @@ dmypy.json
 # Sensitive files
 payments.json
 secrets.json
+trezor_config.json

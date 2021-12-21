@@ -5,11 +5,12 @@ from mock import patch
 
 from trezor import TrezorAccountsSetup
 
+
 def test_trezor_setup_init(tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     tas = TrezorAccountsSetup(f1.strpath)
-    assert tas.trezor_config_file == None
+    assert tas.trezor_config_file is None
     assert tas.trezor_config == {}
     assert tas.payments == {"ronin:<account_s1_address>": "hello"}
 
@@ -44,6 +45,7 @@ def test_trezor_setup_update_already_existing(tmpdir, caplog):
     tas.update_trezor_config()
     assert 'Gathered all accounts config, saving trezor_config file' in caplog.text
     assert 'Trezor_config file saved!' in caplog.text
+
 
 @patch('trezor.trezor_setup.ethereum.get_address', return_value='ronin:<account_s1_address>01234567890123456789')
 @patch('trezor.trezor_setup.get_default_client')

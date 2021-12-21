@@ -26,7 +26,11 @@ def test_transfer_manager_init(mocked_load_json):
 @patch("trezor.trezor_transfers.Axies.get_axies", return_value=[123, 123123, 234])
 @patch("trezor.trezor_transfers.load_json")
 @patch("trezor.trezor_transfers.TrezorAxieTransferManager.execute_transfers")
-def test_transfer_manager_prepare_transfers(mocked_execute_transfers, mocked_load_json, mock_axies, mock_client, mock_parse):
+def test_transfer_manager_prepare_transfers(mocked_execute_transfers,
+                                            mocked_load_json,
+                                            mock_axies,
+                                            mock_client,
+                                            mock_parse):
     transfers_file = "sample_transfers_file.json"
     config_file = "sample_config_file.json"
     atm = TrezorAxieTransferManager(transfers_file, config_file)
@@ -75,7 +79,11 @@ def test_transfer_manager_prepare_transfers(mocked_execute_transfers, mocked_loa
 @patch("trezor.trezor_transfers.Axies.get_axies", return_value=[123])
 @patch("trezor.trezor_transfers.load_json")
 @patch("trezor.trezor_transfers.TrezorAxieTransferManager.execute_transfers")
-def test_transfer_manager_prepare_transfers_only_available(mocked_execute_transfers, mocked_load_json, mock_axies, mock_client, mock_parse):
+def test_transfer_manager_prepare_transfers_only_available(mocked_execute_transfers,
+                                                           mocked_load_json,
+                                                           mock_axies,
+                                                           mock_client,
+                                                           mock_parse):
     transfers_file = "sample_transfers_file.json"
     config_file = "sample_config_file.json"
     atm = TrezorAxieTransferManager(transfers_file, config_file)
@@ -108,7 +116,11 @@ def test_transfer_manager_prepare_transfers_only_available(mocked_execute_transf
 @patch("trezor.trezor_transfers.Axies.get_axies", return_value=[123, 123123, 234])
 @patch("trezor.trezor_transfers.load_json")
 @patch("trezor.trezor_transfers.TrezorAxieTransferManager.execute_transfers")
-def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers, mocked_load_json, mock_axies, mock_client, mock_parse):
+def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers,
+                                                   mocked_load_json,
+                                                   mock_axies,
+                                                   mock_client,
+                                                   mock_parse):
     transfers_file = "sample_transfers_file.json"
     config_file = "sample_config_file.json"
     atm = TrezorAxieTransferManager(transfers_file, config_file, True)
@@ -160,7 +172,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                                       mocked_rlp,
                                       caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     t = TrezorTransfer(
         to_acc="ronin:to_ronin",
@@ -185,8 +197,7 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
         call(AXIE_CONTRACT),
         call('0xfrom_ronin'),
         call('0xfrom_ronin'),
-        call('0xto_ronin'),
-        call('0xfrom_ronin')])
+        call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     mocked_get_transaction_count.assert_called()
     assert ("Axie Transfer of axie (123) from account (ronin:from_ronin) to account "

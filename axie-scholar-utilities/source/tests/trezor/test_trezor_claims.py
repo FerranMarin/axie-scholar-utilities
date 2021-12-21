@@ -147,7 +147,7 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract, mocked_pa
         c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -158,11 +158,12 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract, mocked_pa
     assert c.acc_name == "test_acc"
 
 
+@patch("trezor.trezor_claims.check_balance", return_value=10)
 @patch("trezor.trezor_utils.parse_path", return_value="parsed_path")
 @patch("web3.eth.Eth.contract")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mocked_parse):
+def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mocked_parse, mocked_check):
     last_claimed_date = datetime.now() - timedelta(days=15)
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
@@ -174,11 +175,12 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mo
                           mock_open(read_data='{"foo": "bar"}')):
             c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
             unclaimed = c.has_unclaimed_slp()
-            assert unclaimed == 12
+            assert unclaimed == 2
+        mocked_check.assert_called_with("0xfoo")
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -201,7 +203,7 @@ def test_has_unclaimed_slp_failed_req(mocked_provider, mocked_checksum, mocked_c
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -212,15 +214,39 @@ def test_create_random_msg(mocked_parse):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createRandomMessage": "random_msg"}})
-        resp = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client").create_random_msg()
+        resp = TrezorClaim(
+            account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client").create_random_msg()
         assert resp == "random_msg"
     mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
+
 
 @patch("trezor.trezor_utils.parse_path", return_value="parsed_path")
 def test_create_random_msg_fail_req(mocked_parse):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         status_code=500)
+        c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
+        random_msg = c.create_random_msg()
+        assert random_msg is None
+    mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
+
+
+@patch("trezor.trezor_utils.parse_path", return_value="parsed_path")
+def test_create_random_msg_fail_no_data_req(mocked_parse):
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
+                        json={})
+        c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
+        random_msg = c.create_random_msg()
+        assert random_msg is None
+    mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
+
+
+@patch("trezor.trezor_utils.parse_path", return_value="parsed_path")
+def test_create_random_msg_fail_wrong_data_req(mocked_parse):
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
+                        json={"data": {"foo": "bar"}})
         c = TrezorClaim(account="ronin:foo", acc_name="test_acc", bip_path="m/44'/60'/0'/0/0", client="client")
         random_msg = c.create_random_msg()
         assert random_msg is None
@@ -258,7 +284,7 @@ def test_get_jwt(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_
     mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(SLP_CONTRACT)
     mocked_random_msg.assert_called_once()
@@ -281,7 +307,7 @@ def test_get_jwt_fail_req(mocked_provider, mocked_checksum, mocked_random_msg, m
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -333,7 +359,7 @@ def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_ms
         assert req_mocker.request_history[0].json() == expected_payload
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -346,7 +372,12 @@ def test_jwq_fail_req_content(mocked_provider, mocked_checksum, mocked_random_ms
 @patch("trezor.trezor_claims.TrezorClaim.create_random_msg", return_value="random_msg")
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_msg, mock_sign_message, _, mocked_parse):
+def test_jwq_fail_req_content_2(mocked_provider,
+                                mocked_checksum,
+                                mocked_random_msg,
+                                mock_sign_message,
+                                _,
+                                mocked_parse):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql",
                         json={"data": {"createAccessTokenWithSignature": {}}})
@@ -371,7 +402,7 @@ def test_jwq_fail_req_content_2(mocked_provider, mocked_checksum, mocked_random_
         mocked_parse.assert_called_with("m/44'/60'/0'/0/0")
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with(SLP_CONTRACT)
         mocked_random_msg.assert_called_once()
@@ -411,7 +442,7 @@ async def test_claim_execution(mocked_provider,
                                mocked_parse,
                                caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     await async_cleanup_log_file(log_file)
     with patch.object(builtins,
                       "open",
@@ -433,7 +464,7 @@ async def test_claim_execution(mocked_provider,
             await c.execute()
     mocked_provider.assert_called_with(
         RONIN_PROVIDER_FREE,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_to_bytes.assert_called()
     mock_rlp.assert_called()
@@ -512,7 +543,7 @@ async def test_execution_failed_get_blockchain(mocked_provider,
             await c.execute()
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
-            request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
         )
         mocked_checksum.assert_called_with('0xa8754b9fa15fc18bb59458815510e40a12cd2014')
         mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})

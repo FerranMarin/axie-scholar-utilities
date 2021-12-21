@@ -45,7 +45,7 @@ class TrezorPayment:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.name = name
         self.payment_type = payment_type
         self.from_acc = from_acc.replace("ronin:", "0x")

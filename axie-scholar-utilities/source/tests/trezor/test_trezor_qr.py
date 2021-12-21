@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 from mock import patch, call
-from trezorlib.tools import parse_path 
+from trezorlib.tools import parse_path
 
 from trezor import TrezorQRCodeManager
 from trezor.trezor_qr_code import TrezorQRCode
@@ -95,15 +95,25 @@ def test_qrcode_manager_execute(mocked_qrcode_init, mocked_qrcode_generate_qr, m
     p_file.write(json.dumps(data))
     c_file = tmpdir.join("s.json")
     config_data = {
-        scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}, 
+        scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"},
         scholar_acc_other: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/1"}
     }
     c_file.write(json.dumps(config_data))
     qr = TrezorQRCodeManager(p_file, c_file)
     qr.execute()
     mocked_qrcode_init.assert_has_calls(calls=[
-        call(account=scholar_acc, bip_path="m/44'/60'/0'/0/0", client="client", acc_name="Scholar 1", path=os.path.dirname(c_file)),
-        call(account=scholar_acc_other,bip_path="m/44'/60'/0'/0/1", client="client", acc_name="Scholar 2", path=os.path.dirname(c_file))
+        call(
+            account=scholar_acc,
+            bip_path="m/44'/60'/0'/0/0",
+            client="client",
+            acc_name="Scholar 1",
+            path=os.path.dirname(c_file)),
+        call(
+            account=scholar_acc_other,
+            bip_path="m/44'/60'/0'/0/1",
+            client="client",
+            acc_name="Scholar 2",
+            path=os.path.dirname(c_file))
     ])
     mocked_client.assert_called()
     assert mocked_qrcode_generate_qr.call_count == 2

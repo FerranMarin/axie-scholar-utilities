@@ -91,11 +91,10 @@ def test_morph_execute(mock_get_jwt, mock_sign_msg, mock_parse, caplog):
     assert f"Axie {m.axie} in {m.account} correctly morphed!" in caplog.text
 
 
-
 @patch("trezor.trezor_utils.parse_path", return_value="m/44'/60'/0'/0/0")
 @patch("trezor.trezor_morphing.ethereum.sign_message", return_value=MockedSignedMsg())
 @patch("trezor.trezor_morphing.TrezorMorph.get_jwt", return_value="token")
-def test_morph_execute(mock_get_jwt, mock_sign_msg, mock_parse, caplog):
+def test_morph_execute_bad_json_response(mock_get_jwt, mock_sign_msg, mock_parse, caplog):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post(
             'https://graphql-gateway.axieinfinity.com/graphql',

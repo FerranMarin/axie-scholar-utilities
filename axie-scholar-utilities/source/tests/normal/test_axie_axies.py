@@ -1,5 +1,5 @@
 import builtins
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from mock import patch, call, mock_open
 from freezegun import freeze_time
@@ -21,7 +21,7 @@ def test_axies_init(mocked_provider, mocked_checksum, mocked_contract):
         a = Axies("ronin:abc1")
     mocked_provider.assert_called_with(
         RONIN_PROVIDER,
-        request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}
+        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
     )
     mocked_checksum.assert_called_with(AXIE_CONTRACT)
     mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -173,7 +173,6 @@ def test_get_morph_date_body():
                         json={"data": {"axie": {"bodyShape": body_shape, "birthDate": birth_date}}})
         a = Axies("ronin:abc1")
         resp = a.get_morph_date_and_body(123)
-    
     assert resp == (morph_date, body_shape)
 
 
@@ -183,7 +182,6 @@ def test_get_morph_date_body_no_json():
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql")
         a = Axies("ronin:abc1")
         resp = a.get_morph_date_and_body(123)
-    
     assert resp == (None, None)
 
 
@@ -202,5 +200,4 @@ def test_get_morph_date_body_malformed_json(mocked_json):
         req_mocker.post("https://graphql-gateway.axieinfinity.com/graphql", json=mocked_json)
         a = Axies("ronin:abc1")
         resp = a.get_morph_date_and_body(123)
-    
     assert resp == (None, None)

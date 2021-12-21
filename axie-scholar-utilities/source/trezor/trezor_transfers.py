@@ -41,7 +41,7 @@ class TrezorTransfer:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.from_acc = from_acc.replace("ronin:", "0x")
         self.to_acc = to_acc.replace("ronin:", "0x")
         self.axie_id = axie_id
@@ -68,7 +68,6 @@ class TrezorTransfer:
         ).buildTransaction({
             "chainId": 2020,
             "gas": self.gas,
-            "from": Web3.toChecksumAddress(self.from_acc),
             "gasPrice": self.w3.toWei("0", "gwei"),
             "value": 0,
             "nonce": nonce
@@ -167,18 +166,22 @@ class TrezorAxieTransferManager:
                         t = TrezorTransfer(
                             to_acc=axie['ReceiverAddress'].lower(),
                             client=get_default_client(
-                                ui=CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase'])),
+                                ui=CustomUI(
+                                    passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase'])),
                             bip_path=self.trezor_config[acc['AccountAddress'].lower()]['bip_path'],
                             from_acc=acc['AccountAddress'].lower(),
                             axie_id=axie['AxieId']
                         )
                         transfers.append(t)
+                        logging.info(f"Added transaction to the list: {t}")
                     else:
                         logging.info(f"Axie ({axie['AxieId']}) not in account ({acc['AccountAddress']}), skipping.")
+                else:
+                    logging.info(f"Receiver address {axie['ReceiverAddress']} not in secrets.json, skipping transfer.")
         self.execute_transfers(transfers)
 
     def execute_transfers(self, transfers):
         logging.info("Starting to transfer axies")
         for t in transfers:
             t.execute()
-        logging.info("Axie Transfers Finished")
+        logging.info("Axie transfers finished")

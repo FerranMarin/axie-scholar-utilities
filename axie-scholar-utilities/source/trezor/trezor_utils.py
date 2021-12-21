@@ -6,7 +6,7 @@ from requests.exceptions import RetryError
 from hexbytes import HexBytes
 from trezorlib import ethereum
 from trezorlib.ui import ClickUI
-from trezorlib.tools import parse_path 
+from trezorlib.tools import parse_path
 
 from axie.utils import RETRIES, USER_AGENT
 
@@ -42,7 +42,8 @@ class TrezorAxieGraphQL:
         except RetryError as e:
             logging.critical(f"Error! Creating random msg! Error: {e}")
             return None
-        if 200 <= response.status_code <= 299:
+        if (200 <= response.status_code <= 299 and response.json().get('data') and
+           response.json()['data'].get('createRandomMessage')):
             return response.json()['data']['createRandomMessage']
         return None
 

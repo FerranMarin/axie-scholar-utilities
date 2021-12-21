@@ -721,16 +721,16 @@ def test_payment_get_nonce_calls_w3_low_nonce(mocked_checksum, mock_contract):
 @patch("web3.eth.Eth.contract")
 @patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
 def test_execute_calls_web3_functions(mock_transaction_receipt,
-                                            mock_contract,
-                                            mock_keccak,
-                                            mock_to_hex,
-                                            mock_send,
-                                            mock_sign,
-                                            mock_checksum,
-                                            _,
-                                            caplog):
+                                      mock_contract,
+                                      mock_keccak,
+                                      mock_to_hex,
+                                      mock_send,
+                                      mock_sign,
+                                      mock_checksum,
+                                      _,
+                                      caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
@@ -738,13 +738,13 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
         p = Payment(
-        "random_account",
-        "manager",
-        "ronin:from_ronin",
-        "ronin:from_private_ronin",
-        "ronin:to_ronin",
-        10,
-        s)
+            "random_account",
+            "manager",
+            "ronin:from_ronin",
+            "ronin:from_private_ronin",
+            "ronin:to_ronin",
+            10,
+            s)
         p.execute()
     mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -754,8 +754,8 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
     mock_sign.assert_called_once()
     assert mock_sign.call_args[1]['private_key'] == "ronin:from_private_ronin"
     mock_checksum.assert_has_calls(calls=[
-         call(SLP_CONTRACT),
-        call('0xfrom_ronin'),       
+        call(SLP_CONTRACT),
+        call('0xfrom_ronin'),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
@@ -789,7 +789,7 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
                                             _,
                                             caplog):
     # Make sure file is clean to start
-    log_file= glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
+    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
     cleanup_log_file(log_file)
     PaymentsSummary().clear()
     s = PaymentsSummary()
@@ -797,13 +797,13 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
                       "open",
                       mock_open(read_data='{"foo": "bar"}')) as mock_file:
         p = Payment(
-        "random_account",
-        "manager",
-        "ronin:from_ronin",
-        "ronin:from_private_ronin",
-        "ronin:to_ronin",
-        10,
-        s)
+            "random_account",
+            "manager",
+            "ronin:from_ronin",
+            "ronin:from_private_ronin",
+            "ronin:to_ronin",
+            10,
+            s)
         p.execute()
     mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
     mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
@@ -813,8 +813,8 @@ def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
     mock_sign.assert_called_once()
     assert mock_sign.call_args[1]['private_key'] == "ronin:from_private_ronin"
     mock_checksum.assert_has_calls(calls=[
-         call(SLP_CONTRACT),
-        call('0xfrom_ronin'),       
+        call(SLP_CONTRACT),
+        call('0xfrom_ronin'),
         call('0xto_ronin')])
     mock_transaction_receipt.assert_called_with("transaction_hash")
     mock_replacement_tx.assert_called_with(123)

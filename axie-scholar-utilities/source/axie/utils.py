@@ -65,7 +65,7 @@ def check_balance(account, token='slp'):
     w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
     ctr = w3.eth.contract(
         address=Web3.toChecksumAddress(contract),
         abi=BALANCE_ABI
@@ -147,7 +147,8 @@ class AxieGraphQL:
         except RetryError as e:
             logging.critical(f"Error! Creating random msg! Error: {e}")
             return None
-        if 200 <= response.status_code <= 299:
+        if (200 <= response.status_code <= 299 and response.json().get('data') and
+           response.json()['data'].get('createRandomMessage')):
             return response.json()['data']['createRandomMessage']
         return None
 

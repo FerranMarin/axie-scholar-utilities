@@ -37,7 +37,7 @@ class Breed:
         self.w3 = Web3(
             Web3.HTTPProvider(
                 RONIN_PROVIDER_FREE,
-                request_kwargs={"headers":{"content-type":"application/json","user-agent": USER_AGENT}}))
+                request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}))
         self.sire_axie = sire_axie
         self.matron_axie = matron_axie
         self.address = address.replace("ronin:", "0x")
@@ -104,7 +104,6 @@ class Breed:
 
 
 class AxieBreedManager:
-
     def __init__(self, breeding_file, secrets_file, payment_account):
         self.secrets = load_json(secrets_file)
         self.breeding_file = load_json(breeding_file)

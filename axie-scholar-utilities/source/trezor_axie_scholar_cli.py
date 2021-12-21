@@ -141,6 +141,7 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
 
     log.info('New payments file saved')
 
+
 def check_file(file):
     if not os.path.isfile(file):
         logging.critical('Please provide a correct path to the file. '
@@ -151,7 +152,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v1.13.0')
+    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v1.14.0')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
