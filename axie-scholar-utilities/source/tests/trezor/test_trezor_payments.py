@@ -306,9 +306,10 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
     assert str(s) == "Paid 1 managers, 10 SLP.\n"
     with open(log_file) as f:
         lf = f.readlines()
-        assert len(lf) == 1
+        assert len(lf) == 2
+    assert "Important: Debugging information" in lf[0]
     assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! "
-            "Hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash") in lf[0]
+            "Hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash") in lf[1]
     cleanup_log_file(log_file)
 
 
@@ -371,8 +372,9 @@ def test_execute_calls_web3_functions_retry(mock_replacement_tx,
             "Trying to replace it with a 0 value tx and re-try." in caplog.text)
     with open(log_file) as f:
         lf = f.readlines()
-        assert len(lf) == 1
+        assert len(lf) == 2
+    assert "Important: Debugging information" in lf[0]
     assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP failed. "
-            "Trying to replace it with a 0 value tx and re-try.") in lf[0]
+            "Trying to replace it with a 0 value tx and re-try.") in lf[1]
     assert str(s) == "No payments made!"
     cleanup_log_file(log_file)
