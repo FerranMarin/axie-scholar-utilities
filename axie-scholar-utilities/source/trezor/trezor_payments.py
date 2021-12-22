@@ -90,6 +90,7 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
+        logging.info(f'Important: Debugging information {sig}')
         if sig[1][:4] == b'0x00':
             sig[1] = b'0x' + sig[1][4:]
         if sig[2][:4] == b'0x00':
@@ -152,7 +153,7 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
-        logging.info(sig)
+        logging.info(f'Important: Debugging information {sig}')
         if sig[1][:4] == b'0x00':
             sig[1] = b'0x' + sig[1][4:]
         if sig[2][:4] == b'0x00':
