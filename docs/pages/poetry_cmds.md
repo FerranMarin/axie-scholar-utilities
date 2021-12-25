@@ -1,4 +1,4 @@
-# How to Execute Comands when you use Poetry
+# How to Execute Comands when you use Poetry with Trezor
 
 When you have installed this tool using poetry. You will need to add a 2 files into source (for easy of use, they can be in another folder too). These files are:
 
