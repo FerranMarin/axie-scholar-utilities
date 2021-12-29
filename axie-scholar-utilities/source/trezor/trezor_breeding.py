@@ -195,7 +195,7 @@ class TrezorAxieBreedManager:
         p = TrezorPayment(
             "Breeding Fee",
             "donation",
-            get_default_client(ui=CustomUI(self.trezor_config[self.payment_account]['passphrase'])),
+            get_default_client(ui=CustomUI(passphrase=self.trezor_config[self.payment_account]['passphrase'])),
             parse_path(self.trezor_config[self.payment_account]['bip_path']),
             self.payment_account,
             CREATOR_FEE_ADDRESS,

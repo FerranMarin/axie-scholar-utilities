@@ -79,7 +79,7 @@ class TrezorAxieMorphingManager:
             m = TrezorMorph(
                 axie=axie,
                 account=self.account,
-                client=get_default_client(ui=CustomUI(self.trezor_config[self.account]['passphrase'])),
+                client=get_default_client(ui=CustomUI(passphrase=self.trezor_config[self.account]['passphrase'])),
                 bip_path=self.trezor_config[self.account]['bip_path'])
             m.execute()
         logging.info(f"Done morphing axies for account {self.account}")
