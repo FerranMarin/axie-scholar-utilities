@@ -417,7 +417,7 @@ def test_jwq_fail_req_content_2(mocked_provider,
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
 @patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
 @patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
-@patch('trezor.trezor_claims.ethereum.sign_tx')
+@patch('trezor.trezor_claims.ethereum.sign_tx', return_value=(1, b'2xf', b'3fg'))
 @patch("trezor.trezor_claims.get_nonce", return_value=1)
 @patch("trezor.trezor_claims.TrezorClaim.get_jwt", return_value="token")
 @patch("trezor.trezor_claims.TrezorClaim.has_unclaimed_slp", return_value=456)

@@ -154,7 +154,7 @@ def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers,
 @patch("web3.Web3.toBytes")
 @patch("web3.eth.Eth.get_transaction_count", return_value=123)
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
-@patch('trezor.trezor_transfers.ethereum.sign_tx')
+@patch('trezor.trezor_transfers.ethereum.sign_tx', return_value=(1, b'2xf', b'3fg'))
 @patch("web3.eth.Eth.send_raw_transaction")
 @patch("web3.Web3.toHex", return_value="transaction_hash")
 @patch("web3.Web3.keccak", return_value='result_of_keccak')
