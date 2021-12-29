@@ -91,8 +91,10 @@ class TrezorPayment:
             chain_id=2020
         )
         logging.info(f'Important: Debugging information {sig}')
-        sig[1] = sig[1].lstrip(b'\x00')
-        sig[2] = sig[2].lstrip(b'\x00')
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         replacement_tx = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(replacement_tx)
@@ -152,8 +154,10 @@ class TrezorPayment:
             chain_id=2020
         )
         logging.info(f'Important: Debugging information {sig}')
-        sig[1] = sig[1].lstrip(b'\x00')
-        sig[2] = sig[2].lstrip(b'\x00')
+        l_sig = list(sig)
+        l_sig[1] = l_sig[1].lstrip(b'\x00')
+        l_sig[2] = l_sig[2].lstrip(b'\x00')
+        sig = tuple(l_sig)
         transaction = rlp.encode((nonce, self.gwei, self.gas, to, 0, data) + sig)
         # Send raw transaction
         self.w3.eth.send_raw_transaction(transaction)
