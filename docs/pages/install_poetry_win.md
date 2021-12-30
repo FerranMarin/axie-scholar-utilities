@@ -4,7 +4,7 @@ To run my tool you will need Python3 (the language it is written in) to be insta
 
 ## Install Python and Poetry
 
-1. Go to the [Official Python Webiste](https://www.python.org/downloads/windows/) and download python3. I personally run Python 3.8.2 in my development machine, but this should work in any 3.8 or higher version. (Maybe any version from 3.6?? -- If you decide to go with those versions and have issues, please do report and I will try and fix them)
+1. Go to the [Official Python Website](https://www.python.org/downloads/windows/) and download python3. I personally run Python 3.8.2 in my development machine, but this should work in any 3.8 or higher version. (Maybe any version from 3.6?? -- If you decide to go with those versions and have issues, please do report and I will try and fix them)
 
 2. During installation, just follow the installer instructions but remmember to tick the box on the 1st window that says **"Add Python 3.9 to PATH"**. If you do no do that, you will need to remmember the full path of where you have Python installed everytime you want to execute it (which is annoying!). By just ticking that you will have a nicer way to call python just using its name "python".
 
