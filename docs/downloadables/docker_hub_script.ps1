@@ -24,7 +24,7 @@ function axie-utils-auto-payout {
 }
 # Alias to execute axie transfers
 function axie-utils-transfer-axies {
-    docker run -it -v $pwd\payments.json:/opt/app/files/transfers.json -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json
+    docker run -it -v $pwd\transfers.json:/opt/app/files/transfers.json -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities transfer_axies files/transfers.json files/secrets.json
 }
 #Alias to generate transfers file
 function axie-utils-gen-transfers {
