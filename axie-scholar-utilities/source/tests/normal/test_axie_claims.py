@@ -12,7 +12,7 @@ from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
 from axie.claims import Claim
-from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
+from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT, AXIE_CLAIM_COOLDOWN_SECONDS
 from tests.test_utils import async_cleanup_log_file, LOG_FILE_PATH
 
 
@@ -212,11 +212,12 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mocked_check):
-    last_claimed_date = datetime.now() - timedelta(days=15)
+    one_day = 60 * 60 * 24
+    last_claimed_timestamp = datetime.now().timestamp() - (AXIE_CLAIM_COOLDOWN_SECONDS + one_day)
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
                        json={"total": 12,
-                             "last_claimed_item_at": round(last_claimed_date.timestamp()),
+                             "last_claimed_item_at": last_claimed_timestamp,
                              "claimable_total": 0})
         with patch.object(builtins,
                           "open",
@@ -225,6 +226,32 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mo
             unclaimed = c.has_unclaimed_slp()
             assert unclaimed == 2
         mocked_check.assert_called_with("0xfoo")
+        mocked_provider.assert_called_with(
+            RONIN_PROVIDER_FREE,
+            request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
+        )
+        mocked_checksum.assert_called_with(SLP_CONTRACT)
+        mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
+
+
+@patch("axie.claims.check_balance", return_value=10)
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress", return_value="checksum")
+@patch("web3.Web3.HTTPProvider", return_value="provider")
+def test_has_unclaimed_failed_date(mocked_provider, mocked_checksum, mocked_contract, mocked_check):
+    one_day = 60 * 60 * 24
+    last_claimed_timestamp = datetime.now().timestamp() - (AXIE_CLAIM_COOLDOWN_SECONDS - one_day)
+    with requests_mock.Mocker() as req_mocker:
+        req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
+                       json={"total": 12,
+                             "last_claimed_item_at": last_claimed_timestamp,
+                             "claimable_total": 0})
+        with patch.object(builtins,
+                          "open",
+                          mock_open(read_data='{"foo": "bar"}')):
+            c = Claim(account="ronin:foo", private_key="0xbar", acc_name="test_acc")
+            unclaimed = c.has_unclaimed_slp()
+            assert unclaimed is None
         mocked_provider.assert_called_with(
             RONIN_PROVIDER_FREE,
             request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}

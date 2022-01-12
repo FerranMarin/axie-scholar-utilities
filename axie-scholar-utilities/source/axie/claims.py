@@ -2,7 +2,7 @@ import sys
 import asyncio
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 from requests.exceptions import RetryError
@@ -16,6 +16,7 @@ from axie.utils import (
     ImportantLogsFilter,
     SLP_CONTRACT,
     RONIN_PROVIDER_FREE,
+    AXIE_CLAIM_COOLDOWN_SECONDS,
     AxieGraphQL
 )
 
@@ -55,7 +56,15 @@ class Claim(AxieGraphQL):
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
-            in_game_total = int(response.json()['total'])
+            data = response.json()
+            in_game_total = int(data['total'])
+            last_claimed = int(data['last_claimed_item_at'])
+            if now - last_claimed <= AXIE_CLAIM_COOLDOWN_SECONDS:
+                last_claimed_date = datetime.fromtimestamp(last_claimed)
+                human_readable_date = last_claimed_date.strftime("%m/%d/%Y, %H:%M")
+                logging.critical(f"You last claimed SLP on {human_readable_date}."
+                                 "You must wait at least 14 days between claims.")
+                return None
             wallet_total = check_balance(self.account)
             if in_game_total > wallet_total:
                 return in_game_total - wallet_total
