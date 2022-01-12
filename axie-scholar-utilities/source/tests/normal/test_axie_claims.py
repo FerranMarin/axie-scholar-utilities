@@ -2,7 +2,7 @@ import sys
 import json
 import builtins
 from glob import glob
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from mock import patch, mock_open, call
@@ -12,7 +12,7 @@ from eth_account.messages import encode_defunct
 
 from axie import AxieClaimsManager
 from axie.claims import Claim
-from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT, AXIE_CLAIM_COOLDOWN_SECONDS
+from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
 from tests.test_utils import async_cleanup_log_file, LOG_FILE_PATH
 
 
@@ -212,12 +212,11 @@ def test_claim_init(mocked_provider, mocked_checksum, mocked_contract):
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mocked_check):
-    one_day = 60 * 60 * 24
-    last_claimed_timestamp = datetime.now().timestamp() - (AXIE_CLAIM_COOLDOWN_SECONDS + one_day)
+    last_claimed_date = datetime.utcnow() - timedelta(days=15)
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
                        json={"total": 12,
-                             "last_claimed_item_at": last_claimed_timestamp,
+                             "last_claimed_item_at": last_claimed_date.timestamp(),
                              "claimable_total": 0})
         with patch.object(builtins,
                           "open",
@@ -239,12 +238,12 @@ def test_has_unclaimed_slp(mocked_provider, mocked_checksum, mocked_contract, mo
 @patch("web3.Web3.toChecksumAddress", return_value="checksum")
 @patch("web3.Web3.HTTPProvider", return_value="provider")
 def test_has_unclaimed_failed_date(mocked_provider, mocked_checksum, mocked_contract, mocked_check):
-    one_day = 60 * 60 * 24
-    last_claimed_timestamp = datetime.now().timestamp() - (AXIE_CLAIM_COOLDOWN_SECONDS - one_day)
+    utcnow = datetime.utcnow()
+    last_claimed_date = datetime.utcnow() - timedelta(days=14) + timedelta(minutes=1)
     with requests_mock.Mocker() as req_mocker:
         req_mocker.get("https://game-api.skymavis.com/game-api/clients/0xfoo/items/1",
                        json={"total": 12,
-                             "last_claimed_item_at": last_claimed_timestamp,
+                             "last_claimed_item_at": last_claimed_date.timestamp(),
                              "claimable_total": 0})
         with patch.object(builtins,
                           "open",
