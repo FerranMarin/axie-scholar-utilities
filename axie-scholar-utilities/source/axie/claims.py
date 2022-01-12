@@ -2,7 +2,7 @@ import sys
 import asyncio
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 from requests.exceptions import RetryError

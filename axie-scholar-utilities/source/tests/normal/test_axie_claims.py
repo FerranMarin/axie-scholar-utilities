@@ -2,7 +2,7 @@ import sys
 import json
 import builtins
 from glob import glob
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytest
 from mock import patch, mock_open, call
