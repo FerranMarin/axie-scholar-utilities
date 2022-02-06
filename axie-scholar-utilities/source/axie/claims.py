@@ -2,7 +2,7 @@ import sys
 import asyncio
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 
 from requests.exceptions import RetryError
@@ -46,6 +46,13 @@ class Claim(AxieGraphQL):
         self.acc_name = acc_name
         self.request = requests.Session()
 
+    def localize_date(self, date_utc):
+        return date_utc.replace(tzinfo=timezone.utc).astimezone(tz=None)
+
+    def humanize_date(self, date):
+        local_date = self.localize_date(date)
+        return local_date.strftime("%m/%d/%Y, %H:%M")
+
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
         try:
@@ -55,8 +62,15 @@ class Claim(AxieGraphQL):
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
-            in_game_total = int(response.json()['total'])
+            data = response.json()
+            last_claimed = datetime.utcfromtimestamp(data['last_claimed_item_at'])
+            next_claim_date = last_claimed + timedelta(days=14)
+            utcnow = datetime.utcnow()
+            if utcnow < next_claim_date:
+                logging.critical(f"This account will be claimable again on {self.humanize_date(next_claim_date)}.")
+                return None
             wallet_total = check_balance(self.account)
+            in_game_total = int(data['total'])
             if in_game_total > wallet_total:
                 return in_game_total - wallet_total
         return None
