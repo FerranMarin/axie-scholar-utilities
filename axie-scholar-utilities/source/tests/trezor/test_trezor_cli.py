@@ -13,6 +13,7 @@ import trezor_axie_scholar_cli as cli
                          [
                             (["payout", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -34,6 +35,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": True}),
                             (["payout", "file1", "file2", "-y"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": True,
                               "--safe-mode": False,
@@ -55,6 +57,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": True}),
                             (["payout", "file1", "file2", "--yes"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": True,
                               "--safe-mode": False,
@@ -76,6 +79,29 @@ import trezor_axie_scholar_cli as cli
                               "payout": True}),
                             (["claim", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
+                              "--version": False,
+                              "--yes": False,
+                              "--safe-mode": False,
+                              '<list_of_accounts>': None,
+                              'axie_morphing': False,
+                              "<payments_file>": "file1",
+                              "<config_file>": "file2",
+                              '<transfers_file>': None,
+                              'transfer_axies': False,
+                              '<csv_file>': None,
+                              '<breedings_file>': None,
+                              'axie_breeding': False,
+                              'generate_breedings': False,
+                              "claim": True,
+                              "generate_QR": False,
+                              'generate_transfer_axies': False,
+                              "config_trezor": False,
+                              'generate_payments': False,
+                              "payout": False}),
+                            (["claim", "file1", "file2", "--force"],
+                             {"--help": False,
+                              "--force": True,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -97,6 +123,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["config_trezor", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -118,6 +145,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["config_trezor", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -139,6 +167,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["transfer_axies", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -160,6 +189,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["transfer_axies", "file1", "file2", "--safe-mode"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": True,
@@ -181,6 +211,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["generate_payments", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -202,6 +233,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["generate_payments", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -223,6 +255,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["axie_morphing", "file1", "a,b,c"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -244,6 +277,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["axie_breeding", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -265,6 +299,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["generate_QR", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -286,6 +321,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["generate_breedings", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -307,6 +343,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["generate_breedings", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -328,6 +365,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["generate_transfer_axies", "file1", "file2"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -349,6 +387,7 @@ import trezor_axie_scholar_cli as cli
                               "payout": False}),
                             (["generate_transfer_axies", "file1"],
                              {"--help": False,
+                              "--force": False,
                               "--version": False,
                               "--yes": False,
                               "--safe-mode": False,
@@ -641,7 +680,23 @@ def test_claim(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, tmpd
         cli.run_cli()
     mock_verify_inputs.assert_called_with()
     mock_prepare_claims.assert_called_with()
-    mock_claimsmanager.assert_called_with(str(f1), str(f2))
+    mock_claimsmanager.assert_called_with(str(f1), str(f2), False)
+
+
+@patch("trezor.TrezorAxieClaimsManager.__init__", return_value=None)
+@patch("trezor.TrezorAxieClaimsManager.prepare_claims")
+@patch("trezor.TrezorAxieClaimsManager.verify_inputs")
+def test_claim(mock_verify_inputs, mock_prepare_claims, mock_claimsmanager, tmpdir):
+    f1 = tmpdir.join("file1.json")
+    f1.write('{"ronin:<account_s1_address>": "hello"}')
+    f2 = tmpdir.join("file2.json")
+    config_data = {"ronin:<account_s1_address>": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/48"}}
+    f2.write(json.dumps(config_data))
+    with patch.object(sys, 'argv', ["", "claim", str(f1), str(f2), '--force']):
+        cli.run_cli()
+    mock_verify_inputs.assert_called_with()
+    mock_prepare_claims.assert_called_with()
+    mock_claimsmanager.assert_called_with(str(f1), str(f2), True)
 
 
 def test_claim_file_check_fail(caplog):

@@ -5,7 +5,7 @@ axie_breeding, generate_breedings
 
 Usage:
     trezor_axie_scholar_cli.py payout <payments_file> <config_file> [-y]
-    trezor_axie_scholar_cli.py claim <payments_file> <config_file>
+    trezor_axie_scholar_cli.py claim <payments_file> <config_file> [--force]
     trezor_axie_scholar_cli.py config_trezor <payments_file> [<config_file>]
     trezor_axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
     trezor_axie_scholar_cli.py generate_QR <payments_file> <config_file>
@@ -20,6 +20,7 @@ Usage:
 Options:
     -h --help   Shows this extra help options
     -y --yes    Automatically say "yes" to all confirmation promts (they will not appear).
+    --force     Forces claim even if last claim was less than 14 days ago. (Used to bypass possible issues)
     --version   Show version.
 """
 import os
@@ -169,10 +170,11 @@ def run_cli():
     elif args['claim']:
         payments_file_path = args['<payments_file>']
         config_file_path = args['<config_file>']
+        force = args['--force']
         if check_file(payments_file_path) and check_file(config_file_path):
             # Claim SLP
             logging.info('I shall claim SLP')
-            acm = TrezorAxieClaimsManager(payments_file_path, config_file_path)
+            acm = TrezorAxieClaimsManager(payments_file_path, config_file_path, force)
             acm.verify_inputs()
             acm.prepare_claims()
         else:

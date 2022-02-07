@@ -3,7 +3,7 @@ import asyncio
 import json
 import rlp
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from requests.exceptions import RetryError
 from web3 import Web3, exceptions
@@ -34,7 +34,7 @@ logger.addHandler(file_handler)
 
 
 class TrezorClaim(TrezorAxieGraphQL):
-    def __init__(self, acc_name, **kwargs):
+    def __init__(self, acc_name, force, **kwargs):
         super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(
@@ -50,6 +50,14 @@ class TrezorClaim(TrezorAxieGraphQL):
         self.request = requests.Session()
         self.gwei = self.w3.toWei('0', 'gwei')
         self.gas = 492874
+        self.force = force
+
+    def localize_date(self, date_utc):
+        return date_utc.replace(tzinfo=timezone.utc).astimezone(tz=None)
+
+    def humanize_date(self, date):
+        local_date = self.localize_date(date)
+        return local_date.strftime("%m/%d/%Y, %H:%M")
 
     def has_unclaimed_slp(self):
         url = f"https://game-api.skymavis.com/game-api/clients/{self.account}/items/1"
@@ -60,8 +68,17 @@ class TrezorClaim(TrezorAxieGraphQL):
                              f"({self.account.replace('0x','ronin:')})")
             return None
         if 200 <= response.status_code <= 299:
-            in_game_total = int(response.json()['total'])
+            data = response.json()
+            last_claimed = datetime.utcfromtimestamp(data['last_claimed_item_at'])
+            next_claim_date = last_claimed + timedelta(days=14)
+            utcnow = datetime.utcnow()
+            if utcnow < next_claim_date and not self.force:
+                logging.critical(f"This account will be claimable again on {self.humanize_date(next_claim_date)}.")
+                return None
+            elif self.force:
+                logging.info('Skipping check of dates, --force option was selected')
             wallet_total = check_balance(self.account)
+            in_game_total = int(data['total'])
             if in_game_total > wallet_total:
                 return in_game_total - wallet_total
         return None
@@ -155,8 +172,9 @@ class TrezorClaim(TrezorAxieGraphQL):
 
 
 class TrezorAxieClaimsManager:
-    def __init__(self, payments_file, trezor_config):
+    def __init__(self, payments_file, trezor_config, force=False):
         self.trezor_config, self.acc_names = self.load_trezor_config_and_acc_name(trezor_config, payments_file)
+        self.force = force
 
     def load_trezor_config_and_acc_name(self, trezor_config, payments_file):
         config = load_json(trezor_config)
@@ -186,6 +204,7 @@ class TrezorAxieClaimsManager:
         claims_list = [
             TrezorClaim(
                 account=acc,
+                force=self.force,
                 client=get_default_client(ui=CustomUI(passphrase=self.trezor_config[acc]['passphrase'])),
                 bip_path=self.trezor_config[acc]['bip_path'],
                 acc_name=self.acc_names[acc]) for acc in self.trezor_config]

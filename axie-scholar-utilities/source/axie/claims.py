@@ -31,7 +31,7 @@ logger.addHandler(file_handler)
 
 
 class Claim(AxieGraphQL):
-    def __init__(self, acc_name, **kwargs):
+    def __init__(self, acc_name, force, **kwargs):
         super().__init__(**kwargs)
         self.w3 = Web3(
             Web3.HTTPProvider(
@@ -44,6 +44,7 @@ class Claim(AxieGraphQL):
             abi=slp_abi
         )
         self.acc_name = acc_name
+        self.force = force
         self.request = requests.Session()
 
     def localize_date(self, date_utc):
@@ -66,9 +67,11 @@ class Claim(AxieGraphQL):
             last_claimed = datetime.utcfromtimestamp(data['last_claimed_item_at'])
             next_claim_date = last_claimed + timedelta(days=14)
             utcnow = datetime.utcnow()
-            if utcnow < next_claim_date:
+            if utcnow < next_claim_date and not self.force:
                 logging.critical(f"This account will be claimable again on {self.humanize_date(next_claim_date)}.")
                 return None
+            elif self.force:
+                logging.info('Skipping check of dates, --force option was selected')
             wallet_total = check_balance(self.account)
             in_game_total = int(data['total'])
             if in_game_total > wallet_total:
@@ -149,8 +152,9 @@ class Claim(AxieGraphQL):
 
 
 class AxieClaimsManager:
-    def __init__(self, payments_file, secrets_file):
+    def __init__(self, payments_file, secrets_file, force=False):
         self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(secrets_file, payments_file)
+        self.force = force
 
     def load_secrets_and_acc_name(self, secrets_file, payments_file):
         secrets = load_json(secrets_file)
@@ -184,6 +188,7 @@ class AxieClaimsManager:
     def prepare_claims(self):
         claims_list = [
             Claim(
+                force=self.force,
                 account=acc,
                 private_key=self.secrets_file[acc],
                 acc_name=self.acc_names[acc]) for acc in self.secrets_file]

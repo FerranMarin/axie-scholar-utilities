@@ -5,7 +5,7 @@ transfer_axies, axie_morphing, axie_breeding, generate_breedings
 
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
-    axie_scholar_cli.py claim <payments_file> <secrets_file>
+    axie_scholar_cli.py claim <payments_file> <secrets_file> [--force]
     axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
     axie_scholar_cli.py mass_update_secrets <csv_file> <secrets_file>
     axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
@@ -21,6 +21,7 @@ Usage:
 Options:
     -h --help   Shows this extra help options
     -y --yes    Automatically say "yes" to all confirmation promts (they will not appear).
+    --force     Forces claim even if last claim was less than 14 days ago. (Used to bypass possible issues)
     --version   Show version.
 """
 import os
@@ -211,10 +212,11 @@ def run_cli():
     elif args['claim']:
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
+        force = args['--force']
         if check_file(payments_file_path) and check_file(secrets_file_path):
             # Claim SLP
             logging.info('I shall claim SLP')
-            acm = AxieClaimsManager(payments_file_path, secrets_file_path)
+            acm = AxieClaimsManager(payments_file_path, secrets_file_path, force)
             acm.verify_inputs()
             acm.prepare_claims()
         else:
