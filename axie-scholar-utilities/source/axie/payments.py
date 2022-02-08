@@ -354,7 +354,7 @@ class AxiePaymentsManager:
             total_payments = 0
             acc_payments = []
             # Scholar Payment
-            scholar_amount = acc_balance * (acc["ScholarPercent"]/100)
+            scholar_amount = (acc_balance * (acc["ScholarPercent"]/100)) + acc.get("ScholarAdjustment", 0)
             scholar_amount += acc.get("ScholarPayout", 0)
             scholar_amount = round(scholar_amount)
             acc_payments.append(Payment(

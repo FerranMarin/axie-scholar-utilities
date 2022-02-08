@@ -40,6 +40,9 @@ payments_schema = {
                         "type": "number",
                         "minimum": 1
                     },
+                    "ScholarAdjustment": {
+                        "type": "number",
+                    },
                     "TrainerPayoutAddress": {
                         "type": "string",
                         "pattern": "^ronin:"
@@ -127,6 +130,9 @@ payments_percent_schema = {
                     "ScholarPayout": {
                         "type": "number",
                         "minimum": 1
+                    },
+                    "ScholarAdjustment": {
+                        "type": "number",
                     },
                     "ScholarPercent": {
                         "type": "number",

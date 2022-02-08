@@ -433,6 +433,7 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                     "AccountAddress": "ronin:<account_s1_address>",
                     "ScholarPayoutAddress": "ronin:<scholar_address>",
                     "ScholarPercent": 50,
+                    "ScholarAdjustment": -100
                     "TrainerPayoutAddress": "ronin:<trainer_address>",
                     "TrainerPercent": 10
                 },
@@ -441,6 +442,7 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
                     "AccountAddress": "ronin:<account_s2_address>",
                     "ScholarPayoutAddress": "ronin:<scholar2_address>",
                     "ScholarPercent": 55,
+                    "ScholarAdjustment": +100
                     "TrainerPayoutAddress": "ronin:<trainer_address>",
                     "TrainerPercent": 14,
                     "TrainerPayout": 100
