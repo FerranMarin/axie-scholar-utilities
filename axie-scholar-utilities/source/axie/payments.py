@@ -173,13 +173,69 @@ class AxiePaymentsManager:
         self.auto = auto
         self.summary = PaymentsSummary()
 
+    def legacy_verify(self):
+        validation_success = True
+        # check manager ronin
+        if len(self.payments_file["Manager"].replace("ronin:", "0x")) != 42:
+            logging.critical(f"Check your manager ronin {self.payments_file['Manager']}, it has an incorrect format")
+            validation_success = False
+        # check donations do not exceed 100%
+        if self.payments_file.get("Donations"):
+            total = sum([x["Percent"] for x in self.payments_file["Donations"]])
+            if total > 99:
+                logging.critical("Payments file donations exeeds 100%, please review it")
+                validation_success = False
+            if any(len(dono['ronin'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["donations"]): # noqa
+                logging.critical("Please review the ronins in your donations. One or more are wrong!")
+                validation_success = False
+            self.donations = self.payments_file["Donations"]
+
+        # Check we have private keys for all accounts
+        for acc in self.payments_file["Scholars"]:
+            if acc["AccountAddress"] not in self.secrets_file:
+                logging.critical(f"Account '{acc['Name']}' is not present in secret file, please add it.")
+                validation_success = False       
+        if not validation_success:
+            logging.critical("Please make sure your payments.json file looks like the legacy one in the wiki or the sample files.\n"
+                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
+                             "Make sure you have configured all secrets too!")
+            sys.exit()
+        return
+    
+    def verify(self):
+        validation_success = True
+        # check donations do not exceed 100%
+        if self.payments_file.get("donations"):
+            total = sum([x["percentage"] for x in self.payments_file["donations"]])
+            if total > 99:
+                logging.critical("Payments file donations exeeds 100% adding the 1% fee, please review it")
+                validation_success = False
+            if any(len(dono['ronin'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["donations"]): # noqa
+                logging.critical("Please review the ronins in your donations. One or more are wrong!")
+                validation_success = False
+            self.donations = self.payments_file["donations"]
+
+        # Check we have private keys for all accounts
+        for acc in self.payments_file["scholars"]:
+            if acc["ronin"] not in self.secrets_file:
+                logging.critical(f"Account '{acc['name']}' is not present in secret file, please add it.")
+                validation_success = False
+
+        if not validation_success:
+            logging.critical("Please make sure your payments.json file looks like the payments one in the wiki or the sample files.\n"
+                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
+                             "Make sure you have configured all secrets too!")
+            sys.exit()
+
+        return
+
     def verify_inputs(self):
-        # TODO: SPLIT!
         logging.info("Validating file inputs...")
         validation_success = True
         # Validate payments file
         legacy_msg = None
         new_msg = None
+
         try:
             validate(self.payments_file, payments_schema)
             self.type = "new"
@@ -188,6 +244,7 @@ class AxiePaymentsManager:
                           f"Error given: {ex.message}\n"
                           f"For attribute in: {list(ex.path)}\n")
             validation_success = False
+
         if not self.type:
             try:
                 validate(self.payments_file, legacy_payments_schema)
@@ -198,6 +255,7 @@ class AxiePaymentsManager:
                                f"Error given: {ex.message}\n"
                                f"For attribute in: {list(ex.path)}\n")
                 validation_success = False
+        
         if not validation_success:
             msg = "Payments file failed validation. Please review it.\n"
             if new_msg:
@@ -205,48 +263,24 @@ class AxiePaymentsManager:
             if legacy_msg:
                 msg += legacy_msg
             logging.critical(msg)
-        if len(self.payments_file["Manager"].replace("ronin:", "0x")) != 42:
-            logging.critical(f"Check your manager ronin {self.payments_file['Manager']}, it has an incorrect format")
-            validation_success = False
-        # check donations do not exceed 100%
-        if self.payments_file.get("Donations") or self.payments_file.get("donations"):
-            if self.type == "legacy":
-                total = sum([x["Percent"] for x in self.payments_file["Donations"]])
-            elif self.type == "new":
-                total = sum([x["percentage"] for x in self.payments_file["donations"]])
-            if total > 99:
-                logging.critical("Payments file donations exeeds 100%, please review it")
-                validation_success = False
-            if self.type == "legacy":
-                if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]): # noqa
-                    logging.critical("Please review the ronins in your donations. One or more are wrong!")
-                    validation_success = False
-            elif self.type == "new":
-                if any(len(dono['ronin'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["donations"]): # noqa
-                    logging.critical("Please review the ronins in your donations. One or more are wrong!")
-                    validation_success = False
-            self.donations = self.payments_file["Donations"]
+        
+        if self.type == 'legacy':
+            self.legacy_verify()
+        elif self.type == 'new':
+            self.verify()
+        else:
+            raise 'Something went very wrong, this should never happen!'
 
-        # Check we have private keys for all accounts
-        for acc in self.payments_file["Scholars"]:
-            if self.type == "legacy":
-                if acc["AccountAddress"] not in self.secrets_file:
-                    logging.critical(f"Account '{acc['Name']}' is not present in secret file, please add it.")
-                    validation_success = False
-            elif self.type == "new":
-                if acc["ronin"] not in self.secrets_file:
-                    logging.critical(f"Account '{acc['name']}' is not present in secret file, please add it.")
-                    validation_success = False
         for sf in self.secrets_file:
             if len(self.secrets_file[sf]) != 66 or self.secrets_file[sf][:2] != "0x":
                 logging.critical(f"Private key for account {sf} is not valid, please review it!")
                 validation_success = False
+        
         if not validation_success:
-            logging.critical("Please make sure your payments.json file looks like the one in the README.md\n"
-                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/")
-            logging.critical("If your problem is with secrets.json, "
-                             "delete it and re-generate the file starting with an empty secrets file.")
+            logging.critical("There is a problem with your secrets.json, delete it and re-generate the file starting with an empty secrets file."
+                             "Or open it and see what is wrong with the keys of the accounts reported above.")
             sys.exit()
+        
         if self.type == "legacy":
             self.manager_acc = self.payments_file["Manager"]
             self.scholar_accounts = self.payments_file["Scholars"]
@@ -267,15 +301,79 @@ class AxiePaymentsManager:
 
     def prepare_payout(self):
         if self.type == "new":
-            self.prepare_new_payout()
+            self.prepare_payout()
         elif self.type == "old":
             self.prepare_old_payout()
         else:
             logging.critical(f"Unexpected error! Unrecognized payments mode {self.type}")
 
-    def prepare_new_payout(self):
-        # TODO
-        pass
+    def prepare_payout(self):
+        for acc in self.scholar_accounts:
+            acc_balance = check_balance(acc['ronin'])
+            total_payments = 0
+            acc_payments = []
+            deductable_fees = 1
+            for dono in self.donations:
+                deductable_fees += dono['percentage']
+            # Split payments
+            for sacc in acc['splits']:
+                if sacc['persona'].lower() == 'manager':
+                    amount = acc_balance * ((sacc['percentage'] - deductable_fees)/100)
+                else:
+                    amount = acc_balance * (sacc['percentage']/100)
+                if amount < 1:
+                    logging.info(f'Important: Skipping payment to {sacc["persona"]} as it would be less than 1SLP')
+                    continue
+                total_payments += amount
+                # define type
+                if sacc['persona'].lower() == 'manager':
+                    t = 'manager'
+                elif sacc['persona'].lower() == 'scholar':
+                    t = 'scholar'
+                elif sacc['persona'].lower() in ['trainer', 'investor', 'trainer/investor', 'investor/trainer']:
+                    t = 'trainer'
+                else:
+                    t = 'other'
+                acc_payments.append(Payment(
+                    f"Payment to {sacc['persona']}",
+                    t,
+                    acc['ronin'],
+                    self.secrets_file[acc['ronin']],
+                    amount,
+                    self.summary
+                ))
+            # Dono Payments
+            if self.donations:
+                for dono in self.donations:
+                    dono_amount = round(acc_balance * (dono["percentage"]/100))
+                    if dono_amount > 0:
+                        acc_payments.append(Payment(
+                                f"Donation to {dono['name']} for {acc['name']}",
+                                "donation",
+                                acc["ronin"],
+                                self.secrets_file[acc["ronin"]],
+                                dono["ronin"],
+                                dono_amount,
+                                self.summary
+                            ))
+            # Fee Payments
+            fee_amount = round(acc_balance * 0.01)
+            if fee_amount > 0:
+                acc_payments.append(Payment(
+                            f"Donation to software creator for {acc['name']}",
+                            "donation",
+                            acc["ronin"],
+                            self.secrets_file[acc["ronin"]],
+                            CREATOR_FEE_ADDRESS,
+                            fee_amount,
+                            self.summary
+                        ))
+            if self.check_acc_has_enough_balance(acc['ronin'], total_payments) and acc_balance > 0:
+                self.payout_account(acc['name'], acc_payments)
+            else:
+                logging.info(f"Important: Skipping payments for account '{acc['name']}'. "
+                             "Insufficient funds!")
+        logging.info(f"Important: Transactions Summary:\n {self.summary}")
 
     def prepare_old_payout(self):
         for acc in self.scholar_accounts:
@@ -384,6 +482,7 @@ class PaymentsSummary(Singleton):
         self.manager = {"accounts": [], "slp": 0}
         self.trainer = {"accounts": [], "slp": 0}
         self.scholar = {"accounts": [], "slp": 0}
+        self.other = {"accounts": [], "slp": 0}
         self.donations = {"accounts": [], "slp": 0}
 
     def increase_payout(self, amount, address, payout_type):
@@ -395,6 +494,8 @@ class PaymentsSummary(Singleton):
             self.increase_donations_payout(amount, address)
         elif payout_type == "trainer":
             self.increase_trainer_payout(amount, address)
+        elif payout_type == "other":
+            self.increase_other_payout(amount, address)
 
     def increase_manager_payout(self, amount, address):
         self.manager["slp"] += amount
@@ -415,6 +516,11 @@ class PaymentsSummary(Singleton):
         self.donations["slp"] += amount
         if address not in self.donations["accounts"]:
             self.donations["accounts"].append(address)
+    
+    def increase_other_payout(self, amount, address):
+        self.other["slp"] += amount
+        if address not in self.other["accounts"]:
+            self.other["accounts"].append(address)
 
     def __str__(self):
         msg = "No payments made!"
@@ -427,6 +533,8 @@ class PaymentsSummary(Singleton):
             msg = f'Paid {len(self.scholar["accounts"])} scholars, {self.scholar["slp"]} SLP.\n'
         if self.trainer["slp"] > 0:
             msg += f'Paid {len(self.trainer["accounts"])} trainers, {self.trainer["slp"]} SLP.\n'
+        if self.other["slp"] > 0:
+            msg += f'Paid {len(self.other["accounts"])} other accounts, {self.other["slp"]} SLP.\n'
         if self.donations["slp"] > 0:
             msg += f'Donated to {len(self.donations["accounts"])} organisations, {self.donations["slp"]} SLP.\n'
         return msg
