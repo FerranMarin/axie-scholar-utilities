@@ -255,8 +255,91 @@ class TrezorAxiePaymentsManager:
             logging.info(f'These payments will leave {account_balance - balance} SLP in your wallet.'
                          'Cancel payments and adjust payments if you want to leave 0 SLP in it.')
         return True
-
+    
     def prepare_payout(self):
+        if self.type == "new":
+            self.prepare_new_payout()
+        elif self.type == "old":
+            self.prepare_old_payout()
+        else:
+            logging.critical(f"Unexpected error! Unrecognized payments mode {self.type}")
+
+    def prepare_new_payout(self):
+        for acc in self.scholar_accounts:
+            client = get_default_client(
+                ui=CustomUI(passphrase=self.trezor_config[acc['ronin'].lower()]['passphrase']))
+            bip_path = parse_path(self.trezor_config[acc['ronin'].lower()]['bip_path'])
+            acc_balance = check_balance(acc['ronin'])
+            total_payments = 0
+            acc_payments = []
+            deductable_fees = 1
+            for dono in self.donations:
+                deductable_fees += dono['percentage']
+            # Split payments
+            for sacc in acc['splits']:
+                if sacc['persona'].lower() == 'manager':
+                    amount = acc_balance * ((sacc['percentage'] - deductable_fees)/100)
+                else:
+                    amount = acc_balance * (sacc['percentage']/100)
+                if amount < 1:
+                    logging.info(f'Important: Skipping payment to {sacc["persona"]} as it would be less than 1SLP')
+                    continue
+                total_payments += amount
+                # define type
+                if sacc['persona'].lower() == 'manager':
+                    t = 'manager'
+                elif sacc['persona'].lower() == 'scholar':
+                    t = 'scholar'
+                elif sacc['persona'].lower() in ['trainer', 'investor', 'trainer/investor', 'investor/trainer']:
+                    t = 'trainer'
+                else:
+                    t = 'other'
+                acc_payments.append(TrezorPayment(
+                    f"Payment to {sacc['persona']} of {acc['name']}",
+                    t,
+                    client,
+                    bip_path,
+                    acc['ronin'].lower(),
+                    sacc['ronin'].lower(),
+                    amount,
+                    self.summary
+                ))
+            # Dono Payments
+            if self.donations:
+                for dono in self.donations:
+                    dono_amount = round(acc_balance * (dono["percentage"]/100))
+                    if dono_amount > 0:
+                        acc_payments.append(TrezorPayment(
+                                f"Donation to {dono['name']} for {acc['name']}",
+                                "donation",
+                                client,
+                                bip_path,
+                                acc["ronin"],
+                                dono["ronin"],
+                                dono_amount,
+                                self.summary
+                            ))
+            # Fee Payments
+            fee_amount = round(acc_balance * 0.01)
+            if fee_amount > 0:
+                acc_payments.append(TrezorPayment(
+                            f"Donation to software creator for {acc['name']}",
+                            "donation",
+                            client,
+                            bip_path,
+                            acc["ronin"],
+                            CREATOR_FEE_ADDRESS,
+                            fee_amount,
+                            self.summary
+                        ))
+            if self.check_acc_has_enough_balance(acc['ronin'], total_payments) and acc_balance > 0:
+                self.payout_account(acc['name'], acc_payments)
+            else:
+                logging.info(f"Important: Skipping payments for account '{acc['name']}'. "
+                             "Insufficient funds!")
+        logging.info(f"Important: Transactions Summary:\n {self.summary}")
+
+    def prepare_old_payout(self):
         for acc in self.scholar_accounts:
             client = get_default_client(
                 ui=CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase']))

@@ -301,13 +301,13 @@ class AxiePaymentsManager:
 
     def prepare_payout(self):
         if self.type == "new":
-            self.prepare_payout()
+            self.prepare_new_payout()
         elif self.type == "old":
             self.prepare_old_payout()
         else:
             logging.critical(f"Unexpected error! Unrecognized payments mode {self.type}")
 
-    def prepare_payout(self):
+    def prepare_new_payout(self):
         for acc in self.scholar_accounts:
             acc_balance = check_balance(acc['ronin'])
             total_payments = 0
@@ -335,10 +335,11 @@ class AxiePaymentsManager:
                 else:
                     t = 'other'
                 acc_payments.append(Payment(
-                    f"Payment to {sacc['persona']}",
+                    f"Payment to {sacc['persona']} of {acc['name']}",
                     t,
                     acc['ronin'],
                     self.secrets_file[acc['ronin']],
+                    sacc['ronin'],
                     amount,
                     self.summary
                 ))
