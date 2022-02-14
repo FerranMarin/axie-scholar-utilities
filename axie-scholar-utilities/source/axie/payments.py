@@ -164,8 +164,8 @@ class Payment:
 
 class AxiePaymentsManager:
     def __init__(self, payments_file, secrets_file, auto=False):
-        self.payments_file = load_json(payments_file)
-        self.secrets_file = load_json(secrets_file)
+        self.payments_file = payments_file
+        self.secrets_file = secrets_file
         self.manager_acc = None
         self.scholar_accounts = None
         self.donations = None
