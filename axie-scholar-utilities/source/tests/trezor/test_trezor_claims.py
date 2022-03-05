@@ -594,9 +594,8 @@ async def test_claim_execution(mocked_provider,
     assert "SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in caplog.text
     with open(log_file) as f:
         lf = f.readlines()
-        assert len(lf) == 2
-    assert "Important: Debugging information" in lf[0]
-    assert "Important: SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in lf[1]
+        assert len(lf) == 1
+    assert "Important: SLP Claimed! New balance for account test_acc (ronin:foo) is: 123" in lf[0]
     await async_cleanup_log_file(log_file)
 
 

@@ -13,7 +13,7 @@ from trezorlib import ethereum
 from web3 import Web3, exceptions
 
 from axie.payments import PaymentsSummary
-from axie.schemas import payments_percent_schema
+from axie.schemas import payments_schema
 from axie.utils import (
     check_balance,
     get_nonce,
@@ -90,7 +90,6 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
-        logging.info(f'Important: Debugging information {sig}')
         l_sig = list(sig)
         l_sig[1] = l_sig[1].lstrip(b'\x00')
         l_sig[2] = l_sig[2].lstrip(b'\x00')
@@ -153,7 +152,6 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
-        logging.info(f'Important: Debugging information {sig}')
         l_sig = list(sig)
         l_sig[1] = l_sig[1].lstrip(b'\x00')
         l_sig[2] = l_sig[2].lstrip(b'\x00')
@@ -212,7 +210,7 @@ class TrezorAxiePaymentsManager:
         validation_success = True
         # Validate payments file
         try:
-            validate(self.payments_file, payments_percent_schema)
+            validate(self.payments_file, payments_schema)
         except ValidationError as ex:
             logging.critical("If you were tyring to pay using percents:\n"
                              f"Error given: {ex.message}\n"

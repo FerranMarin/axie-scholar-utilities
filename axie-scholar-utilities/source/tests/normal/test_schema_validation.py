@@ -2,7 +2,7 @@ import pytest
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from axie.schemas import payments_schema, payments_percent_schema, transfers_schema, breeding_schema
+from axie.schemas import payments_schema, payments_schema, transfers_schema, breeding_schema
 
 
 @pytest.mark.parametrize("json_input, expected_error", [
@@ -363,9 +363,9 @@ def test_json_validator_pass_transfers_schema_optional_params(json_input):
             "ManagerPayout": 10}]},
             "'ManagerPayout' was unexpected"),
 ])
-def test_json_validator_payments_percent_schema_error(json_input, expected_error):
+def test_json_validator_payments_schema_error(json_input, expected_error):
     with pytest.raises(ValidationError) as e:
-        validate(json_input, payments_percent_schema)
+        validate(json_input, payments_schema)
     assert expected_error in str(e.value)
 
 
@@ -487,8 +487,8 @@ def test_json_validator_payments_percent_schema_error(json_input, expected_error
     ({"Manager": "ronin:abc", "Scholars": []}),
     ({"Manager": "ronin:abc", "Scholars": [], "Donations": []}),
 ])
-def test_json_validator_pass_payments_percent_schema_optional_params(json_input):
-    validate(json_input, payments_percent_schema)
+def test_json_validator_pass_payments_schema_optional_params(json_input):
+    validate(json_input, payments_schema)
 
 
 @pytest.mark.parametrize("json_input, expected_error", [
