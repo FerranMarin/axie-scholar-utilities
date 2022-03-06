@@ -12,7 +12,6 @@ from axie.schemas import payments_schema, legacy_payments_schema
 from axie.utils import (
     check_balance,
     get_nonce,
-    load_json,
     Singleton,
     ImportantLogsFilter,
     SLP_CONTRACT,
@@ -269,7 +268,7 @@ class AxiePaymentsManager:
         elif self.type == 'new':
             self.verify()
         else:
-            raise 'Something went very wrong, this should never happen!'
+            raise Exception('Something went very wrong, this should never happen!')
 
         for sf in self.secrets_file:
             if len(self.secrets_file[sf]) != 66 or self.secrets_file[sf][:2] != "0x":

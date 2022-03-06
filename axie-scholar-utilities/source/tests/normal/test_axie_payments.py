@@ -23,49 +23,59 @@ def cleanup(request):
     request.addfinalizer(remove_log_files)
 
 
-@patch("axie.payments.load_json")
-def test_payments_manager_init(mocked_load_json):
+def test_payments_manager_init():
     payments_file = "sample_payments_file.json"
     secrets_file = "sample_secrets_file.json"
     axp = AxiePaymentsManager(payments_file, secrets_file)
-    mocked_load_json.assert_has_calls(
-        calls=[call(payments_file), call(secrets_file)]
-    )
     assert axp.auto is False
     axp2 = AxiePaymentsManager(payments_file, secrets_file, auto=True)
     assert axp2.auto is True
 
 
-def test_payments_manager_verify_input_success(tmpdir):
-    p_file = tmpdir.join("p.json")
+def test_payments_manager_verify_input_success():
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPayout":10,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPayout":1,'
-                  '"ManagerPayout":9}],"Donations":[{"Name":"Entity 1",'
-                  '"AccountAddress": "'+dono_acc+'","Percent":0.01}]}'))
-    s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    p_file = {
+        "scholars": [{
+            "name": "Scholar 1",
+            "ronin": scholar_acc,
+            "splits": [
+                {
+                    "persona": "Manager",
+                    "percentage": 44,
+                    "ronin": manager_acc
+                },
+                {
+                    "persona": "Scholar",
+                    "percentage": 40,
+                    "ronin": "ronin:<scholar_1_address>"
+                },
+                {
+                    "persona": "Other Person",
+                    "percentage": 6,
+                    "ronin": "ronin:<other_person_address>"
+                },
+                {
+                    "persona": "Trainer",
+                    "percentage": 10,
+                    "ronin": "ronin:<trainer_address>"
+                }
+        ]}],
+        "donations": [{
+            "name": "Entitity 1",
+            "ronin": dono_acc,
+            "percentage": 1
+        }]
+    }
+    s_file = {scholar_acc: scholar_private_acc}
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
-    assert axp.manager_acc == manager_acc
-    assert axp.type == "amount"
-    assert axp.scholar_accounts == [
-        {"Name": "Scholar 1",
-         "AccountAddress": scholar_acc,
-         "ScholarPayoutAddress": "ronin:<scholar_address>",
-         "ScholarPayout": 10,
-         "TrainerPayoutAddress": "ronin:<trainer_address>",
-         "TrainerPayout": 1,
-         "ManagerPayout": 9}]
-    assert axp.donations == [
-        {"Name": "Entity 1",
-         "AccountAddress": dono_acc,
-         "Percent": 0.01}]
+    assert axp.manager_acc == None
+    assert axp.type == "new"
+    assert axp.scholar_accounts == p_file['scholars']
+    assert axp.donations == p_file['donations']
 
 
 def test_payments_manager_verify_input_success_percent(tmpdir):
@@ -74,28 +84,31 @@ def test_payments_manager_verify_input_success_percent(tmpdir):
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":50,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":1}],'
-                  '"Donations":[{"Name":"Entity 1", "AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    p_file = {
+        "Manager": manager_acc,
+        "Scholars": [
+            {
+                "Name":"Scholar 1", 
+                "AccountAddress": scholar_acc,
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPercent": 50,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPercent": 1
+            }],
+        "Donations": [
+            {
+                "Name": "Entity 1",
+                "AccountAddress": dono_acc,
+                "Percent": 1
+            }]
+    }
+    s_file = {scholar_acc: scholar_private_acc}
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
     assert axp.manager_acc == manager_acc
-    assert axp.type == "percent"
-    assert axp.scholar_accounts == [
-        {"Name": "Scholar 1",
-         "AccountAddress": scholar_acc,
-         "ScholarPayoutAddress": "ronin:<scholar_address>",
-         "ScholarPercent": 50,
-         "TrainerPayoutAddress": "ronin:<trainer_address>",
-         "TrainerPercent": 1}]
-    assert axp.donations == [
-        {"Name": "Entity 1",
-         "AccountAddress": dono_acc,
-         "Percent": 1}]
+    assert axp.type == "legacy"
+    assert axp.scholar_accounts == p_file['scholars']
+    assert axp.donations == p_file['donations']
 
 
 def test_payments_manager_verify_input_success_percent_with_payouts(tmpdir):
