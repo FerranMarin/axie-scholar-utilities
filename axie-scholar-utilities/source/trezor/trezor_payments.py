@@ -260,7 +260,7 @@ class TrezorAxiePaymentsManager:
         elif self.type == "old":
             self.prepare_old_payout()
         else:
-            logging.critical(f"Unexpected error! Unrecognized payments mode {self.type}")
+            logging.critical(f"Unexpected error! Unrecognized payments mode")
 
     def prepare_new_payout(self):
         for acc in self.scholar_accounts:
@@ -276,9 +276,9 @@ class TrezorAxiePaymentsManager:
             # Split payments
             for sacc in acc['splits']:
                 if sacc['persona'].lower() == 'manager':
-                    amount = acc_balance * ((sacc['percentage'] - deductable_fees)/100)
+                    amount = round(acc_balance * ((sacc['percentage'] - deductable_fees)/100))
                 else:
-                    amount = acc_balance * (sacc['percentage']/100)
+                    amount = round(acc_balance * (sacc['percentage']/100))
                 if amount < 1:
                     logging.info(f'Important: Skipping payment to {sacc["persona"]} as it would be less than 1SLP')
                     continue

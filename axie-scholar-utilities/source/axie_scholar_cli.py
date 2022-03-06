@@ -9,11 +9,11 @@ Usage:
     axie_scholar_cli.py claim <payments_file> <secrets_file> [--force]
     axie_scholar_cli.py managed_claim <secrets_file> <token> [--force]
     axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
-    axie_scholar_cli.py managed_generate_secrets <token> <secrets_file>
+    axie_scholar_cli.py managed_generate_secrets <secrets_file> <token>
     axie_scholar_cli.py mass_update_secrets <csv_file> <secrets_file>
     axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
     axie_scholar_cli.py generate_QR <payments_file> <secrets_file>
-    axie_scholar_cli.py managed_generate_QR <token> <secrets_file>
+    axie_scholar_cli.py managed_generate_QR <secrets_file> <token>
     axie_scholar_cli.py axie_morphing <secrets_file> <list_of_accounts>
     axie_scholar_cli.py axie_breeding <breedings_file> <secrets_file>
     axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
@@ -90,12 +90,18 @@ def generate_transfers_file(csv_file_path, transfer_file_path=None):
 
 
 def load_payments_file(token):
-    url = ''
-    r = requests.post(url, auth={"accessToken": token})
+    url = "https://api.axie.management/external/epithslayer/user/scholars"
+    r = requests.post(url, json={"accessToken": token})
+    if r.status_code == 500:
+        logging.critical('Something went wrong on axie.management side. Go to their Discord see what is it about!')
+    if r.status_code == 426:
+        logging.critical('You have been doing too many requests to axie.management, please wait 5min before a retry')
     if r.status_code != 200:
         logging.critical('Could not retrieve your information from axie.management, double check your token')
         sys.exit()
-    return r.json()
+    # Only for testing!
+    else:
+        return r.json()
 
 
 def generate_breedings_file(csv_file_path, breeding_file_path=None):

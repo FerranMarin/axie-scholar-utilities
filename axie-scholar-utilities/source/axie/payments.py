@@ -12,6 +12,7 @@ from axie.schemas import payments_schema, legacy_payments_schema
 from axie.utils import (
     check_balance,
     get_nonce,
+    load_json,
     Singleton,
     ImportantLogsFilter,
     SLP_CONTRACT,
@@ -184,7 +185,7 @@ class AxiePaymentsManager:
             if total > 99:
                 logging.critical("Payments file donations exeeds 100%, please review it")
                 validation_success = False
-            if any(len(dono['ronin'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["donations"]): # noqa
+            if any(len(dono['AccountAddress'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["Donations"]): # noqa
                 logging.critical("Please review the ronins in your donations. One or more are wrong!")
                 validation_success = False
             self.donations = self.payments_file["Donations"]
@@ -225,7 +226,6 @@ class AxiePaymentsManager:
                              "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
                              "Make sure you have configured all secrets too!")
             sys.exit()
-
         return
 
     def verify_inputs(self):
@@ -262,13 +262,15 @@ class AxiePaymentsManager:
             if legacy_msg:
                 msg += legacy_msg
             logging.critical(msg)
+            sys.exit()
         
         if self.type == 'legacy':
             self.legacy_verify()
         elif self.type == 'new':
             self.verify()
         else:
-            raise Exception('Something went very wrong, this should never happen!')
+            # This should not be reachable!
+            logging.critical(f"Unexpected error! Unrecognized payments mode")
 
         for sf in self.secrets_file:
             if len(self.secrets_file[sf]) != 66 or self.secrets_file[sf][:2] != "0x":
@@ -301,7 +303,7 @@ class AxiePaymentsManager:
     def prepare_payout(self):
         if self.type == "new":
             self.prepare_new_payout()
-        elif self.type == "old":
+        elif self.type == "legacy":
             self.prepare_old_payout()
         else:
             logging.critical(f"Unexpected error! Unrecognized payments mode {self.type}")
@@ -317,9 +319,9 @@ class AxiePaymentsManager:
             # Split payments
             for sacc in acc['splits']:
                 if sacc['persona'].lower() == 'manager':
-                    amount = acc_balance * ((sacc['percentage'] - deductable_fees)/100)
+                    amount = round(acc_balance * ((sacc['percentage'] - deductable_fees)/100))
                 else:
-                    amount = acc_balance * (sacc['percentage']/100)
+                    amount = round(acc_balance * (sacc['percentage']/100))
                 if amount < 1:
                     logging.info(f'Important: Skipping payment to {sacc["persona"]} as it would be less than 1SLP')
                     continue
