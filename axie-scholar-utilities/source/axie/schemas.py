@@ -23,26 +23,29 @@ payments_schema = {
                     },
                     "splits": {
                         "type": "array",
-                        "required": [
-                            "persona",
-                            "ronin",
-                            "percentage"
-                        ],
-                        "properties": {
-                            "persona": {
-                                "type": "string"
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "persona",
+                                "ronin",
+                                "percentage"
+                            ],
+                            "properties": {
+                                "persona": {
+                                    "type": "string"
+                                },
+                                "ronin": {
+                                    "type": "string",
+                                    "pattern": "^ronin:"
+                                },
+                                "percentage": {
+                                    "type": "number",
+                                    "minimum": 1,
+                                    "maximum": 99
+                                }
                             },
-                            "ronin": {
-                                "type": "string",
-                                "pattern": "^ronin:"
-                            },
-                            "percentage": {
-                                "type": "number",
-                                "minimum": 1,
-                                "maximum": 99
-                            }
-                        },
-                        "additionalProperties": False
+                            "additionalProperties": False
+                        }
                     }
                 },
                 "additionalProperties": False

@@ -5,7 +5,7 @@ from datetime import datetime
 
 import qrcode
 
-from axie.utils import AxieGraphQL, load_json
+from axie.utils import AxieGraphQL
 
 
 class QRCode(AxieGraphQL):
@@ -30,8 +30,8 @@ class QRCodeManager:
         self.path = os.path.dirname(secrets_file)
 
     def load_secrets_and_acc_name(self, secrets_file, payments_file):
-        secrets = load_json(secrets_file)
-        payments = load_json(payments_file)
+        secrets = secrets_file
+        payments = payments_file
         refined_secrets = {}
         acc_names = {}
         for scholar in payments['Scholars']:
