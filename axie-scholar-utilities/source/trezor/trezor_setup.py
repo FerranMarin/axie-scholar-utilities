@@ -13,8 +13,8 @@ class TrezorAccountsSetup:
 
     def __init__(self, payments_file, trezor_config_file=None):
         self.trezor_config_file = trezor_config_file
-        self.trezor_config = load_json(trezor_config_file) if trezor_config_file else {}
-        self.payments = load_json(payments_file)
+        self.trezor_config = trezor_config_file if trezor_config_file else {}
+        self.payments = payments_file
 
     def update_trezor_config(self):
         account_list = []

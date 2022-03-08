@@ -13,7 +13,7 @@ from trezorlib import ethereum
 from web3 import Web3, exceptions
 
 from axie.payments import PaymentsSummary
-from axie.schemas import payments_schema
+from axie.schemas import payments_schema, legacy_payments_schema
 from axie.utils import (
     check_balance,
     get_nonce,
@@ -197,30 +197,24 @@ class TrezorPayment:
 
 class TrezorAxiePaymentsManager:
     def __init__(self, payments_file, trezor_config, auto=False):
-        self.payments_file = load_json(payments_file)
-        self.trezor_config = load_json(trezor_config)
+        self.payments_file = payments_file
+        self.trezor_config = trezor_config
         self.manager_acc = None
         self.scholar_accounts = None
         self.donations = None
+        self.type = None
         self.auto = auto
         self.summary = PaymentsSummary()
 
-    def verify_inputs(self):
-        logging.info("Validating file inputs...")
+    def legacy_verify(self):
         validation_success = True
-        # Validate payments file
-        try:
-            validate(self.payments_file, payments_schema)
-        except ValidationError as ex:
-            logging.critical("If you were tyring to pay using percents:\n"
-                             f"Error given: {ex.message}\n"
-                             f"For attribute in: {list(ex.path)}\n")
+        # check manager ronin
         if len(self.payments_file["Manager"].replace("ronin:", "0x")) != 42:
             logging.critical(f"Check your manager ronin {self.payments_file['Manager']}, it has an incorrect format")
             validation_success = False
         # check donations do not exceed 100%
         if self.payments_file.get("Donations"):
-            total = sum([x["Percent"] for x in self.payments_file.get("Donations")])
+            total = sum([x["Percent"] for x in self.payments_file["Donations"]])
             if total > 99:
                 logging.critical("Payments file donations exeeds 100%, please review it")
                 validation_success = False
@@ -229,18 +223,97 @@ class TrezorAxiePaymentsManager:
                 validation_success = False
             self.donations = self.payments_file["Donations"]
 
-        # Check we have trezor configs for all accounts
+        # Check we have private keys for all accounts
         for acc in self.payments_file["Scholars"]:
-            if acc["AccountAddress"].lower() not in self.trezor_config:
-                logging.critical(f"Account '{acc['Name']}' is not present in trezor config file, please re-run setup.")
-                validation_success = False
+            if acc["AccountAddress"] not in self.trezor_config:
+                logging.critical(f"Account '{acc['Name']}' is not present in trezor_config file, please add it.")
+                validation_success = False       
         if not validation_success:
-            logging.critical("Please make sure your payments.json file looks like the one in the README.md\n"
-                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/")
-            logging.critical("If your problem is with trezor_config.json, delete it and re-run trezor setup command.")
+            logging.critical("Please make sure your payments.json file looks like the legacy one in the wiki or the sample files.\n"
+                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
+                             "Make sure you have configured all accounts too!")
             sys.exit()
-        self.manager_acc = self.payments_file["Manager"]
-        self.scholar_accounts = self.payments_file["Scholars"]
+        return
+    
+    def verify(self):
+        validation_success = True
+        # check donations do not exceed 100%
+        if self.payments_file.get("donations"):
+            total = sum([x["percentage"] for x in self.payments_file["donations"]])
+            if total > 99:
+                logging.critical("Payments file donations exeeds 100% adding the 1% fee, please review it")
+                validation_success = False
+            if any(len(dono['ronin'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["donations"]): # noqa
+                logging.critical("Please review the ronins in your donations. One or more are wrong!")
+                validation_success = False
+            self.donations = self.payments_file["donations"]
+
+        # Check we have private keys for all accounts
+        for acc in self.payments_file["scholars"]:
+            if acc["ronin"] not in self.trezor_config:
+                logging.critical(f"Account '{acc['name']}' is not present in trezor_config file, please add it.")
+                validation_success = False
+
+        if not validation_success:
+            logging.critical("Please make sure your payments.json file looks like the payments one in the wiki or the sample files.\n"
+                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
+                             "Make sure you have configured all accounts too!")
+            sys.exit()
+        return
+
+    def verify_inputs(self):
+        logging.info("Validating file inputs...")
+        validation_success = True
+        # Validate payments file
+        legacy_msg = None
+        new_msg = None
+
+        try:
+            validate(self.payments_file, payments_schema)
+            self.type = "new"
+        except ValidationError as ex:
+            new_msg = ("If you were tyring to pay using the current format:\n"
+                          f"Error given: {ex.message}\n"
+                          f"For attribute in: {list(ex.path)}\n")
+            validation_success = False
+
+        if not self.type:
+            try:
+                validate(self.payments_file, legacy_payments_schema)
+                self.type = "legacy"
+                validation_success = True
+            except ValidationError as ex:
+                legacy_msg = ("If you were tyring to pay using the legacy format:\n"
+                               f"Error given: {ex.message}\n"
+                               f"For attribute in: {list(ex.path)}\n")
+                validation_success = False
+        
+        if not validation_success:
+            msg = "Payments file failed validation. Please review it.\n"
+            if new_msg:
+                msg += new_msg
+            if legacy_msg:
+                msg += legacy_msg
+            logging.critical(msg)
+            sys.exit()
+        
+        if self.type == 'legacy':
+            self.legacy_verify()
+        elif self.type == 'new':
+            self.verify()
+        else:
+            # This should not be reachable!
+            logging.critical(f"Unexpected error! Unrecognized payments mode")
+       
+        if not validation_success:
+            logging.critical("There is a problem with your trezor_config.json, delete it and re-generate the file starting with an empty file.")
+            sys.exit()
+        
+        if self.type == "legacy":
+            self.manager_acc = self.payments_file["Manager"]
+            self.scholar_accounts = self.payments_file["Scholars"]
+        elif self.type == "new":
+            self.scholar_accounts = self.payments_file["scholars"]
         logging.info("Files correctly validated!")
 
     def check_acc_has_enough_balance(self, account, balance):
