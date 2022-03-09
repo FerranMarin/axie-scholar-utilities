@@ -330,7 +330,7 @@ class TrezorAxiePaymentsManager:
     def prepare_payout(self):
         if self.type == "new":
             self.prepare_new_payout()
-        elif self.type == "old":
+        elif self.type == "legacy":
             self.prepare_old_payout()
         else:
             logging.critical(f"Unexpected error! Unrecognized payments mode")
@@ -454,7 +454,7 @@ class TrezorAxiePaymentsManager:
             if self.donations:
                 # Extra Donations
                 for dono in self.donations:
-                    dono_amount = round(manager_payout * (dono["Percent"]/100))
+                    dono_amount = round(acc_balance * (dono["Percent"]/100))
                     if dono_amount > 1:
                         acc_payments.append(TrezorPayment(
                                 f"Donation to {dono['Name']} for {acc['Name']}",

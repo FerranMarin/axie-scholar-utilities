@@ -25,9 +25,9 @@ class QRCode(AxieGraphQL):
 
 class QRCodeManager:
 
-    def __init__(self, payments_file, secrets_file):
+    def __init__(self, payments_file, secrets_file, path):
         self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(secrets_file, payments_file)
-        self.path = os.path.dirname(secrets_file)
+        self.path = path
 
     def load_secrets_and_acc_name(self, secrets_file, payments_file):
         secrets = secrets_file

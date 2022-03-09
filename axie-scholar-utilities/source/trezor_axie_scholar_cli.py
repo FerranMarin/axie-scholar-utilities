@@ -236,7 +236,7 @@ def run_cli():
            not config_file_path and check_file(payments_file_path)):
             logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
                          'have configured the tool for all the accounts present in payments.json')
-            tas = TrezorAccountsSetup(load_json(payments_file_path), load_json(config_file_path))
+            tas = TrezorAccountsSetup(load_json(payments_file_path), load_json(config_file_path), config_file_path)
             tas.update_trezor_config()
         else:
             logging.critical("Please review your file paths and re-try.")
@@ -249,7 +249,7 @@ def run_cli():
         if config_file_path and check_file(config_file_path):
             logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
                          'have configured the tool for all the accounts present in payments.json')
-            tas = TrezorAccountsSetup(payments, load_json(config_file_path))
+            tas = TrezorAccountsSetup(payments, load_json(config_file_path), config_file_path)
             tas.update_trezor_config()
         else:
             logging.critical("Please review your file paths and re-try.")
@@ -341,7 +341,7 @@ def run_cli():
         payments_file_path = args['<payments_file>']
         config_file_path = args['<config_file>']
         if check_file(payments_file_path) and check_file(config_file_path):
-            qr = TrezorQRCodeManager(load_json(payments_file_path), load_json(config_file_path))
+            qr = TrezorQRCodeManager(load_json(payments_file_path), load_json(config_file_path), os.path.dirname(config_file_path))
             qr.execute()
         else:
             logging.critical("Please review your file paths and re-try.")
@@ -352,7 +352,7 @@ def run_cli():
         payments = load_payments_file(token)
         config_file_path = args['<config_file>']
         if check_file(config_file_path):
-            qr = TrezorQRCodeManager(payments, load_json(config_file_path))
+            qr = TrezorQRCodeManager(payments, load_json(config_file_path), os.path.dirname(config_file_path))
             qr.execute()
         else:
             logging.critical("Please review your file paths and re-try.")

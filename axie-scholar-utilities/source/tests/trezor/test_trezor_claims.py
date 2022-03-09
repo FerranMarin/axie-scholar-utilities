@@ -37,10 +37,9 @@ def test_claims_manager_init_force(mocked_load_secrets_and_acc_name):
     assert tacm.force == True
 
 
-def test_claims_manager_verify_input_success(tmpdir):
+def test_claims_manager_verify_input_success():
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -53,20 +52,16 @@ def test_claims_manager_verify_input_success(tmpdir):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    c_file = tmpdir.join("s.json")
-    config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
+    c_file = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
     axc = TrezorAxieClaimsManager(p_file, c_file)
     axc.verify_inputs()
-    assert axc.trezor_config == config_data
+    assert axc.trezor_config == c_file
     assert axc.acc_names == {scholar_acc: "Scholar 1"}
 
 
-def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
+def test_claims_manager_verify_only_accounts_in_payments_get_claimed():
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -79,23 +74,19 @@ def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    c_file = tmpdir.join("s.json")
-    config_data = {
+    c_file = {
         scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"},
         "ronin:abc1": {"passphrase": "", "bip_path": "m/44'/60'/0'/0/1"}
     }
-    c_file.write(json.dumps(config_data))
     axc = TrezorAxieClaimsManager(p_file, c_file)
     axc.verify_inputs()
     assert axc.trezor_config == {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
     assert axc.acc_names == {scholar_acc: "Scholar 1"}
 
 
-def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
+def test_claims_manager_verify_inputs_wrong_public_ronin(caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -108,10 +99,7 @@ def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    c_file = tmpdir.join("s.json")
-    config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
+    c_file = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
     with patch.object(sys, "exit") as mocked_sys:
         axc = TrezorAxieClaimsManager(p_file, c_file)
         axc.verify_inputs()
@@ -122,10 +110,9 @@ def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
 
 @patch("trezor.trezor_claims.get_default_client", return_value="client")
 @patch("trezor.trezor_claims.TrezorClaim.execute")
-def test_claims_manager_prepare_claims(mocked_claim_execute, mock_client, tmpdir):
+def test_claims_manager_prepare_claims(mocked_claim_execute, mock_client):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -138,10 +125,7 @@ def test_claims_manager_prepare_claims(mocked_claim_execute, mock_client, tmpdir
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    c_file = tmpdir.join("s.json")
-    config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
+    c_file = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
     axc = TrezorAxieClaimsManager(p_file, c_file)
     axc.prepare_claims()
     mocked_claim_execute.assert_called_once()

@@ -1,3 +1,4 @@
+import os
 import sys
 import builtins
 import json
@@ -831,4 +832,4 @@ def test_qrcode(mock_execute, mock_qrcodemanager, tmpdir):
     with patch.object(sys, 'argv', ["", "generate_QR", str(f1), str(f2)]):
         cli.run_cli()
     mock_execute.assert_called_with()
-    mock_qrcodemanager.assert_called_with(str(f1), str(f2))
+    mock_qrcodemanager.assert_called_with(str(f1), str(f2), os.path.dirname(f2))

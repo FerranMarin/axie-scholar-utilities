@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import builtins
 
 from mock import patch, call, mock_open
@@ -24,133 +23,178 @@ def cleanup(request):
     request.addfinalizer(remove_log_files)
 
 
-@patch("trezor.trezor_payments.load_json")
-def test_payments_manager_init(mocked_load_json):
-    payments_file = "sample_payments_file.json"
-    config_file = "sample_config_file.json"
+def test_payments_manager_init():
+    payments_file = "foo"
+    config_file = "bar"
     axp = TrezorAxiePaymentsManager(payments_file, config_file)
-    mocked_load_json.assert_has_calls(
-        calls=[call(payments_file), call(config_file)]
-    )
+    assert axp.payments_file == payments_file
+    assert axp.trezor_config == config_file
     assert axp.auto is False
     axp2 = TrezorAxiePaymentsManager(payments_file, config_file, auto=True)
+    assert axp2.payments_file == payments_file
+    assert axp2.trezor_config == config_file
     assert axp2.auto is True
 
 
-def test_payments_manager_verify_input_success(tmpdir):
-    p_file = tmpdir.join("p.json")
+def test_payments_manager_verify_input_success():
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":50,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":1}],'
-                  '"Donations":[{"Name":"Entity 1", "AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    c_file = tmpdir.join("c.json")
+    p_file = {
+        "scholars": [{
+            "name": "Scholar 1",
+            "ronin": scholar_acc,
+            "splits": [
+                {
+                    "persona": "Manager",
+                    "percentage": 44,
+                    "ronin": manager_acc
+                },
+                {
+                    "persona": "Scholar",
+                    "percentage": 40,
+                    "ronin": "ronin:<scholar_1_address>"
+                },
+                {
+                    "persona": "Other Person",
+                    "percentage": 6,
+                    "ronin": "ronin:<other_person_address>"
+                },
+                {
+                    "persona": "Trainer",
+                    "percentage": 10,
+                    "ronin": "ronin:<trainer_address>"
+                }
+        ]}],
+        "donations": [{
+            "name": "Entity 1",
+            "ronin": dono_acc,
+            "percentage": 1
+        }]
+    }
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
-    taxp = TrezorAxiePaymentsManager(p_file, c_file)
+    taxp = TrezorAxiePaymentsManager(p_file, config_data)
     taxp.verify_inputs()
-    assert taxp.manager_acc == manager_acc
-    assert taxp.scholar_accounts == [
-        {"Name": "Scholar 1",
-         "AccountAddress": scholar_acc,
-         "ScholarPayoutAddress": "ronin:<scholar_address>",
-         "ScholarPercent": 50,
-         "TrainerPayoutAddress": "ronin:<trainer_address>",
-         "TrainerPercent": 1}]
-    assert taxp.donations == [
-        {"Name": "Entity 1",
-         "AccountAddress": dono_acc,
-         "Percent": 1}]
+    assert taxp.type == "new"
+    assert taxp.manager_acc == None
+    assert taxp.scholar_accounts == p_file['scholars']
+    assert taxp.donations == p_file['donations']
 
 
-def test_payments_manager_verify_input_success_percent_with_payouts(tmpdir):
-    p_file = tmpdir.join("p.json")
+def test_payments_manager_verify_input_success_legacy():
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":50,"ScholarPayout":10,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":1}],'
-                  '"Donations":[{"Name":"Entity 1", "AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    c_file = tmpdir.join("s.json")
+    p_file = {
+        "Manager": manager_acc,
+        "Scholars": [
+            {
+                "Name":"Scholar 1", 
+                "AccountAddress": scholar_acc,
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPercent": 50,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPercent": 1
+            }],
+        "Donations": [
+            {
+                "Name": "Entity 1",
+                "AccountAddress": dono_acc,
+                "Percent": 1
+            }]
+    }
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
-    axp = TrezorAxiePaymentsManager(p_file, c_file)
+    axp = TrezorAxiePaymentsManager(p_file, config_data)
     axp.verify_inputs()
     assert axp.manager_acc == manager_acc
-    assert axp.scholar_accounts == [
-        {"Name": "Scholar 1",
-         "AccountAddress": scholar_acc,
-         "ScholarPayoutAddress": "ronin:<scholar_address>",
-         "ScholarPercent": 50,
-         "ScholarPayout": 10,
-         "TrainerPayoutAddress": "ronin:<trainer_address>",
-         "TrainerPercent": 1}]
-    assert axp.donations == [
-        {"Name": "Entity 1",
-         "AccountAddress": dono_acc,
-         "Percent": 1}]
+    assert axp.type == "legacy"
+    assert axp.scholar_accounts == p_file['Scholars']
+    assert axp.donations == p_file['Donations']
 
-
-def test_payments_manager_verify_input_manager_ronin_short(tmpdir, caplog):
-    p_file = tmpdir.join("p.json")
+def test_payments_manager_verify_input_manager_ronin_short(caplog):
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>'
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":50,"ScholarPayout":10,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":1}],'
-                  '"Donations":[{"Name":"Entity 1", "AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    c_file = tmpdir.join("s.json")
+    p_file = {
+        "Manager": manager_acc,
+        "Scholars": [
+            {
+                "Name":"Scholar 1", 
+                "AccountAddress": scholar_acc,
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPercent": 50,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPercent": 1
+            }],
+        "Donations": [
+            {
+                "Name": "Entity 1",
+                "AccountAddress": dono_acc,
+                "Percent": 1
+            }]
+    }
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
     with patch.object(sys, "exit") as mocked_sys:
-        axp = TrezorAxiePaymentsManager(p_file, c_file)
+        axp = TrezorAxiePaymentsManager(p_file, config_data)
         axp.verify_inputs()
     mocked_sys.assert_called_once()
     assert "Please review the ronins in your donations. One or more are wrong!" in caplog.text
 
 
-def test_payments_manager_verify_input_correct_dono(tmpdir, caplog):
-    p_file = tmpdir.join("p.json")
+def test_payments_manager_verify_input_correct_dono(caplog):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":50,"ScholarPayout":10,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":1}],'
-                  '"Donations":[{"Name":"Entity 1", "AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    c_file = tmpdir.join("c.json")
-    c_file.write('{ }')
+    p_file = {
+        "Manager": manager_acc,
+        "Scholars": [
+            {
+                "Name":"Scholar 1", 
+                "AccountAddress": scholar_acc,
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPercent": 50,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPercent": 1
+            }],
+        "Donations": [
+            {
+                "Name": "Entity 1",
+                "AccountAddress": dono_acc,
+                "Percent": 1
+            }]
+    }
     with patch.object(sys, "exit") as mocked_sys:
-        axp = TrezorAxiePaymentsManager(p_file, c_file)
+        axp = TrezorAxiePaymentsManager(p_file, {})
         axp.verify_inputs()
     mocked_sys.assert_called_once()
-    assert "Account 'Scholar 1' is not present in trezor config file, please re-run setup." in caplog.text
+    assert "Account 'Scholar 1' is not present in trezor_config file, please add it." in caplog.text
 
 
 @patch("trezor.TrezorAxiePaymentsManager.prepare_payout")
-def test_payments_manager_prepare_payout(mocked_prepare_payout, tmpdir):
-    p_file = tmpdir.join("p.json")
+def test_payments_manager_prepare_payout(mocked_prepare_payout):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":45,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10}],'
-                  '"Donations":[{"Name":"Entity 1",'
-                  '"AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    c_file = tmpdir.join("c.json")
+    p_file = {
+        "Manager": manager_acc,
+        "Scholars": [
+            {
+                "Name":"Scholar 1", 
+                "AccountAddress": scholar_acc,
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPercent": 50,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPercent": 1
+            }],
+        "Donations": [
+            {
+                "Name": "Entity 1",
+                "AccountAddress": dono_acc,
+                "Percent": 1
+            }]
+    }
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
-    axp = TrezorAxiePaymentsManager(p_file, c_file)
+    axp = TrezorAxiePaymentsManager(p_file, config_data)
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_prepare_payout.assert_called_once()
@@ -165,23 +209,31 @@ def test_payments_manager_prepare_payout_check_correct_payments(mocked_enough_ba
                                                                 mocked_payout,
                                                                 mocked_check_balance,
                                                                 mocked_client,
-                                                                mocked_parse,
-                                                                tmpdir):
-    p_file = tmpdir.join("p.json")
+                                                                mocked_parse):
     scholar_acc = 'ronin:12345678900987654321' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:12345678900987000321' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
     clean_scholar_acc = scholar_acc.replace("ronin:", "0x")
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":45,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10}],'
-                  '"Donations":[{"Name":"Entity 1",'
-                  '"AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    c_file = tmpdir.join("c.json")
+    p_file = {
+        "Manager": manager_acc,
+        "Scholars": [
+            {
+                "Name":"Scholar 1", 
+                "AccountAddress": scholar_acc,
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPercent": 50,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPercent": 10
+            }],
+        "Donations": [
+            {
+                "Name": "Entity 1",
+                "AccountAddress": dono_acc,
+                "Percent": 1
+            }]
+    }
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
-    axp = TrezorAxiePaymentsManager(p_file, c_file)
+    axp = TrezorAxiePaymentsManager(p_file, config_data)
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_client.assert_called()
@@ -194,7 +246,7 @@ def test_payments_manager_prepare_payout_check_correct_payments(mocked_enough_ba
     assert mocked_payout.call_args[0][1][0].name == "Payment to scholar of Scholar 1"
     assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][0].bip_path == "m/44'/60'/0'/0/0"
-    assert mocked_payout.call_args[0][1][0].amount == 450
+    assert mocked_payout.call_args[0][1][0].amount == 500
     # 2nd payment
     assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
     assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
@@ -204,7 +256,7 @@ def test_payments_manager_prepare_payout_check_correct_payments(mocked_enough_ba
     assert mocked_payout.call_args[0][1][2].name == "Donation to Entity 1 for Scholar 1"
     assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][2].bip_path == "m/44'/60'/0'/0/0"
-    assert mocked_payout.call_args[0][1][2].amount == round(450*0.01)
+    assert mocked_payout.call_args[0][1][2].amount == round(1000*0.01)
     # 4th Payment (fee)
     assert mocked_payout.call_args[0][1][3].name == "Donation to software creator for Scholar 1"
     assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
@@ -214,7 +266,7 @@ def test_payments_manager_prepare_payout_check_correct_payments(mocked_enough_ba
     assert mocked_payout.call_args[0][1][4].name == "Payment to manager of Scholar 1"
     assert mocked_payout.call_args[0][1][4].from_acc == clean_scholar_acc
     assert mocked_payout.call_args[0][1][4].bip_path == "m/44'/60'/0'/0/0"
-    assert mocked_payout.call_args[0][1][4].amount == 1000 - 550 - round(1000*0.01) - round(450*0.01)
+    assert mocked_payout.call_args[0][1][4].amount == 400 - round(1000*0.02)
     assert len(mocked_payout.call_args[0][1]) == 5
 
 
@@ -225,22 +277,30 @@ def test_payments_manager_prepare_payout_check_correct_payments(mocked_enough_ba
 def test_payments_manager_prepare_payout_check_correct_payments_no_balance(mocked_enough_balance,
                                                                            mocked_payout,
                                                                            mocked_check_balance,
-                                                                           mocked_client,
-                                                                           tmpdir):
-    p_file = tmpdir.join("p.json")
+                                                                           mocked_client):
     scholar_acc = 'ronin:12345678900987654321' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:12345678900987000321' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
-    p_file.write(('{"Manager":"'+manager_acc+'","Scholars":'
-                  '[{"Name":"Scholar 1","AccountAddress":"'+scholar_acc+'",'
-                  '"ScholarPayoutAddress":"ronin:<scholar_address>","ScholarPercent":45,'
-                  '"TrainerPayoutAddress":"ronin:<trainer_address>","TrainerPercent":10}],'
-                  '"Donations":[{"Name":"Entity 1",'
-                  '"AccountAddress": "'+dono_acc+'","Percent":1}]}'))
-    c_file = tmpdir.join("c.json")
+    p_file = {
+        "Manager": manager_acc,
+        "Scholars": [
+            {
+                "Name":"Scholar 1", 
+                "AccountAddress": scholar_acc,
+                "ScholarPayoutAddress": "ronin:<scholar_address>",
+                "ScholarPercent": 50,
+                "TrainerPayoutAddress": "ronin:<trainer_address>",
+                "TrainerPercent": 10
+            }],
+        "Donations": [
+            {
+                "Name": "Entity 1",
+                "AccountAddress": dono_acc,
+                "Percent": 1
+            }]
+    }
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
-    axp = TrezorAxiePaymentsManager(p_file, c_file)
+    axp = TrezorAxiePaymentsManager(p_file, config_data)
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_client.assert_called()

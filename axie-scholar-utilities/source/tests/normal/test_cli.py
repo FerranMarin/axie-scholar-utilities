@@ -1,3 +1,4 @@
+import os
 import sys
 import builtins
 import json
@@ -1248,11 +1249,11 @@ def test_qrcode(mock_execute, mock_qrcodemanager, tmpdir):
     f1 = tmpdir.join("file1.json")
     f1.write('{"ronin:<account_s1_address>": "hello"}')
     f2 = tmpdir.join("file2.json")
-    f2.write('{"ronin:<account_s1_address>": "hello"}')
+    f2.write('{"ronin:<account_s1_address>": "bye"}')
     with patch.object(sys, 'argv', ["", "generate_QR", str(f1), str(f2)]):
         cli.run_cli()
     mock_execute.assert_called_with()
-    mock_qrcodemanager.assert_called_with(str(f1), str(f2))
+    mock_qrcodemanager.assert_called_with({'ronin:<account_s1_address>': 'hello'}, {'ronin:<account_s1_address>': 'bye'}, os.path.dirname(f2))
 
 
 def test_load_payments():

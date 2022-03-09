@@ -410,7 +410,7 @@ def run_cli():
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
         if check_file(payments_file_path) and check_file(secrets_file_path):
-            qr = QRCodeManager(load_json(payments_file_path), load_json(secrets_file_path))
+            qr = QRCodeManager(load_json(payments_file_path), load_json(secrets_file_path), os.path.dirname(secrets_file_path))
             qr.execute()
         else:
             logging.critical("Please review your file paths and re-try.")
@@ -421,7 +421,7 @@ def run_cli():
         payments = load_payments_file(token)
         secrets_file_path = args['<secrets_file>']
         if check_file(secrets_file_path):
-            qr = QRCodeManager(payments, load_json(secrets_file_path))
+            qr = QRCodeManager(payments, load_json(secrets_file_path), os.path.dirname(secrets_file_path))
             qr.execute()
         else:
             logging.critical("Please review your file paths and re-try.")
