@@ -5,14 +5,14 @@ axie_breeding, generate_breedings
 
 Usage:
     trezor_axie_scholar_cli.py payout <payments_file> <config_file> [-y]
-    trezor_axie_scholar_cli.py managed_payout <secrets_file> <token> [-y]
+    trezor_axie_scholar_cli.py managed_payout <config_file> <token> [-y]
     trezor_axie_scholar_cli.py claim <payments_file> <config_file> [--force]
-    trezor_axie_scholar_cli.py managed_claim <secrets_file> <token> [--force]
+    trezor_axie_scholar_cli.py managed_claim <config_file> <token> [--force]
     trezor_axie_scholar_cli.py config_trezor <payments_file> [<config_file>]
-    trezor_axie_scholar_cli.py managed_config_trezor <secrets_file> <token>
+    trezor_axie_scholar_cli.py managed_config_trezor <config_file> <token>
     trezor_axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
     trezor_axie_scholar_cli.py generate_QR <payments_file> <config_file>
-    trezor_axie_scholar_cli.py managed_generate_QR <secrets_file> <token>
+    trezor_axie_scholar_cli.py managed_generate_QR <config_file> <token>
     trezor_axie_scholar_cli.py axie_morphing <config_file> <list_of_accounts>
     trezor_axie_scholar_cli.py axie_breeding <breedings_file> <config_file>
     trezor_axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
@@ -236,7 +236,10 @@ def run_cli():
            not config_file_path and check_file(payments_file_path)):
             logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
                          'have configured the tool for all the accounts present in payments.json')
-            tas = TrezorAccountsSetup(load_json(payments_file_path), load_json(config_file_path), config_file_path)
+            if not config_file_path:
+                tas = TrezorAccountsSetup(load_json(payments_file_path), None, None)
+            else:
+                tas = TrezorAccountsSetup(load_json(payments_file_path), load_json(config_file_path), config_file_path)
             tas.update_trezor_config()
         else:
             logging.critical("Please review your file paths and re-try.")
