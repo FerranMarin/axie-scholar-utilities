@@ -156,9 +156,7 @@ class AxieClaimsManager:
         self.secrets_file, self.acc_names = self.load_secrets_and_acc_name(secrets_file, payments_file)
         self.force = force
 
-    def load_secrets_and_acc_name(self, secrets_file, payments_file):
-        secrets = load_json(secrets_file)
-        payments = load_json(payments_file)
+    def load_secrets_and_acc_name(self, secrets, payments):
         refined_secrets = {}
         acc_names = {}
         for scholar in payments['Scholars']:

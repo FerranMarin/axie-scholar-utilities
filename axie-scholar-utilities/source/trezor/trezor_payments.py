@@ -13,7 +13,7 @@ from trezorlib import ethereum
 from web3 import Web3, exceptions
 
 from axie.payments import PaymentsSummary
-from axie.schemas import payments_percent_schema
+from axie.schemas import payments_schema, legacy_payments_schema
 from axie.utils import (
     check_balance,
     get_nonce,
@@ -90,7 +90,6 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
-        logging.info(f'Important: Debugging information {sig}')
         l_sig = list(sig)
         l_sig[1] = l_sig[1].lstrip(b'\x00')
         l_sig[2] = l_sig[2].lstrip(b'\x00')
@@ -153,7 +152,6 @@ class TrezorPayment:
             data=data,
             chain_id=2020
         )
-        logging.info(f'Important: Debugging information {sig}')
         l_sig = list(sig)
         l_sig[1] = l_sig[1].lstrip(b'\x00')
         l_sig[2] = l_sig[2].lstrip(b'\x00')
@@ -199,30 +197,24 @@ class TrezorPayment:
 
 class TrezorAxiePaymentsManager:
     def __init__(self, payments_file, trezor_config, auto=False):
-        self.payments_file = load_json(payments_file)
-        self.trezor_config = load_json(trezor_config)
+        self.payments_file = payments_file
+        self.trezor_config = trezor_config
         self.manager_acc = None
         self.scholar_accounts = None
         self.donations = None
+        self.type = None
         self.auto = auto
         self.summary = PaymentsSummary()
 
-    def verify_inputs(self):
-        logging.info("Validating file inputs...")
+    def legacy_verify(self):
         validation_success = True
-        # Validate payments file
-        try:
-            validate(self.payments_file, payments_percent_schema)
-        except ValidationError as ex:
-            logging.critical("If you were tyring to pay using percents:\n"
-                             f"Error given: {ex.message}\n"
-                             f"For attribute in: {list(ex.path)}\n")
+        # check manager ronin
         if len(self.payments_file["Manager"].replace("ronin:", "0x")) != 42:
             logging.critical(f"Check your manager ronin {self.payments_file['Manager']}, it has an incorrect format")
             validation_success = False
         # check donations do not exceed 100%
         if self.payments_file.get("Donations"):
-            total = sum([x["Percent"] for x in self.payments_file.get("Donations")])
+            total = sum([x["Percent"] for x in self.payments_file["Donations"]])
             if total > 99:
                 logging.critical("Payments file donations exeeds 100%, please review it")
                 validation_success = False
@@ -231,18 +223,97 @@ class TrezorAxiePaymentsManager:
                 validation_success = False
             self.donations = self.payments_file["Donations"]
 
-        # Check we have trezor configs for all accounts
+        # Check we have private keys for all accounts
         for acc in self.payments_file["Scholars"]:
-            if acc["AccountAddress"].lower() not in self.trezor_config:
-                logging.critical(f"Account '{acc['Name']}' is not present in trezor config file, please re-run setup.")
-                validation_success = False
+            if acc["AccountAddress"] not in self.trezor_config:
+                logging.critical(f"Account '{acc['Name']}' is not present in trezor_config file, please add it.")
+                validation_success = False       
         if not validation_success:
-            logging.critical("Please make sure your payments.json file looks like the one in the README.md\n"
-                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/")
-            logging.critical("If your problem is with trezor_config.json, delete it and re-run trezor setup command.")
+            logging.critical("Please make sure your payments.json file looks like the legacy one in the wiki or the sample files.\n"
+                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
+                             "Make sure you have configured all accounts too!")
             sys.exit()
-        self.manager_acc = self.payments_file["Manager"]
-        self.scholar_accounts = self.payments_file["Scholars"]
+        return
+    
+    def verify(self):
+        validation_success = True
+        # check donations do not exceed 100%
+        if self.payments_file.get("donations"):
+            total = sum([x["percentage"] for x in self.payments_file["donations"]])
+            if total > 99:
+                logging.critical("Payments file donations exeeds 100% adding the 1% fee, please review it")
+                validation_success = False
+            if any(len(dono['ronin'].replace("ronin:", "0x")) != 42 for dono in self.payments_file["donations"]): # noqa
+                logging.critical("Please review the ronins in your donations. One or more are wrong!")
+                validation_success = False
+            self.donations = self.payments_file["donations"]
+
+        # Check we have private keys for all accounts
+        for acc in self.payments_file["scholars"]:
+            if acc["ronin"] not in self.trezor_config:
+                logging.critical(f"Account '{acc['name']}' is not present in trezor_config file, please add it.")
+                validation_success = False
+
+        if not validation_success:
+            logging.critical("Please make sure your payments.json file looks like the payments one in the wiki or the sample files.\n"
+                             "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
+                             "Make sure you have configured all accounts too!")
+            sys.exit()
+        return
+
+    def verify_inputs(self):
+        logging.info("Validating file inputs...")
+        validation_success = True
+        # Validate payments file
+        legacy_msg = None
+        new_msg = None
+
+        try:
+            validate(self.payments_file, payments_schema)
+            self.type = "new"
+        except ValidationError as ex:
+            new_msg = ("If you were tyring to pay using the current format:\n"
+                          f"Error given: {ex.message}\n"
+                          f"For attribute in: {list(ex.path)}\n")
+            validation_success = False
+
+        if not self.type:
+            try:
+                validate(self.payments_file, legacy_payments_schema)
+                self.type = "legacy"
+                validation_success = True
+            except ValidationError as ex:
+                legacy_msg = ("If you were tyring to pay using the legacy format:\n"
+                               f"Error given: {ex.message}\n"
+                               f"For attribute in: {list(ex.path)}\n")
+                validation_success = False
+        
+        if not validation_success:
+            msg = "Payments file failed validation. Please review it.\n"
+            if new_msg:
+                msg += new_msg
+            if legacy_msg:
+                msg += legacy_msg
+            logging.critical(msg)
+            sys.exit()
+        
+        if self.type == 'legacy':
+            self.legacy_verify()
+        elif self.type == 'new':
+            self.verify()
+        else:
+            # This should not be reachable!
+            logging.critical(f"Unexpected error! Unrecognized payments mode")
+       
+        if not validation_success:
+            logging.critical("There is a problem with your trezor_config.json, delete it and re-generate the file starting with an empty file.")
+            sys.exit()
+        
+        if self.type == "legacy":
+            self.manager_acc = self.payments_file["Manager"]
+            self.scholar_accounts = self.payments_file["Scholars"]
+        elif self.type == "new":
+            self.scholar_accounts = self.payments_file["scholars"]
         logging.info("Files correctly validated!")
 
     def check_acc_has_enough_balance(self, account, balance):
@@ -255,8 +326,91 @@ class TrezorAxiePaymentsManager:
             logging.info(f'These payments will leave {account_balance - balance} SLP in your wallet.'
                          'Cancel payments and adjust payments if you want to leave 0 SLP in it.')
         return True
-
+    
     def prepare_payout(self):
+        if self.type == "new":
+            self.prepare_new_payout()
+        elif self.type == "legacy":
+            self.prepare_old_payout()
+        else:
+            logging.critical(f"Unexpected error! Unrecognized payments mode")
+
+    def prepare_new_payout(self):
+        for acc in self.scholar_accounts:
+            client = get_default_client(
+                ui=CustomUI(passphrase=self.trezor_config[acc['ronin'].lower()]['passphrase']))
+            bip_path = parse_path(self.trezor_config[acc['ronin'].lower()]['bip_path'])
+            acc_balance = check_balance(acc['ronin'])
+            total_payments = 0
+            acc_payments = []
+            deductable_fees = 1
+            for dono in self.donations:
+                deductable_fees += dono['percentage']
+            # Split payments
+            for sacc in acc['splits']:
+                if sacc['persona'].lower() == 'manager':
+                    amount = round(acc_balance * ((sacc['percentage'] - deductable_fees)/100))
+                else:
+                    amount = round(acc_balance * (sacc['percentage']/100))
+                if amount < 1:
+                    logging.info(f'Important: Skipping payment to {sacc["persona"]} as it would be less than 1SLP')
+                    continue
+                total_payments += amount
+                # define type
+                if sacc['persona'].lower() == 'manager':
+                    t = 'manager'
+                elif sacc['persona'].lower() == 'scholar':
+                    t = 'scholar'
+                elif sacc['persona'].lower() in ['trainer', 'investor', 'trainer/investor', 'investor/trainer']:
+                    t = 'trainer'
+                else:
+                    t = 'other'
+                acc_payments.append(TrezorPayment(
+                    f"Payment to {sacc['persona']} of {acc['name']}",
+                    t,
+                    client,
+                    bip_path,
+                    acc['ronin'].lower(),
+                    sacc['ronin'].lower(),
+                    amount,
+                    self.summary
+                ))
+            # Dono Payments
+            if self.donations:
+                for dono in self.donations:
+                    dono_amount = round(acc_balance * (dono["percentage"]/100))
+                    if dono_amount > 0:
+                        acc_payments.append(TrezorPayment(
+                                f"Donation to {dono['name']} for {acc['name']}",
+                                "donation",
+                                client,
+                                bip_path,
+                                acc["ronin"],
+                                dono["ronin"],
+                                dono_amount,
+                                self.summary
+                            ))
+            # Fee Payments
+            fee_amount = round(acc_balance * 0.01)
+            if fee_amount > 0:
+                acc_payments.append(TrezorPayment(
+                            f"Donation to software creator for {acc['name']}",
+                            "donation",
+                            client,
+                            bip_path,
+                            acc["ronin"],
+                            CREATOR_FEE_ADDRESS,
+                            fee_amount,
+                            self.summary
+                        ))
+            if self.check_acc_has_enough_balance(acc['ronin'], total_payments) and acc_balance > 0:
+                self.payout_account(acc['name'], acc_payments)
+            else:
+                logging.info(f"Important: Skipping payments for account '{acc['name']}'. "
+                             "Insufficient funds!")
+        logging.info(f"Important: Transactions Summary:\n {self.summary}")
+
+    def prepare_old_payout(self):
         for acc in self.scholar_accounts:
             client = get_default_client(
                 ui=CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase']))
@@ -300,7 +454,7 @@ class TrezorAxiePaymentsManager:
             if self.donations:
                 # Extra Donations
                 for dono in self.donations:
-                    dono_amount = round(manager_payout * (dono["Percent"]/100))
+                    dono_amount = round(acc_balance * (dono["Percent"]/100))
                     if dono_amount > 1:
                         acc_payments.append(TrezorPayment(
                                 f"Donation to {dono['Name']} for {acc['Name']}",

@@ -14,7 +14,6 @@ from trezorlib import ethereum
 from axie.utils import (
     check_balance,
     get_nonce,
-    load_json,
     ImportantLogsFilter,
     SLP_CONTRACT,
     RONIN_PROVIDER_FREE,
@@ -138,7 +137,6 @@ class TrezorClaim(TrezorAxieGraphQL):
             data=data,
             chain_id=2020
         )
-        logging.info(f'Important: Debugging information {sig}')
         l_sig = list(sig)
         l_sig[1] = l_sig[1].lstrip(b'\x00')
         l_sig[2] = l_sig[2].lstrip(b'\x00')
@@ -177,8 +175,8 @@ class TrezorAxieClaimsManager:
         self.force = force
 
     def load_trezor_config_and_acc_name(self, trezor_config, payments_file):
-        config = load_json(trezor_config)
-        payments = load_json(payments_file)
+        config = trezor_config
+        payments = payments_file
         refined_config = {}
         acc_names = {}
         for scholar in payments['Scholars']:

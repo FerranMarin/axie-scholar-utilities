@@ -11,10 +11,10 @@ from trezor.trezor_utils import CustomUI
 
 class TrezorAccountsSetup:
 
-    def __init__(self, payments_file, trezor_config_file=None):
-        self.trezor_config_file = trezor_config_file
-        self.trezor_config = load_json(trezor_config_file) if trezor_config_file else {}
-        self.payments = load_json(payments_file)
+    def __init__(self, payments_file, trezor_config_file=None, path=None):
+        self.trezor_config = trezor_config_file if trezor_config_file else {}
+        self.payments = payments_file
+        self.path = path
 
     def update_trezor_config(self):
         account_list = []
@@ -46,7 +46,7 @@ class TrezorAccountsSetup:
                     non_configured_accs.remove(address)
 
         logging.info('Gathered all accounts config, saving trezor_config file')
-        file_path = self.trezor_config_file if self.trezor_config_file else 'trezor_config.json'
+        file_path = self.path if self.path else 'trezor_config.json'
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(self.trezor_config, f, indent=4)
         logging.info('Trezor_config file saved!')

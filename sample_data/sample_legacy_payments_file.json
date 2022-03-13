@@ -24,5 +24,17 @@
             "ScholarPayoutAddress": "ronin:<scholar2_address>",
             "ScholarPercent": 50
         }
+    ],
+    "Donations": [
+        {
+            "Name": "Entity 1",
+            "AccountAddress": "ronin:<donation_entity_1_address>",
+            "Percent": 1
+        },
+        {
+            "Name": "Entity 2",
+            "AccountAddress": "ronin:<donation_entity_2_address>",
+            "Percent": 1
+        }
     ]
 }

@@ -206,5 +206,5 @@ def test_execute_calls_web3_functions(mock_transaction_receipt,
     print(log_file)
     with open(log_file) as f:
         lf = f.readlines()
-        assert len(lf) == 2
+        assert len(lf) == 1
     cleanup_log_file(log_file)

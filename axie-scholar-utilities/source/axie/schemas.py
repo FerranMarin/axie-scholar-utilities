@@ -1,82 +1,77 @@
 payments_schema = {
     "type": "object",
     "required": [
-        "Manager",
-        "Scholars"
+        "scholars"
     ],
     "properties": {
-        "Manager": {
-            "type": "string",
-            "pattern": "^ronin:"
-        },
-        "Scholars": {
+        "scholars": {
             "type": "array",
             "items": {
                 "type": "object",
                 "required": [
-                    "Name",
-                    "AccountAddress",
-                    "ScholarPayoutAddress",
-                    "ScholarPayout",
-                    "ManagerPayout"
+                    "name",
+                    "ronin",
+                    "splits"
                 ],
-                "dependencies": {
-                    "TrainerPayoutAddress": ["TrainerPayout"],
-                    "TrainerPayout": ["TrainerPayoutAddress"]
-                },
                 "properties": {
-                    "Name": {
+                    "name": {
                         "type": "string"
                     },
-                    "AccountAddress": {
+                    "ronin": {
                         "type": "string",
                         "pattern": "^ronin:"
                     },
-                    "ScholarPayoutAddress": {
-                        "type": "string",
-                        "pattern": "^ronin:"
-                    },
-                    "ScholarPayout": {
-                        "type": "number",
-                        "minimum": 1
-                    },
-                    "TrainerPayoutAddress": {
-                        "type": "string",
-                        "pattern": "^ronin:"
-                    },
-                    "TrainerPayout": {
-                        "type": "number",
-                        "minimum": 1
-                    },
-                    "ManagerPayout": {
-                        "type": "number",
-                        "minimum": 1
+                    "splits": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "persona",
+                                "ronin",
+                                "percentage"
+                            ],
+                            "properties": {
+                                "persona": {
+                                    "type": "string"
+                                },
+                                "ronin": {
+                                    "type": "string",
+                                    "pattern": "^ronin:"
+                                },
+                                "percentage": {
+                                    "type": "number",
+                                    "minimum": 1,
+                                    "maximum": 99
+                                }
+                            },
+                            "additionalProperties": False
+                        }
                     }
                 },
                 "additionalProperties": False
             }
         },
-        "Donations": {
+        "donations": {
             "type": "array",
             "items": {
                 "type": "object",
                 "required": [
-                    "Name",
-                    "AccountAddress",
-                    "Percent"
+                    "name",
+                    "ronin",
+                    "percentage"
                 ],
                 "properties": {
-                    "Name": {
+                    "name": {
                         "type": "string"
                     },
-                    "AccountAddress": {
+                    "ronin": {
                         "type": "string",
                         "pattern": "^ronin:"
                     },
-                    "Percent": {
+                    "percentage": {
                         "type": "number",
-                        "minimum": 0.01,
-                        "maximum": 1
+                        "minimum": 1,
+                        "maximum": 99
                     }
                 },
                 "additionalProperties": False
@@ -87,7 +82,7 @@ payments_schema = {
 }
 
 
-payments_percent_schema = {
+legacy_payments_schema = {
     "type": "object",
     "required": [
         "Manager",
@@ -170,7 +165,7 @@ payments_percent_schema = {
                     "Percent": {
                         "type": "number",
                         "minimum": 1,
-                        "maximum": 100
+                        "maximum": 98
                     }
                 },
                 "additionalProperties": False

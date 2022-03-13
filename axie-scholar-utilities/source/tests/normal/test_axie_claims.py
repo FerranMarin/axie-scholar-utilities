@@ -32,11 +32,10 @@ def test_claims_manager_init_force(mocked_load_secrets_and_acc_name):
     mocked_load_secrets_and_acc_name.assert_called_with(secrets_file, payments_file)
     assert a.force == True
 
-def test_claims_manager_verify_input_success(tmpdir):
+def test_claims_manager_verify_input_success():
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -49,19 +48,16 @@ def test_claims_manager_verify_input_success(tmpdir):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    s_file = {scholar_acc: scholar_private_acc}
     axc = AxieClaimsManager(p_file, s_file)
     axc.verify_inputs()
     assert axc.secrets_file == {scholar_acc: scholar_private_acc}
 
 
-def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
+def test_claims_manager_verify_only_accounts_in_payments_get_claimed():
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -74,23 +70,19 @@ def test_claims_manager_verify_only_accounts_in_payments_get_claimed(tmpdir):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    s_file = tmpdir.join("s.json")
-    s_data = {
+    s_file = {
         scholar_acc: scholar_private_acc,
         "ronin:acc": "ronin:secret"
     }
-    s_file.write(json.dumps(s_data))
     axc = AxieClaimsManager(p_file, s_file)
     axc.verify_inputs()
     assert axc.secrets_file == {scholar_acc: scholar_private_acc}
 
 
-def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
+def test_claims_manager_verify_inputs_wrong_public_ronin(caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -103,9 +95,7 @@ def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    s_file = {scholar_acc: scholar_private_acc}
     with patch.object(sys, "exit") as mocked_sys:
         axc = AxieClaimsManager(p_file, s_file)
         axc.verify_inputs()
@@ -114,11 +104,10 @@ def test_claims_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
     assert f"Public address {scholar_acc} needs to start with ronin:" in caplog.text
 
 
-def test_claims_manager_verify_input_wrong_private_ronin(tmpdir, caplog):
+def test_claims_manager_verify_input_wrong_private_ronin(caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = 'ronin:<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -131,9 +120,7 @@ def test_claims_manager_verify_input_wrong_private_ronin(tmpdir, caplog):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    s_file = {scholar_acc: scholar_private_acc}
     with patch.object(sys, "exit") as mocked_sys:
         axc = AxieClaimsManager(p_file, s_file)
         axc.verify_inputs()
@@ -142,11 +129,10 @@ def test_claims_manager_verify_input_wrong_private_ronin(tmpdir, caplog):
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text
 
 
-def test_claims_manager_verify_input_wrong_private_short(tmpdir, caplog):
+def test_claims_manager_verify_input_wrong_private_short(caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = 'ronin:<account_s1_private_address>012345'
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -159,9 +145,7 @@ def test_claims_manager_verify_input_wrong_private_short(tmpdir, caplog):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    s_file = {scholar_acc: scholar_private_acc}
     with patch.object(sys, "exit") as mocked_sys:
         axc = AxieClaimsManager(p_file, s_file)
         axc.verify_inputs()
@@ -171,11 +155,10 @@ def test_claims_manager_verify_input_wrong_private_short(tmpdir, caplog):
 
 
 @patch("axie.claims.Claim.execute")
-def test_claims_manager_prepare_claims(mocked_claim_execute, tmpdir):
+def test_claims_manager_prepare_claims(mocked_claim_execute):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -188,9 +171,7 @@ def test_claims_manager_prepare_claims(mocked_claim_execute, tmpdir):
                 "ManagerPayout": 90
             }]
     }
-    p_file.write(json.dumps(data))
-    s_file = tmpdir.join("s.json")
-    s_file.write('{"'+scholar_acc+'":"'+scholar_private_acc+'"}')
+    s_file = {scholar_acc: scholar_private_acc}
     axc = AxieClaimsManager(p_file, s_file)
     axc.prepare_claims()
     mocked_claim_execute.assert_called_once()

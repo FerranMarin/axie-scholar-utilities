@@ -1,4 +1,4 @@
-FROM python:3.9-alpine as python-base
+FROM python:3.10-alpine as python-base
 # External Deps we need
 RUN apk add --update --no-cache gcc libc-dev jpeg-dev zlib-dev linux-headers libusb libusb-dev eudev-dev eudev
 
@@ -7,7 +7,7 @@ COPY /source/ /opt/app/
 
 WORKDIR /opt/app/
 # Install Poetry
-RUN python get-poetry.py --version 1.1.11 && rm get-poetry.py
+RUN python get-poetry.py --version 1.1.13 && rm get-poetry.py
 ENV PATH="/root/.poetry/bin:${PATH}"
 # Update PIP
 RUN python -m pip install -U pip

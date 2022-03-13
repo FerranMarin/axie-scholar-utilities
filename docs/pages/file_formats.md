@@ -3,53 +3,62 @@ It requires a JSON file like:
 
 ```
 {
-    "Manager": "ronin:<Manager address here>",
-    "Scholars":[
+    "scholars": [
         {
-            "Name": "Scholar 1",
-            "AccountAddress": "ronin:<account_address>",
-            "ScholarPayoutAddress": "ronin:<scholar_address>",
-            "ScholarPayout": 10,
-            "TrainerPayoutAddress": "ronin:<trainer_address>",
-            "TrainerPayout": 1,
-            "ManagerPayout": 9
+            "name": "Scholar 1",
+            "ronin": "ronin:<account_s1_address>",
+            "splits": [
+                {
+                    "persona": "Manager",
+                    "percentage": 44,
+                    "ronin": "ronin:<manager_address>"
+                },
+                {
+                    "persona": "Scholar",
+                    "percentage": 40,
+                    "ronin": "ronin:<scholar_1_address>"
+                },
+                {
+                    "persona": "Other Person",
+                    "percentage": 6,
+                    "ronin": "ronin:<other_person_address>"
+                },
+                {
+                    "persona": "Trainer",
+                    "percentage": 10,
+                    "ronin": "ronin:<trainer_address>"
+                }
+            ]
         },
-        {...},
-        ...
+        {...}
     ],
-    "Donations": [
+    "donations": [
         {
-            "Name": "Entity 1",
-            "AccountAddress": "ronin:<donation_entity_address>",
-            "Percent": 0.01
+            "name": "Entity 1",
+            "ronin": "ronin:<donation_entity_1_address>",
+            "percentage": 1
         },
-        {
-            ...
-        }
+        {...}
     ]
 }
 ```
 
 Let's define the concepts in that file.
-- **Manager**: There we input the "manager's" ronin address. This means all manager payments will be paid to that address. A manager is who owns the teams, who put the money to buy the axies the scholars are playing.
-- **Scholars**: This is the list of all scholar accounts we need to make payments to each element in this list contains:
-    - **Name**: Name of this account, it is only for identification purposes.
-    - **Account Address**: Public ronin address of this scholar account. The account that is actually played and we need to get the SLP from
-    - **Scholar Payout Address**: Scholar's ronin address. This is where we will pay the scholar. (Their private account)
-    - **Scholar Payout**: This is the amount of SLP we will pay to the scholar
-    - **Trainer Payout Address**: This is an optional parameter. It is the public ronin address of the trainer for this particular scholar account. A trainer is usually someone who helps the manager control and help him/her with the scholars.
-    - **Trainer Payout**: If previous parameter is present, this is the amount of SLP it will be paid to that address.
-    - **Manager Payout**: This is the amount of SLP that will be transferred to the manager account.
-- **Donations**: Optional list of donations, in case you want to support other projects sharing with them part of your earnings. This percent will be calculated from the Manager Payout and rounded. **Donations to me do NOT go in this place, they are in the code itself!** If any donations or the fee does not reach a minumum of 1 SLP it will not be paid out.
+- **scholars**: This is the list of all scholar accounts we need to make payments to each element in this list contains:
+    - **name**: Name of this account, it is only for identification purposes.
+    - **ronin**: Public ronin address of this scholar account. The account that is actually played and we need to get the SLP from
+    - **splits**: This is the list of accounts that will be paid from that account. It can be as many as you want, just make sure to leave 1% free for the tool fee and for any donations you might want to do.
+        - **persona**: Name of the account to pay, it expects it to be one of the following: `manager`, `scholar`, `other`, `trainer`.
+        - **percentage**: This is the precent of SLP we will pay to the account. Percent is calculated from ALL the SLP in the scholar account. It is in whole numbers, so 1 means 1% and 40 means 40%.
+        - **ronin**: Public ronin address of the account to pay
+- **donations**: Optional list of donations, in case you want to support other projects sharing with them part of your earnings. This percent will be calculated from the total of the account. **Donations to me do NOT go in this place, they are in the code itself!** If any donations or the fee does not reach a minumum of 1 SLP it will not be paid out.
     - **Name**: Name of the entity you want to donate to. This is only for identification purposes.
-    - **Account Address**: Public ronin address of the entity or project you want to donate to.
-    - **Percent**: Percent you want to donate to that entity. **Caution!** Be aware that to donate 1% you need to input: 0.01. If you write a 1, you would be donating 100% of your manager payments! Total percent of all donations added cannot be over 1 (100%). If that is the case, the software will throw an error and ask you to correct it.
-
-Amounts in payots are exact SLP amounts, not percents. For that look into **payments percent file**.
+    - **ronin**: Public ronin address of the entity or project you want to donate to.
+    - **percentage**: Percent you want to donate to that entity. **Caution!** Be aware that to donate 1% you need to input: 0.01. If you write a 1, you would be donating 100% of your manager payments! Total percent of all donations added cannot be over 1 (100%). If that is the case, the software will throw an error and ask you to correct it.
 
 **WARNING!** All addresses in the previous file are the PUBLIC ones. Remember to always keep your private keys safe.
 
-# Payments Percent file format
+# Legacy Payments file format
 It requires a JSON file like:
 
 ```

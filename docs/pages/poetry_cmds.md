@@ -2,18 +2,25 @@
 
 When you have installed this tool using poetry. You will need to add a 2 files into source (for easy of use, they can be in another folder too). These files are:
 
-- payments.json
+- payments.json (optional, if you do not use axie.management integration)
 - secrets.json
+
+To avoid issues, create a `logs` folder.
 
 Check the format on the index page of this wiki, but in general what I recommend you do is:
 
-1. Download the payments file from [here](https://axie.management/tracker/payments). I recomend re-naming the file to payments.json. If you do not get it from there, you will need to build it yourself. If you are planning to use percent payments, in that case, please just have a payments.json that only contains this inside:
+1. If you want to not use the axie.management integration, you will need to have a payments.json that only contains this inside:
+
+        {}
+
+and before running any other command you will need to generate the payments file. So go to `Payments Generation`.
+
+2. You need a secrets.json file that only contains this inside:
 
         { }
 
-2. Have a secrets.json file that only contains this inside:
+3. Result log files will be placed inside a folder `logs` inside files folder. No need to create it before hand, but creating it avoids issues.
 
-        { }
 
 ## Payments Generation
 
@@ -23,6 +30,8 @@ To help in generating payments json, you simply need to execute this command fro
 
 This will ask for your manager ronin and then create a payments file according to what you setup in payments.csv. It can be named anything, just have it in the files folder and use the same name in the command.
 
+If you are using the axie.management integration, this step is not needed.
+
 ## Secret Generation
 
 To help in generating secrets, you simply need to execute this command from the source folder.
@@ -30,6 +39,12 @@ To help in generating secrets, you simply need to execute this command from the 
     poetry run python axie_scholar_cli.py generate_secrets payments.json secrets.json
 
 This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
+
+If you are using the axie.management integration, the command is as follows:
+
+    poetry run python axie_scholar_cli.py managed_generate_secrets secrets.json TOKEN
+
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
 
 ## Mass Update Secrets
 
@@ -45,6 +60,14 @@ To Claim SLP from the scholar accounts in the payments.json file. You need to ru
 
     poetry run python axie_scholar_cli.py claim payments.json secrets.json
 
+If you are using the axie.management integrataion, the command is as follows:
+
+    poetry run python axie_scholar_cli.py managed_claim secrets.json TOKEN
+
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
+
+You can allways append `--force` at the end of the command to force the execution. This will make the command ignore the last time an account was claimed and still try to claim it. (Useful in some cases where errors occurred)
+
 ## Payout
 
 To payout from the scholar accounts, you need to run this command from the source folder.
@@ -56,6 +79,15 @@ This will execute the payments defined in payments.json. Results.log will be upd
 If you do not want to confirm account by account, you can run this other command (result will be the same):
 
     poetry run python axie_scholar_cli.py payout payments.json secrets.json -y
+
+If you are using the axie.management integration, the commands are as folows:
+
+    poetry run python axie_scholar_cli.py managed_payout secrets.json TOKEN
+
+or
+    poetry run python axie_scholar_cli.py managed_payout secrets.json TOKEN -y
+
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
 
 Remmember this command has a cost of 1% of the total ammount of SLP transfered of each account.
 
@@ -84,6 +116,14 @@ For this command we need to have a generated payments file and secrets file. The
     poetry run python axie_scholar_cli.py generate_QR payments.json secrets.json
 
 The resulting QR codes will be placed in same folder as secrets.json (in this case the source folder)
+
+The resulting QR codes will be placed in same folder as secrets.json (in this case the files folder).
+
+If you are using the axie.management integration, the command is as follows:
+
+    poetry run python axie_scholar_cli.py managed_generate_QR secrets.json TOKEN
+
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
 
 ## Axie Generate Breedings
 
@@ -123,12 +163,3 @@ This command will automatically find your axies to morph and morph them. It need
     poetry run python axie_scholar_cli.py axie_morphing secrets.json ronin:abc1,ronin:abc2
 
 Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACE!)
-
-# Alternative Method
-
-If instead of using this commands you are on **windows** (sorry macOs and Linux users!).
-You can put this file in the source folder and simply click it.
-
-[Download Link](../downloadables/poetry_script.ps1)
-
-**Caution**: Be aware, for this file to work you must name the files exactly how I name them in my examples!

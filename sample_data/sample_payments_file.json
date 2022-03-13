@@ -1,35 +1,63 @@
 {
-    "Manager": "ronin:<Manager address here>",
-    "Scholars": [
+    "scholars": [
         {
-            "Name": "Scholar 1",
-            "AccountAddress": "ronin:<account_s1_address>",
-            "ScholarPayoutAddress": "ronin:<scholar_address>",
-            "ScholarPayout": 100,
-            "TrainerPayoutAddress": "ronin:<trainer_address>",
-            "TrainerPayout": 10,
-            "ManagerPayout": 90
+            "name": "Scholar 1",
+            "ronin": "ronin:<account_s1_address>",
+            "splits": [
+                {
+                    "persona": "Manager",
+                    "percentage": 44,
+                    "ronin": "ronin:<manager_address>"
+                },
+                {
+                    "persona": "Scholar",
+                    "percentage": 40,
+                    "ronin": "ronin:<scholar_1_address>"
+                },
+                {
+                    "persona": "Other Person",
+                    "percentage": 6,
+                    "ronin": "ronin:<other_person_address>"
+                },
+                {
+                    "persona": "Trainer",
+                    "percentage": 10,
+                    "ronin": "ronin:<trainer_address>"
+                }
+            ]
         },
         {
-            "Name": "Scholar 2",
-            "AccountAddress": "ronin:<account_s2_address>",
-            "ScholarPayoutAddress": "ronin:<scholar2_address>",
-            "ScholarPayout": 200,
-            "TrainerPayoutAddress": "ronin:<trainer_address>",
-            "TrainerPayout": 14,
-            "ManagerPayout": 190
+            "name": "Scholar 2",
+            "ronin": "ronin:<account_s2_address>",
+            "splits": [
+                {
+                    "persona": "Manager",
+                    "percentage": 5,
+                    "ronin": "ronin:<manager_address>"
+                },
+                {
+                    "persona": "Scholar",
+                    "percentage": 55,
+                    "ronin": "ronin:<scholar_2_address>"
+                },
+                {
+                    "persona": "Other Person",
+                    "percentage": 40,
+                    "ronin": "ronin:<other_address>"
+                }
+            ]
         }
     ],
-    "Donations": [
+    "donations": [
         {
-            "Name": "Entity 1",
-            "AccountAddress": "ronin:<donation_entity_1_address>",
-            "Percent": 0.01
+            "name": "Entity 1",
+            "ronin": "ronin:<donation_entity_1_address>",
+            "percentage": 1
         },
         {
-            "Name": "Entity 2",
-            "AccountAddress": "ronin:<donation_entity_2_address>",
-            "Percent": 0.01
+            "name": "Entity 2",
+            "ronin": "ronin:<donation_entity_2_address>",
+            "percentage": 1
         }
     ]
 }

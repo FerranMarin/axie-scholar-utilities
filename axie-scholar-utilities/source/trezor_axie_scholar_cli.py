@@ -5,10 +5,14 @@ axie_breeding, generate_breedings
 
 Usage:
     trezor_axie_scholar_cli.py payout <payments_file> <config_file> [-y]
+    trezor_axie_scholar_cli.py managed_payout <config_file> <token> [-y]
     trezor_axie_scholar_cli.py claim <payments_file> <config_file> [--force]
+    trezor_axie_scholar_cli.py managed_claim <config_file> <token> [--force]
     trezor_axie_scholar_cli.py config_trezor <payments_file> [<config_file>]
+    trezor_axie_scholar_cli.py managed_config_trezor <config_file> <token>
     trezor_axie_scholar_cli.py generate_payments <csv_file> [<payments_file>]
     trezor_axie_scholar_cli.py generate_QR <payments_file> <config_file>
+    trezor_axie_scholar_cli.py managed_generate_QR <config_file> <token>
     trezor_axie_scholar_cli.py axie_morphing <config_file> <list_of_accounts>
     trezor_axie_scholar_cli.py axie_breeding <breedings_file> <config_file>
     trezor_axie_scholar_cli.py generate_breedings <csv_file> [<breedings_file>]
@@ -29,9 +33,11 @@ import csv
 import json
 import logging
 
+import requests
 from docopt import docopt
 
 from axie import Axies
+from axie.utils import load_json
 from trezor import (
     TrezorAccountsSetup,
     TrezorAxiePaymentsManager,
@@ -143,6 +149,21 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
     log.info('New payments file saved')
 
 
+def load_payments_file(token):
+    url = "https://api.axie.management/external/epithslayer/user/scholars"
+    r = requests.post(url, json={"accessToken": token})
+    if r.status_code == 500:
+        logging.critical('Something went wrong on axie.management side. Go to their Discord see what is it about!')
+    if r.status_code == 426:
+        logging.critical('You have been doing too many requests to axie.management, please wait 5min before a retry')
+    if r.status_code != 200:
+        logging.critical('Could not retrieve your information from axie.management, double check your token')
+        sys.exit()
+    # Only for testing!
+    else:
+        return r.json()
+
+
 def check_file(file):
     if not os.path.isfile(file):
         logging.critical('Please provide a correct path to the file. '
@@ -153,7 +174,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v1.15.1')
+    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v2.0.0')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
@@ -162,7 +183,21 @@ def run_cli():
             logging.info('I shall pay my scholars!')
             if args['--yes']:
                 logging.info("Automatic acceptance active, it won't ask before each execution")
-            apm = TrezorAxiePaymentsManager(payments_file_path, config_file_path, auto=args['--yes'])
+            apm = TrezorAxiePaymentsManager(load_json(payments_file_path), load_json(config_file_path), auto=args['--yes'])
+            apm.verify_inputs()
+            apm.prepare_payout()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    if args['managed_payout']:
+        logging.info("I shall help you pay!")
+        token = args['<token>']
+        payments = load_payments_file(token)
+        config_file_path = args['<config_file>']
+        if check_file(config_file_path):
+            logging.info('I shall pay my scholars!')
+            if args['--yes']:
+                logging.info("Automatic acceptance active, it won't ask before each execution")
+            apm = TrezorAxiePaymentsManager(payments, load_json(config_file_path), auto=args['--yes'])
             apm.verify_inputs()
             apm.prepare_payout()
         else:
@@ -174,7 +209,20 @@ def run_cli():
         if check_file(payments_file_path) and check_file(config_file_path):
             # Claim SLP
             logging.info('I shall claim SLP')
-            acm = TrezorAxieClaimsManager(payments_file_path, config_file_path, force)
+            acm = TrezorAxieClaimsManager(load_json(payments_file_path), load_json(config_file_path), force)
+            acm.verify_inputs()
+            acm.prepare_claims()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['managed_claim']:
+        token = args['<token>']
+        payments = load_payments_file(token)
+        config_file_path = args['<config_file>']
+        force = args['--force']
+        if check_file(config_file_path):
+            # Claim SLP
+            logging.info('I shall claim SLP')
+            acm = TrezorAxieClaimsManager(payments, load_json(config_file_path), force)
             acm.verify_inputs()
             acm.prepare_claims()
         else:
@@ -188,7 +236,23 @@ def run_cli():
            not config_file_path and check_file(payments_file_path)):
             logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
                          'have configured the tool for all the accounts present in payments.json')
-            tas = TrezorAccountsSetup(payments_file_path, config_file_path)
+            if not config_file_path:
+                tas = TrezorAccountsSetup(load_json(payments_file_path), None, None)
+            else:
+                tas = TrezorAccountsSetup(load_json(payments_file_path), load_json(config_file_path), config_file_path)
+            tas.update_trezor_config()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['managed_config_trezor']:
+        # Configure Trezor
+        logging.info('I shall help you configure your trezor device to use this tool!')
+        token = args['<token>']
+        payments = load_payments_file(token)
+        config_file_path = args.get('<config_file>')
+        if config_file_path and check_file(config_file_path):
+            logging.info('You will be asked to introduce passphrases and number of accounts per passphrase until you '
+                         'have configured the tool for all the accounts present in payments.json')
+            tas = TrezorAccountsSetup(payments, load_json(config_file_path), config_file_path)
             tas.update_trezor_config()
         else:
             logging.critical("Please review your file paths and re-try.")
@@ -280,7 +344,18 @@ def run_cli():
         payments_file_path = args['<payments_file>']
         config_file_path = args['<config_file>']
         if check_file(payments_file_path) and check_file(config_file_path):
-            qr = TrezorQRCodeManager(payments_file_path, config_file_path)
+            qr = TrezorQRCodeManager(load_json(payments_file_path), load_json(config_file_path), os.path.dirname(config_file_path))
+            qr.execute()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['managed_generate_QR']:
+        # Generate QR codes
+        logging.info('I shall generate QR codes')
+        token = args['<token>']
+        payments = load_payments_file(token)
+        config_file_path = args['<config_file>']
+        if check_file(config_file_path):
+            qr = TrezorQRCodeManager(payments, load_json(config_file_path), os.path.dirname(config_file_path))
             qr.execute()
         else:
             logging.critical("Please review your file paths and re-try.")

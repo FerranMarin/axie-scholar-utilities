@@ -14,16 +14,16 @@ from trezor.trezor_qr_code import TrezorQRCode
 def test_qrcode_manager_init(mocked_load):
     config_file = "trezor_config.json"
     payments_file = "payments.json"
-    tr_qr_m = TrezorQRCodeManager(payments_file, config_file)
+    tr_qr_m = TrezorQRCodeManager(payments_file, config_file, '/')
     mocked_load.assert_called_with(config_file, payments_file)
     assert tr_qr_m.trezor_config == "foo"
     assert tr_qr_m.acc_names == "bar"
+    assert tr_qr_m.path == '/'
 
 
-def test_qrcode_manager_verify_input_success(tmpdir):
+def test_qrcode_manager_verify_input_success():
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -33,21 +33,17 @@ def test_qrcode_manager_verify_input_success(tmpdir):
                 "ScholarPercent": 60
             }]
     }
-    p_file.write(json.dumps(data))
-    c_file = tmpdir.join("s.json")
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
-    qr = TrezorQRCodeManager(p_file, c_file)
+    qr = TrezorQRCodeManager(p_file, config_data, '/')
     qr.verify_inputs()
     assert qr.trezor_config == config_data
     assert qr.acc_names == {scholar_acc: "Scholar 1"}
-    assert qr.path == os.path.dirname(c_file)
+    assert qr.path == '/'
 
 
-def test_qrcode_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
+def test_qrcode_manager_verify_inputs_wrong_public_ronin(caplog):
     scholar_acc = '<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -57,12 +53,9 @@ def test_qrcode_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
                 "ScholarPercent": 60
             }]
     }
-    p_file.write(json.dumps(data))
-    c_file = tmpdir.join("s.json")
     config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
-    c_file.write(json.dumps(config_data))
     with patch.object(sys, "exit") as mocked_sys:
-        qr = TrezorQRCodeManager(p_file, c_file)
+        qr = TrezorQRCodeManager(p_file, config_data, '/')
         qr.verify_inputs()
 
     mocked_sys.assert_called_once()
@@ -72,11 +65,10 @@ def test_qrcode_manager_verify_inputs_wrong_public_ronin(tmpdir, caplog):
 @patch("trezor.trezor_qr_code.get_default_client", return_value="client")
 @patch("trezor.trezor_qr_code.TrezorQRCode.generate_qr")
 @patch("trezor.trezor_qr_code.TrezorQRCode.__init__", return_value=None)
-def test_qrcode_manager_execute(mocked_qrcode_init, mocked_qrcode_generate_qr, mocked_client, tmpdir):
+def test_qrcode_manager_execute(mocked_qrcode_init, mocked_qrcode_generate_qr, mocked_client):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_acc_other = 'ronin:<account_s2_address>' + "".join([str(x) for x in range(10)]*4)
-    p_file = tmpdir.join("p.json")
-    data = {
+    p_file = {
         "Manager": "ronin:<Manager address here>",
         "Scholars": [
             {
@@ -92,14 +84,11 @@ def test_qrcode_manager_execute(mocked_qrcode_init, mocked_qrcode_generate_qr, m
                 "ScholarPercebt": 60
             }]
     }
-    p_file.write(json.dumps(data))
-    c_file = tmpdir.join("s.json")
     config_data = {
         scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"},
         scholar_acc_other: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/1"}
     }
-    c_file.write(json.dumps(config_data))
-    qr = TrezorQRCodeManager(p_file, c_file)
+    qr = TrezorQRCodeManager(p_file, config_data, '/')
     qr.execute()
     mocked_qrcode_init.assert_has_calls(calls=[
         call(
@@ -107,13 +96,13 @@ def test_qrcode_manager_execute(mocked_qrcode_init, mocked_qrcode_generate_qr, m
             bip_path="m/44'/60'/0'/0/0",
             client="client",
             acc_name="Scholar 1",
-            path=os.path.dirname(c_file)),
+            path='/'),
         call(
             account=scholar_acc_other,
             bip_path="m/44'/60'/0'/0/1",
             client="client",
             acc_name="Scholar 2",
-            path=os.path.dirname(c_file))
+            path='/')
     ])
     mocked_client.assert_called()
     assert mocked_qrcode_generate_qr.call_count == 2
