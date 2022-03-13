@@ -165,7 +165,7 @@ class AxieClaimsManager:
                 refined_secrets[key] = secrets[key]
                 acc_names[key] = scholar['Name']
         else:
-            for scholar in payments['scholar']:
+            for scholar in payments['scholars']:
                 key = scholar['ronin']
                 refined_secrets[key] = secrets[key]
                 acc_names[key] = scholar['name']
