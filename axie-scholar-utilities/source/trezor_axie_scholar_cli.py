@@ -174,7 +174,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v2.0.0')
+    args = docopt(__doc__, version='Trezor Axie Scholar Payments CLI v2.0.1')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
