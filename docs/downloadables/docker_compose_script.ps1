@@ -2,6 +2,10 @@
 function axie-utils-gen-secrets {
     docker-compose run scholar-utilities generate_secrets files/payments.json files/secrets.json
 }
+# Alias to managed generate secrets
+function axie-utils-managed-gen-secrets {
+    docker-compose run scholar-utilities managed_generate_secrets files/secrets.json $token
+}
 # Alias to generate payments
 function axie-utils-gen-payments {
     docker-compose run scholar-utilities generate_payments files/payments.csv files/payments.json
@@ -14,13 +18,25 @@ function axie-utils-mass-update {
 function axie-utils-claim {
     docker-compose run scholar-utilities claim files/payments.json files/secrets.json
 }
+# Alias to managed execute claims
+function axie-utils-managed-claim {
+    docker-compose run scholar-utilities managed_claim files/secrets.json $token
+}
 # Alias to execute payments
 function axie-utils-payout {
     docker-compose run scholar-utilities payout files/payments.json files/secrets.json
 }
+# Alias to managed execute payments
+function axie-utils-managed-payout {
+    docker-compose run scholar-utilities managed_payout files/secrets.json $token
+}
 # Alias to execute auto-payments (no confirmation)
 function axie-utils-auto-payout {
     docker-compose run scholar-utilities payout files/payments.json files/secrets.json -y
+}
+# Alias to managed execute auto-payments (no confirmation)
+function axie-utils-managed-auto-payout {
+    docker-compose run scholar-utilities managed_payout files/secrets.json $token -y
 }
 # Alias to execute axie transfers
 function axie-utils-transfer-axies {
@@ -33,6 +49,10 @@ function axie-utils-gen-transfers {
 # Alias to execute generate_qr
 function axie-utils-gen-QR {
     docker-compose run scholar-utilities generate_QR files/payments.json files/secrets.json
+}
+# Alias to managed execute generate_qr
+function axie-utils-managed-gen-QR {
+    docker-compose run scholar-utilities managed_generate_QR files/secrets.json $token
 }
 #Alias to generate breedings file
 function axie-utils-gen-breedings {
@@ -92,6 +112,14 @@ while ($running -ne 0) {
     Write-Host "10. Generate Breedings File"
     Write-Host "11. Execute Breed Axies"
     Write-Host "12. Execute Morph Axies by Ronin Addresses"
+    Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    Write-Host "   Managed commands (if you have axie.management Token)"
+    Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    Write-Host "13. Managed Generate Secrets"
+    Write-Host "14. Managed Execute Claims"
+    Write-Host "15. Managed Execute Payments"
+    Write-Host "16. Managed Execute Auto-PaymentsPayments"
+    Write-Host "17. Managed Generate QR Code"
     Write-Host "0. Exit"
     Write-Host "====================================="
     $choice = Read-Host "Choose an option: "
@@ -146,6 +174,31 @@ while ($running -ne 0) {
             $ronin_list = Read-Host "Ronin Addresses list where axies to morph are (separate with a comma)"
             validate_ronin_addresses ($ronin_list -split ",")
             axie-utils-axie-morphing $ronin_list
+            pause
+        }
+        13 {
+            $token = Read-Host "Introduce Axie.management Token:"
+            axie-utils-managed-gen-secrets $token
+            pause
+        }
+        14 {
+            $token = Read-Host "Introduce Axie.management Token:"
+            axie-utils-managed-claim $token
+            pause
+        }
+        15 {
+            $token = Read-Host "Introduce Axie.management Token:"
+            axie-utils-managed-payout
+            pause
+        }
+        16 {
+            $token = Read-Host "Introduce Axie.management Token:"
+            axie-utils-managed-auto-payout
+            pause
+        }
+        17 {
+            $token = Read-Host "Introduce Axie.management Token:"
+            axie-utils-managed-gen-QR
             pause
         }
     }
