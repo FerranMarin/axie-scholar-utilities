@@ -36,10 +36,16 @@ class TrezorQRCodeManager:
         payments = payments_file
         refined_config = {}
         acc_names = {}
-        for scholar in payments['Scholars']:
-            key = scholar['AccountAddress'].lower()
-            refined_config[key] = config[key]
-            acc_names[key] = scholar['Name']
+        if 'Manager' in payments:
+            for scholar in payments['Scholars']:
+                key = scholar['AccountAddress'].lower()
+                refined_config[key] = config[key]
+                acc_names[key] = scholar['Name']
+        else:
+            for scholar in payments['scholar']:
+                key = scholar['ronin']
+                refined_config[key] = config[key]
+                acc_names[key] = scholar['name']
         return refined_config, acc_names
 
     def verify_inputs(self):
