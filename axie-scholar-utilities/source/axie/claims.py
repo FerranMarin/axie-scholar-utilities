@@ -159,10 +159,16 @@ class AxieClaimsManager:
     def load_secrets_and_acc_name(self, secrets, payments):
         refined_secrets = {}
         acc_names = {}
-        for scholar in payments['Scholars']:
-            key = scholar['AccountAddress']
-            refined_secrets[key] = secrets[key]
-            acc_names[key] = scholar['Name']
+        if 'Manager' in payments:
+            for scholar in payments['Scholars']:
+                key = scholar['AccountAddress']
+                refined_secrets[key] = secrets[key]
+                acc_names[key] = scholar['Name']
+        else:
+            for scholar in payments['scholar']:
+                key = scholar['ronin']
+                refined_secrets[key] = secrets[key]
+                acc_names[key] = scholar['name']
         return refined_secrets, acc_names
 
     def verify_inputs(self):
