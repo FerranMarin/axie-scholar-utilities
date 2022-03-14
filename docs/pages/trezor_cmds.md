@@ -16,7 +16,7 @@ Check the format on the index page of this wiki, but in general what I recommend
 
 and before running any other command you will need to generate the payments file. So go to `Payments Generation`.
 
-2. You need a secrets.json file that only contains this inside:
+2. You need a trezor_config.json file that only contains this inside:
 
         { }
 
@@ -56,7 +56,7 @@ To Claim SLP from the scholar accounts in the payments.json file. You need to ru
 
 If you are using the axie.management integrataion, the command is as follows:
 
-   poetry run python trezor_axie_scholar_cli.py managed_claim secrets.json TOKEN
+   poetry run python trezor_axie_scholar_cli.py managed_claim trezor_config.json TOKEN
 
 Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
 
@@ -76,10 +76,10 @@ If you do not want to confirm account by account, you can run this other command
 
 If you are using the axie.management integration, the commands are as folows:
 
-    poetry run python trezor_axie_scholar_cli.py managed_payout secrets.json TOKEN
+    poetry run python trezor_axie_scholar_cli.py managed_payout trezor_config.json TOKEN
 
 or
-    poetry run python trezor_axie_scholar_cli.py managed_payout secrets.json TOKEN -y
+    poetry run python trezor_axie_scholar_cli.py managed_payout trezor_config.json TOKEN -y
 
 Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
 
@@ -111,11 +111,11 @@ For this command we need to have a generated payments file and secrets file. The
 
 The resulting QR codes will be placed in same folder as trezor_config.json (in this case the source folder)
 
-The resulting QR codes will be placed in same folder as secrets.json (in this case the files folder).
+The resulting QR codes will be placed in same folder as trezor_config.json (in this case the files folder).
 
 If you are using the axie.management integration, the command is as follows:
 
-    poetry run python trezor_axie_scholar_cli.py managed_generate_QR secrets.json TOKEN
+    poetry run python trezor_axie_scholar_cli.py managed_generate_QR trezor_config.json TOKEN
 
 Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
 
