@@ -11,15 +11,20 @@ from trezor.trezor_utils import CustomUI
 
 class TrezorAccountsSetup:
 
-    def __init__(self, payments_file, trezor_config_file=None, path=None):
+    def __init__(self, payments_file, trezor_config_file=None, path=None, type='legacy'):
         self.trezor_config = trezor_config_file if trezor_config_file else {}
         self.payments = payments_file
         self.path = path
+        self.type = type
 
     def update_trezor_config(self):
         account_list = []
-        for acc in self.payments['Scholars']:
-            account_list.append(acc['AccountAddress'].lower())
+        if self.type == "legacy":
+            for acc in self.payments['Scholars']:
+                account_list.append(acc['AccountAddress'].lower())
+        else:
+            for acc in self.payments['scholars']:
+                account_list.append(acc['ronin'].lower())
 
         non_configured_accs = account_list.copy()
 
