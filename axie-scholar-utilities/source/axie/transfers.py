@@ -72,17 +72,17 @@ class Transfer:
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        hash_ = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
         # Wait for transaction to finish or timeout
         start_time = datetime.now()
         while True:
-            # We will wait for max 10min for this trasnfer to happen
+            # We will wait for max 10min for this transfer to happen
             if datetime.now() - start_time > timedelta(minutes=TIMEOUT_MINS):
                 success = False
                 logging.info(f"Important: Transfer {self}, timed out!")
                 break
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(hash_)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -93,8 +93,8 @@ class Transfer:
                 # Sleep 10 seconds not to constantly send requests!
                 sleep(10)
         if success:
-            logging.info(f"Important: {self} completed! Hash: {hash} - "
-                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+            logging.info(f"Important: {self} completed! Hash: {hash_} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash_)}")
         else:
             logging.info(f"Important: {self} failed")
 

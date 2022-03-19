@@ -56,7 +56,7 @@ class Morph(AxieGraphQL):
             if response.json().get('data') and response.json()['data'].get('morphAxie'):
                 logging.info(f"Important: Axie {self.axie} in {self.account} correctly morphed!")
             else:
-                logging.info(f"Important: Somethin went wrong morphing axie {self.axie} in {self.account}")
+                logging.info(f"Important: Something went wrong morphing axie {self.axie} in {self.account}")
         else:
             logging.critical(f"Important! Axie {self.axie} in {self.account} is not ready to be morphed!")
 
