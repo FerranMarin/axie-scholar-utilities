@@ -239,7 +239,7 @@ class AxiePaymentsManager:
             self.type = "new"
         except ValidationError as ex:
             new_msg = ("If you were tyring to pay using the current format:\n"
-                       "Error given: {ex.message}\n"
+                       f"Error given: {ex.message}\n"
                        f"For attribute in: {list(ex.path)}\n")
             validation_success = False
 

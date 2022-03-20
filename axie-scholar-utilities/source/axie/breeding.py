@@ -138,14 +138,13 @@ class AxieBreedManager:
 
     def calculate_fee_cost(self):
         number_of_breeds = len(self.breeding_file)
-        cost = 0
         if number_of_breeds <= 15:
             cost = number_of_breeds * 30
-        if 15 < number_of_breeds <= 30:
+        elif 15 < number_of_breeds <= 30:
             cost = (15 * 30) + ((number_of_breeds - 15) * 25)
-        if 30 < number_of_breeds <= 50:
+        elif 30 < number_of_breeds <= 50:
             cost = (15 * 30) + (15 * 25) + ((number_of_breeds - 30) * 20)
-        if number_of_breeds > 50:
+        else:
             cost = (15 * 30) + (15 * 25) + (20 * 20) + ((number_of_breeds - 50) * 15)
         return cost
 

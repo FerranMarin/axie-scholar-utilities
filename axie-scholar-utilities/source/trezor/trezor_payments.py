@@ -273,8 +273,8 @@ class TrezorAxiePaymentsManager:
             self.type = "new"
         except ValidationError as ex:
             new_msg = ("If you were tyring to pay using the current format:\n"
-                          f"Error given: {ex.message}\n"
-                          f"For attribute in: {list(ex.path)}\n")
+                       f"Error given: {ex.message}\n"
+                       f"For attribute in: {list(ex.path)}\n")
             validation_success = False
 
         if not self.type:
@@ -284,8 +284,8 @@ class TrezorAxiePaymentsManager:
                 validation_success = True
             except ValidationError as ex:
                 legacy_msg = ("If you were tyring to pay using the legacy format:\n"
-                               f"Error given: {ex.message}\n"
-                               f"For attribute in: {list(ex.path)}\n")
+                              f"Error given: {ex.message}\n"
+                              f"For attribute in: {list(ex.path)}\n")
                 validation_success = False
         
         if not validation_success:
