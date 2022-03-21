@@ -90,7 +90,7 @@ def get_nonce(account):
 
 
 def load_json(json_file):
-    # This is a safe guard, it should never raise as we check this in the CLI.
+    # This is a safeguard, it should never raise as we check this in the CLI.
     if not os.path.isfile(json_file):
         raise Exception(f"File path {json_file} does not exist. "
                         f"Please provide a correct one")

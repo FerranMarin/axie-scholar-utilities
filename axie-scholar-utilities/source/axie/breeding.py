@@ -71,7 +71,7 @@ class Breed:
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        hash_ = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
         # Wait for transaction to finish or timeout
         logging.info("{self} about to start!")
         start_time = datetime.now()
@@ -82,7 +82,7 @@ class Breed:
                 logging.info(f"Transaction {self}, timed out!")
                 break
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(hash_)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -140,11 +140,11 @@ class AxieBreedManager:
         number_of_breeds = len(self.breeding_file)
         if number_of_breeds <= 15:
             cost = number_of_breeds * 30
-        if 15 < number_of_breeds <= 30:
+        elif 15 < number_of_breeds <= 30:
             cost = (15 * 30) + ((number_of_breeds - 15) * 25)
-        if 30 < number_of_breeds <= 50:
+        elif 30 < number_of_breeds <= 50:
             cost = (15 * 30) + (15 * 25) + ((number_of_breeds - 30) * 20)
-        if number_of_breeds > 50:
+        else:
             cost = (15 * 30) + (15 * 25) + (20 * 20) + ((number_of_breeds - 50) * 15)
         return cost
 

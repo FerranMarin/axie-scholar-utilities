@@ -12,7 +12,6 @@ import requests
 from axie.utils import (
     check_balance,
     get_nonce,
-    load_json,
     ImportantLogsFilter,
     SLP_CONTRACT,
     RONIN_PROVIDER_FREE,
@@ -128,11 +127,11 @@ class Claim(AxieGraphQL):
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed_claim.rawTransaction)
         # Get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
+        hash_ = self.w3.toHex(self.w3.keccak(signed_claim.rawTransaction))
         # Wait for transaction to finish
         while True:
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(hash_)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -140,7 +139,7 @@ class Claim(AxieGraphQL):
                 break
             except exceptions.TransactionNotFound:
                 logging.debug(f"Waiting for claim for {self.acc_name} ({self.account.replace('0x', 'ronin:')}) to "
-                              f"finish (Nonce:{nonce}) (Hash: {hash})...")
+                              f"finish (Nonce:{nonce}) (Hash: {hash_})...")
                 # Sleep 5 seconds not to constantly send requests!
                 await asyncio.sleep(5)
         if success:

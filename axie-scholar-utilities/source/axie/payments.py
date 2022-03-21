@@ -12,7 +12,6 @@ from axie.schemas import payments_schema, legacy_payments_schema
 from axie.utils import (
     check_balance,
     get_nonce,
-    load_json,
     Singleton,
     ImportantLogsFilter,
     SLP_CONTRACT,
@@ -126,7 +125,7 @@ class Payment:
         # Send raw transaction
         self.w3.eth.send_raw_transaction(signed.rawTransaction)
         # get transaction hash
-        hash = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
+        hash_ = self.w3.toHex(self.w3.keccak(signed.rawTransaction))
         # Wait for transaction to finish or timeout
         start_time = datetime.now()
         while True:
@@ -136,7 +135,7 @@ class Payment:
                 logging.info(f"Transaction {self}, timed out!")
                 break
             try:
-                recepit = self.w3.eth.get_transaction_receipt(hash)
+                recepit = self.w3.eth.get_transaction_receipt(hash_)
                 if recepit["status"] == 1:
                     success = True
                 else:
@@ -148,8 +147,8 @@ class Payment:
                 logging.info(f"Waiting for transaction '{self}' to finish (Nonce:{nonce})...")
 
         if success:
-            logging.info(f"Important: Transaction {self} completed! Hash: {hash} - "
-                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash)}")
+            logging.info(f"Important: Transaction {self} completed! Hash: {hash_} - "
+                         f"Explorer: https://explorer.roninchain.com/tx/{str(hash_)}")
             self.summary.increase_payout(
                 amount=self.amount,
                 address=self.to_acc.replace('0x', 'ronin:'),
@@ -240,8 +239,8 @@ class AxiePaymentsManager:
             self.type = "new"
         except ValidationError as ex:
             new_msg = ("If you were tyring to pay using the current format:\n"
-                          f"Error given: {ex.message}\n"
-                          f"For attribute in: {list(ex.path)}\n")
+                       f"Error given: {ex.message}\n"
+                       f"For attribute in: {list(ex.path)}\n")
             validation_success = False
 
         if not self.type:
@@ -251,8 +250,8 @@ class AxiePaymentsManager:
                 validation_success = True
             except ValidationError as ex:
                 legacy_msg = ("If you were tyring to pay using the legacy format:\n"
-                               f"Error given: {ex.message}\n"
-                               f"For attribute in: {list(ex.path)}\n")
+                              f"Error given: {ex.message}\n"
+                              f"For attribute in: {list(ex.path)}\n")
                 validation_success = False
         
         if not validation_success:
@@ -344,7 +343,7 @@ class AxiePaymentsManager:
                     amount,
                     self.summary
                 ))
-            # Dono Payments
+            # Donation Payments
             if self.donations:
                 for dono in self.donations:
                     dono_amount = round(acc_balance * (dono["percentage"]/100))
