@@ -41,7 +41,7 @@ payments_schema = {
                                 "percentage": {
                                     "type": "number",
                                     "minimum": 1,
-                                    "maximum": 99
+                                    "maximum": 100
                                 }
                             },
                             "additionalProperties": False
