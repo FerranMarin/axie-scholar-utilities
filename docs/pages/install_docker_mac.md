@@ -46,8 +46,8 @@ If you go this route, I recomend also setting up these alias in your terminal to
     axie-utils-gen-transfers() {docker run -it -v ${PWD}/${1}:/opt/app/files/transfers.csv -v ${PWD}/${2}:/opt/app/files/transfers.json epith/axie-scholar-utilities generate_transfer_axies files/transfers.csv files/transfers.json}
     # Alias to execute generate_qr
     axie-utils-gen-QR() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/payments.json files/secrets.json}
-    # Alias to execute generate_qr
-    axie-utils-gen-QR() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities generate_QR files/secrets.json ${2}}
+    # Alias to execute managed generate_qr
+    axie-utils-managed-gen-QR() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}:/opt/app/files epith/axie-scholar-utilities managed_generate_QR files/secrets.json ${2}}
     # Alias to generate breedings file
     axie-utils-gen-breedings() {docker run -it -v ${PWD}/${1}:/opt/app/files/breedings.csv -v ${PWD}/${2}:/opt/app/files/breedings.json epith/axie-scholar-utilities generate_breedings files/breedings.csv files/breedings.json}
     # Alias to breed axies
