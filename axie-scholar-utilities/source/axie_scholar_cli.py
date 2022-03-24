@@ -236,7 +236,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v2.0.1')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v2.0.3')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']

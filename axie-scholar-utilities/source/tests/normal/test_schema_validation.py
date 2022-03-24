@@ -25,7 +25,7 @@ from axie.schemas import legacy_payments_schema, payments_schema, transfers_sche
         ({"scholars": [{"name": "foo", "ronin": "ronin:foo", "splits": [
             {"persona": "foo", "ronin": "ronin:foo", "percentage": 0}]}]}, "0 is less than the minimum of 1"),
         ({"scholars": [{"name": "foo", "ronin": "ronin:foo", "splits": [
-            {"persona": "foo", "ronin": "ronin:foo", "percentage": 100}]}]}, "100 is greater than the maximum of 99"),
+            {"persona": "foo", "ronin": "ronin:foo", "percentage": 101}]}]}, "101 is greater than the maximum of 100"),
         ])
 def test_json_validator_payments_schema_error(json_input, expected_error):
     with pytest.raises(ValidationError) as e:

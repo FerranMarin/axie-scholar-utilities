@@ -81,6 +81,50 @@ def test_payments_manager_verify_input_success():
     assert taxp.donations == p_file['donations']
 
 
+def test_payments_manager_verify_input_success(caplog):
+    manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
+    dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
+    scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
+    scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
+    p_file = {
+        "scholars": [{
+            "name": "Scholar 1",
+            "ronin": scholar_acc,
+            "splits": [
+                {
+                    "persona": "foo",
+                    "percentage": 44,
+                    "ronin": manager_acc
+                },
+                {
+                    "persona": "Scholar",
+                    "percentage": 40,
+                    "ronin": "ronin:<scholar_1_address>"
+                },
+                {
+                    "persona": "Other Person",
+                    "percentage": 6,
+                    "ronin": "ronin:<other_person_address>"
+                },
+                {
+                    "persona": "Trainer",
+                    "percentage": 10,
+                    "ronin": "ronin:<trainer_address>"
+                }
+        ]}],
+        "donations": [{
+            "name": "Entity 1",
+            "ronin": dono_acc,
+            "percentage": 1
+        }]
+    }
+    config_data = {scholar_acc: {"passphrase": "", "bip_path": "m/44'/60'/0'/0/0"}}
+    with patch.object(sys, "exit") as mocked_sys:
+        axp = TrezorAxiePaymentsManager(p_file, config_data)
+        axp.verify_inputs()
+    mocked_sys.assert_called()
+    assert "Account 'Scholar 1' has no manager in its splits. Please review it!" in caplog.text
+
 def test_payments_manager_verify_input_success_legacy():
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
