@@ -222,7 +222,7 @@ class AxiePaymentsManager:
             # Check all splits have a "manager" persona
             personas = []
             for split in acc["splits"]:
-                personas.append(split["persona")
+                personas.append(split["persona"])
             if "manager" not in personas:
                 logging.crittical(f"Account '{acc['name']}' has no manager in its splits. Please review it!")
         
