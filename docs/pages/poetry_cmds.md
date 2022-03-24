@@ -85,6 +85,7 @@ If you are using the axie.management integration, the commands are as folows:
     poetry run python axie_scholar_cli.py managed_payout secrets.json TOKEN
 
 or
+    
     poetry run python axie_scholar_cli.py managed_payout secrets.json TOKEN -y
 
 Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
@@ -116,8 +117,6 @@ For this command we need to have a generated payments file and secrets file. The
     poetry run python axie_scholar_cli.py generate_QR payments.json secrets.json
 
 The resulting QR codes will be placed in same folder as secrets.json (in this case the source folder)
-
-The resulting QR codes will be placed in same folder as secrets.json (in this case the files folder).
 
 If you are using the axie.management integration, the command is as follows:
 
