@@ -2,20 +2,24 @@
 
 This one is one of the easiest ways to execute commands. All you need is to have a folder with 2 files (and any csv files you might use to create any json file):
 
-- payments.json
+- payments.json (optional, if you do not use axie.management integration)
 - secrets.json
+
+To avoid issues, create a logs folder.
 
 Check the format on the index page of this wiki, but in general what I recommend you do is:
 
-1. Download the payments file from [here](https://axie.management/tracker/payments). I recomend re-naming the file to payments.json. If you do not get it from there, you will need to build it yourself.For that you need to have a payments.json that only contains this inside:
+1. If you want to not use the axie.management integration, you will need to have a payments.json that only contains this inside:
 
         { }
 
-2. Have a secrets.json file that only contains this inside:
+and before running any other command you will need to generate the payments file. So go to Payments Generation.
+
+2. You need a secrets.json file that only contains this inside:
 
         { }
 
-3. Result log files will be placed inside a folder `logs` where you ran this code. No need to create it before hand.
+3. Result log files will be placed inside a folder `logs` where you ran this code. No need to create it before hand, but creating it avoids issues.
 
 ## Payments Generation
 
@@ -33,6 +37,12 @@ To help in generating secrets, you simply need to execute this command from the 
 
 This will update the secrets.json either from an emtpy one with only {}, to one that already has some accounts in. I recommend ALWAYS running this one before doing claims or payouts.
 
+If you are using the axie.management integration, the command is as follows:
+
+    axie-utils-managed-gen-secrets secrets.json TOKEN
+
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).
+
 ## Mass Update Secrets
 
 For this command you will need a file called update.csv. It needs to be inside the folder that holds your json and csv files. Then the command is as follows:
@@ -47,6 +57,12 @@ To Claim SLP from the scholar accounts in the payments.json file. You need to ru
 
     axie-utils-claim payments.json secrets.json
 
+If you are using the axie.management integrataion, the command is as follows:
+
+    axie-utils-managed-claim secrets.json TOKEN
+ 
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile). 
+
 ## Payout
 
 To payout from the scholar accounts, the command is the following (You need to run this command from the folder where you have the previously mentioned 3 files):
@@ -58,6 +74,16 @@ This will execute the payments defined in payments.json. A log file will be gene
 If you do not want to confirm account by account, you can run this other command (result will be the same):
 
     axie-utils-auto-payout payments.json secrets.json
+
+If you are using the axie.management integration, the commands are as folows:
+
+    axie-utils-managed-auto-payout secrets.json TOKEN
+
+or:
+
+    axie-utils-managed-auto-payout secrets.json TOKEN
+
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile). 
 
 Remmember this command has a cost of 1% of the total ammount of SLP transfered of each account.
 
@@ -84,6 +110,12 @@ For this command we need to have a generated payments file and secrets file. The
     axie-utils-gen-QR payments.json secrets.json
 
 The resulting QR codes will be placed in same folder as secrets.json (in this case the same folder you have the rest of files)
+
+If you are using the axie.management integration, the command is as follows:
+
+    axie-utils-managed-gen-QR secrets.json TOKEN
+
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile). 
 
 ## Axie Generate Breedings
 
