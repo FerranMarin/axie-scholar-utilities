@@ -214,12 +214,18 @@ class AxiePaymentsManager:
                 validation_success = False
             self.donations = self.payments_file["donations"]
 
-        # Check we have private keys for all accounts
         for acc in self.payments_file["scholars"]:
+            # Check we have private keys for all accounts
             if acc["ronin"] not in self.secrets_file:
                 logging.critical(f"Account '{acc['name']}' is not present in secret file, please add it.")
                 validation_success = False
-
+            # Check all splits have a "manager" persona
+            personas = []
+            for split in acc["splits"]:
+                personas.append(split["persona")
+            if "manager" not in personas:
+                logging.crittical(f"Account '{acc['name']}' has no manager in its splits. Please review it!")
+        
         if not validation_success:
             logging.critical("Please make sure your payments.json file looks like the payments one in the wiki or the sample files.\n"
                              "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
