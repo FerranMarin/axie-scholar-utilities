@@ -6,6 +6,8 @@ transfer_axies, axie_morphing, axie_breeding, generate_breedings
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
     axie_scholar_cli.py managed_payout <secrets_file> <token> [-y]
+    axie_scholar_cli.py scatter_ron <payments_file> <secrets_file> <min_amount>
+    axie_scholar_cli.py managed_scatter_ron <payments_file> <token> <min_amount>
     axie_scholar_cli.py claim <payments_file> <secrets_file> [--force]
     axie_scholar_cli.py managed_claim <secrets_file> <token> [--force]
     axie_scholar_cli.py generate_secrets <payments_file> [<secrets_file>]
@@ -44,7 +46,8 @@ from axie import (
     Axies,
     AxieMorphingManager,
     AxieBreedManager,
-    QRCodeManager
+    QRCodeManager,
+    ScatterRonManager
 )
 from axie.utils import load_json
 
@@ -262,6 +265,53 @@ def run_cli():
             apm = AxiePaymentsManager(payments, load_json(secrets_file_path), auto=args['--yes'])
             apm.verify_inputs()
             apm.prepare_payout()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['scatter_ron']:
+        logging.info("I shall help you scatter ron!")
+        payments_file_path = args['<payments_file>']
+        secrets_file_path = args['<secrets_file>']
+        min_ron = args['<min_amount>']
+        if check_file(payments_file_path) and check_file(secrets_file_path):
+            payment_account = ''
+            while payment_account == '':
+                msg = input("Provide ronin account that will provide the RON to scatter: ")
+                if len(msg) == 46 and msg.startswith('ronin:'):
+                    # Make sure is a valid Hex
+                    try:
+                        int(msg[6:], 16)
+                    except ValueError:
+                        continue
+                    payment_account = msg
+                else:
+                    logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
+            logging.info('I shall scatter ron for my scholars!')
+            scm = ScatterRonManager(payment_account, load_json(payments_file_path), load_json(secrets_file_path), min_ron)
+            scm.execute()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['managed_scatter_ron']:
+        logging.info("I shall help you scatter ron!")
+        payments_file_path = args['<payments_file>']
+        token = args['<token>']
+        payments = load_payments_file(token)
+        min_ron = args['<min_amount>']
+        if check_file(secrets_file_path):
+            payment_account = ''
+            while payment_account == '':
+                msg = input("Provide ronin account that will provide the RON to scatter: ")
+                if len(msg) == 46 and msg.startswith('ronin:'):
+                    # Make sure is a valid Hex
+                    try:
+                        int(msg[6:], 16)
+                    except ValueError:
+                        continue
+                    payment_account = msg
+                else:
+                    logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
+            logging.info('I shall scatter ron for my scholars!')
+            scm = ScatterRonManager(payment_account, payments, load_json(secrets_file_path), min_ron)
+            scm.execute()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['claim']:
