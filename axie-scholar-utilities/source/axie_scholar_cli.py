@@ -43,13 +43,14 @@ from axie import (
     AxiePaymentsManager,
     AxieClaimsManager,
     AxieTransferManager,
-    Axies,
     AxieMorphingManager,
     AxieBreedManager,
     QRCodeManager,
     ScatterRonManager
 )
 from axie.utils import load_json
+from axie_utils import Axies
+
 
 # Setup logger
 os.makedirs('logs', exist_ok=True)
