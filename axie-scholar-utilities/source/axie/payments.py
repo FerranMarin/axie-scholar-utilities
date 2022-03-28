@@ -228,6 +228,7 @@ class AxiePaymentsManager:
                     logging.info(f"SLP scatter completed for account: '{acc['name']}'")
                 else:
                     logging.info(f"SLP scatter canceled for account: '{acc['name']}'")
+        logging.info(f"Important: Transactions Summary:\n {self.summary}")
 
     def prepare_old_payout(self):
         for acc in self.scholar_accounts:
@@ -284,6 +285,7 @@ class AxiePaymentsManager:
                     logging.info(f"SLP scatter completed for account: '{acc['Name']}'")
                 else:
                     logging.info(f"SLP scatter canceled for account: '{acc['Name']}'")
+        logging.info(f"Important: Transactions Summary:\n {self.summary}")
 
 
 class PaymentsSummary(Singleton):
