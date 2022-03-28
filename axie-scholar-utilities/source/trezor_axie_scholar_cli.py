@@ -38,7 +38,7 @@ import logging
 import requests
 from docopt import docopt
 
-from axie import Axies
+from axie_utils import Axies
 from axie.utils import load_json
 from trezor import (
     TrezorAccountsSetup,
