@@ -6,6 +6,8 @@ axie_breeding, generate_breedings
 Usage:
     trezor_axie_scholar_cli.py payout <payments_file> <config_file> [-y]
     trezor_axie_scholar_cli.py managed_payout <config_file> <token> [-y]
+    trezor_axie_scholar_cli.py scatter_ron <payments_file> <config_file> <min_amount>
+    trezor_axie_scholar_cli.py managed_scatter_ron <config_file> <token> <min_amount>
     trezor_axie_scholar_cli.py claim <payments_file> <config_file> [--force]
     trezor_axie_scholar_cli.py managed_claim <config_file> <token> [--force]
     trezor_axie_scholar_cli.py config_trezor <payments_file> [<config_file>]
@@ -45,7 +47,8 @@ from trezor import (
     TrezorAxieClaimsManager,
     TrezorAxieTransferManager,
     TrezorAxieMorphingManager,
-    TrezorQRCodeManager
+    TrezorQRCodeManager,
+    TrezorScatterRonManager
 )
 
 # Setup logger
@@ -200,6 +203,53 @@ def run_cli():
             apm = TrezorAxiePaymentsManager(payments, load_json(config_file_path), auto=args['--yes'])
             apm.verify_inputs()
             apm.prepare_payout()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['scatter_ron']:
+        logging.info("I shall help you scatter ron!")
+        payments_file_path = args['<payments_file>']
+        config_file_path = args['<config_file>']
+        min_ron = args['<min_amount>']
+        if check_file(payments_file_path) and check_file(config_file_path):
+            payment_account = ''
+            while payment_account == '':
+                msg = input("Provide ronin account that will provide the RON to scatter: ")
+                if len(msg) == 46 and msg.startswith('ronin:'):
+                    # Make sure is a valid Hex
+                    try:
+                        int(msg[6:], 16)
+                    except ValueError:
+                        continue
+                    payment_account = msg
+                else:
+                    logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
+            logging.info('I shall scatter ron for my scholars!')
+            scm = TrezorScatterRonManager(payment_account, load_json(payments_file_path), load_json(config_file_path), min_ron)
+            scm.execute()
+        else:
+            logging.critical("Please review your file paths and re-try.")
+    elif args['managed_scatter_ron']:
+        logging.info("I shall help you scatter ron!")
+        config_file_path = args['<config_file>']
+        token = args['<token>']
+        payments = load_payments_file(token)
+        min_ron = args['<min_amount>']
+        if check_file(config_file_path):
+            payment_account = ''
+            while payment_account == '':
+                msg = input("Provide ronin account that will provide the RON to scatter: ")
+                if len(msg) == 46 and msg.startswith('ronin:'):
+                    # Make sure is a valid Hex
+                    try:
+                        int(msg[6:], 16)
+                    except ValueError:
+                        continue
+                    payment_account = msg
+                else:
+                    logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
+            logging.info('I shall scatter ron for my scholars!')
+            scm = TrezorScatterRonManager(payment_account, payments, load_json(config_file_path), min_ron)
+            scm.execute()
         else:
             logging.critical("Please review your file paths and re-try.")
     elif args['claim']:

@@ -6,7 +6,8 @@ __all__ = [
     'TrezorAxieClaimsManager',
     'TrezorAxieTransferManager',
     'TrezorAxieMorphingManager',
-    'TrezorQRCodeManager'
+    'TrezorQRCodeManager',
+    'TrezorScatterRonManager'
 ]
 
 from trezor.trezor_setup import TrezorAccountsSetup
@@ -16,3 +17,4 @@ from trezor.trezor_claims import TrezorAxieClaimsManager
 from trezor.trezor_transfers import TrezorAxieTransferManager
 from trezor.trezor_morphing import TrezorAxieMorphingManager
 from trezor.trezor_qr_code import TrezorQRCodeManager
+from trezor.trezor_scatter import TrezorScatterRonManager

@@ -1,12 +1,14 @@
 import logging
+from trezorlib.client import get_default_client
 
-from axie_utils import check_balance, Scatter
+from axie_utils import check_balance, TrezorScatter, CustomUI
 
-class ScatterRonManager:
-    def __init__(self, from_acc, payments, secrets, min_ron):
+class TrezorScatterRonManager:
+    def __init__(self, from_acc, payments, config_file, min_ron):
         self.min_ron = min_ron
-        self.from_acc = from_acc,
-        self.from_private = secrets['from_acc']
+        self.from_acc = from_acc
+        self.bip_path = config_file[self.from_acc]['bip_path']
+        self.client = get_default_client(ui=CustomUI(passphrase=config_file[self.from_acc]['passphrase']))
         self.scatter_accounts_amounts = self.load_scatter(payments)
 
     def load_scatter(self, payments):
@@ -29,5 +31,5 @@ class ScatterRonManager:
                     logging.info(f'Account {scholar["ronin"]} already has more than the min ron desired')
     
     def execute(self):
-        s = Scatter('ron', self.from_acc, self.from_private, self.scatter_accounts_amounts)
+        s = TrezorScatter('ron', self.from_acc, self.client, self.bip_path, self.scatter_accounts_amounts)
         s.execute()
