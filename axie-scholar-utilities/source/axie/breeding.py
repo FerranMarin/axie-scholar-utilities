@@ -6,9 +6,9 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
 from axie.schemas import breeding_schema
-from axie.utils import load_json, check_balance, ImportantLogsFilter
+from axie.utils import load_json, ImportantLogsFilter
 from axie.payments import PaymentsSummary, CREATOR_FEE_ADDRESS
-from axie_utils import Breed, Payment
+from axie_utils import Breed, Payment, check_balance
 
 
 now = int(datetime.now().timestamp())

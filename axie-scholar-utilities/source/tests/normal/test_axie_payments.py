@@ -1,26 +1,10 @@
-import os
 import sys
 import builtins
 import logging
 
-from mock import patch, call, mock_open
-from glob import glob
-import pytest
+from mock import patch
 
 from axie import AxiePaymentsManager
-from axie.payments import Payment, PaymentsSummary
-from axie.utils import SLP_CONTRACT
-from tests.test_utils import LOG_FILE_PATH, cleanup_log_file
-
-
-@pytest.fixture(scope="session", autouse=True)
-def cleanup(request):
-    """Cleanup a testing directory once we are finished."""
-    def remove_log_files():
-        files = glob(LOG_FILE_PATH+'logs/*.log')
-        for f in files:
-            os.remove(f)
-    request.addfinalizer(remove_log_files)
 
 
 def test_payments_manager_init():
@@ -338,10 +322,12 @@ def test_payments_manager_prepare_payout_check_correct_calcs_new(mocked_prepare_
 
 
 @patch("axie.payments.check_balance", return_value=1000)
-@patch("axie.AxiePaymentsManager.payout_account")
+@patch("axie_utils.Payment")
+@patch("axie_utils.Payment.__init__")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_check_correct_payments_legacy(mocked_enough_balance,
-                                                                       mocked_payout,
+                                                                       mocked_payments,
+                                                                       mocked_payments_init,
                                                                        mocked_check_balance):
     scholar_acc = 'ronin:12345678900987654321' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:12345678900987000321' + "".join([str(x) for x in range(10)]*2)
@@ -369,37 +355,12 @@ def test_payments_manager_prepare_payout_check_correct_payments_legacy(mocked_en
     s_file = {scholar_acc: scholar_private_acc}
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
-    axp.prepare_payout()
+    with patch.object(builtins, 'input', lambda _: 'y'):
+        axp.prepare_payout()
     mocked_check_balance.assert_called()
     mocked_enough_balance.assert_called_with(scholar_acc, 1000)
-    mocked_payout.assert_called_once()
-    # 1st payment
-    assert mocked_payout.call_args[0][0] == "Scholar 1"
-    assert mocked_payout.call_args[0][1][0].name == "Payment to scholar of Scholar 1"
-    assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][0].amount == 450
-    # 2nd payment
-    assert mocked_payout.call_args[0][1][1].name == "Payment to trainer of Scholar 1"
-    assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][1].amount == 100
-    # 3rd payment (dono)
-    assert mocked_payout.call_args[0][1][2].name == "Donation to Entity 1 for Scholar 1"
-    assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][2].amount == round(1000*0.01)
-    # 4th Payment (fee)
-    assert mocked_payout.call_args[0][1][3].name == "Donation to software creator for Scholar 1"
-    assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][3].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][3].amount == round(1000*0.01)
-    # 5th Payment
-    assert mocked_payout.call_args[0][1][4].name == "Payment to manager of Scholar 1"
-    assert mocked_payout.call_args[0][1][4].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][4].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][4].amount == 1000 - 550 - round(1000*0.02)
-    assert len(mocked_payout.call_args[0][1]) == 5
+    mocked_payments.assert_called_with()
+    mocked_payments_init.assert_called_with()
 
 
 @patch("axie.payments.check_balance", return_value=1000)
@@ -683,148 +644,3 @@ def test_payments_manager_payout_account_deny(_, mocked_check_balance, mocked_ex
     mocked_check_balance.assert_called_with(scholar_acc, 1000)
     mocked_execute.assert_not_called()
     assert "Transactions canceled for account: 'Scholar 1'" in caplog.text
-
-
-@patch("web3.eth.Eth.contract", return_value="contract")
-@patch("web3.Web3.toChecksumAddress")
-def test_payment_get_nonce_calls_w3_low_nonce(mocked_checksum, mock_contract):
-    s = PaymentsSummary()
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = Payment(
-            "random_account",
-            "manager",
-            "ronin:from_ronin",
-            "ronin:from_private_ronin",
-            "ronin:to_ronin",
-            10,
-            s)
-    mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
-    mocked_checksum.assert_called_with(SLP_CONTRACT)
-    mock_contract.assert_called()
-    assert p.contract == "contract"
-    assert p.name == "random_account"
-    assert p.payment_type == "manager"
-    assert p.from_acc == "0xfrom_ronin"
-    assert p.from_private == "ronin:from_private_ronin"
-    assert p.to_acc == "0xto_ronin"
-    assert p.amount == 10
-    assert p.summary == s
-
-
-@patch("web3.eth.Eth.get_transaction_count", return_value=123)
-@patch("web3.Web3.toChecksumAddress", return_value="checksum")
-@patch("web3.eth.Eth.account.sign_transaction")
-@patch("web3.eth.Eth.send_raw_transaction")
-@patch("web3.Web3.toHex", return_value="transaction_hash")
-@patch("web3.Web3.keccak", return_value='result_of_keccak')
-@patch("web3.eth.Eth.contract")
-@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
-def test_execute_calls_web3_functions(mock_transaction_receipt,
-                                      mock_contract,
-                                      mock_keccak,
-                                      mock_to_hex,
-                                      mock_send,
-                                      mock_sign,
-                                      mock_checksum,
-                                      _,
-                                      caplog):
-    # Make sure file is clean to start
-    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
-    cleanup_log_file(log_file)
-    PaymentsSummary().clear()
-    s = PaymentsSummary()
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = Payment(
-            "random_account",
-            "manager",
-            "ronin:from_ronin",
-            "ronin:from_private_ronin",
-            "ronin:to_ronin",
-            10,
-            s)
-        p.execute()
-    mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-    mock_keccak.assert_called_once()
-    mock_to_hex.assert_called_with("result_of_keccak")
-    mock_send.assert_called_once()
-    mock_sign.assert_called_once()
-    assert mock_sign.call_args[1]['private_key'] == "ronin:from_private_ronin"
-    mock_checksum.assert_has_calls(calls=[
-        call(SLP_CONTRACT),
-        call('0xfrom_ronin'),
-        call('0xto_ronin')])
-    mock_transaction_receipt.assert_called_with("transaction_hash")
-    assert ('Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! Hash: transaction_hash - '
-            'Explorer: https://explorer.roninchain.com/tx/transaction_hash' in caplog.text)
-    assert str(s) == "Paid 1 managers, 10 SLP.\n"
-    with open(log_file) as f:
-        lf = f.readlines()
-        assert len(lf) == 1
-    assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP completed! "
-            "Hash: transaction_hash - Explorer: https://explorer.roninchain.com/tx/transaction_hash") in lf[0]
-    cleanup_log_file(log_file)
-
-
-@patch("web3.eth.Eth.get_transaction_count", return_value=123)
-@patch("axie.payments.Payment.send_replacement_tx")
-@patch("web3.Web3.toChecksumAddress", return_value="checksum")
-@patch("web3.eth.Eth.account.sign_transaction")
-@patch("web3.eth.Eth.send_raw_transaction")
-@patch("web3.Web3.toHex", return_value="transaction_hash")
-@patch("web3.Web3.keccak", return_value='result_of_keccak')
-@patch("web3.eth.Eth.contract")
-@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 0})
-def test_execute_calls_web3_functions_retry(mock_transaction_receipt,
-                                            mock_contract,
-                                            mock_keccak,
-                                            mock_to_hex,
-                                            mock_send,
-                                            mock_sign,
-                                            mock_checksum,
-                                            mock_replacement_tx,
-                                            _,
-                                            caplog):
-    # Make sure file is clean to start
-    log_file = glob(LOG_FILE_PATH+'logs/results_*.log')[0][9:]
-    cleanup_log_file(log_file)
-    PaymentsSummary().clear()
-    s = PaymentsSummary()
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')) as mock_file:
-        p = Payment(
-            "random_account",
-            "manager",
-            "ronin:from_ronin",
-            "ronin:from_private_ronin",
-            "ronin:to_ronin",
-            10,
-            s)
-        p.execute()
-    mock_file.assert_called_with("axie/slp_abi.json", encoding='utf-8')
-    mock_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-    mock_keccak.assert_called_once()
-    mock_to_hex.assert_called_with("result_of_keccak")
-    mock_send.assert_called_once()
-    mock_sign.assert_called_once()
-    assert mock_sign.call_args[1]['private_key'] == "ronin:from_private_ronin"
-    mock_checksum.assert_has_calls(calls=[
-        call(SLP_CONTRACT),
-        call('0xfrom_ronin'),
-        call('0xto_ronin')])
-    mock_transaction_receipt.assert_called_with("transaction_hash")
-    mock_replacement_tx.assert_called_with(123)
-    assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP failed. "
-            "Trying to replace it with a 0 value tx and re-try." in caplog.text)
-    with open(log_file) as f:
-        lf = f.readlines()
-        assert len(lf) == 1
-    assert ("Important: Transaction random_account(ronin:to_ronin) for the amount of 10 SLP failed. "
-            "Trying to replace it with a 0 value tx and re-try.") in lf[0]
-    assert str(s) == "No payments made!"
-    cleanup_log_file(log_file)

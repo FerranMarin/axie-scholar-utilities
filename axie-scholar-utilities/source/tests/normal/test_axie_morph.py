@@ -6,7 +6,7 @@ from hexbytes import HexBytes
 from eth_account.messages import encode_defunct
 
 from axie import AxieMorphingManager
-from axie.morphing import Morph
+from axie_utils import Morph
 
 
 @patch("axie.morphing.load_json", return_value={"foo": "bar"})
@@ -42,8 +42,8 @@ def test_morph_manager_verify_input_fail(tmpdir, caplog):
     assert f"Account '{scholar_acc}' is not present in secret file, please add it." in caplog.text
 
 
-@patch("axie.morphing.Morph.execute", return_value=None)
-@patch("axie.morphing.Morph.__init__", return_value=None)
+@patch("axie_utils.Morph.execute", return_value=None)
+@patch("axie_utils.Morph.__init__", return_value=None)
 def test_morph_manager_execute(mock_morph_init, mock_morph_execute, tmpdir):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
@@ -67,7 +67,7 @@ def test_morph_init():
 
 
 @patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
-@patch("axie.morphing.Morph.get_jwt", return_value="token")
+@patch("axie_utils.Morph.get_jwt", return_value="token")
 def test_morph_execute(mock_get_jwt, mock_sign_msg, caplog):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post(
@@ -85,7 +85,7 @@ def test_morph_execute(mock_get_jwt, mock_sign_msg, caplog):
 
 
 @patch("web3.eth.Eth.account.sign_message", return_value={"signature": HexBytes(b"123")})
-@patch("axie.morphing.Morph.get_jwt", return_value="token")
+@patch("axie_utils.Morph.get_jwt", return_value="token")
 def test_morph_execute_bad_json_response(mock_get_jwt, mock_sign_msg, caplog):
     with requests_mock.Mocker() as req_mocker:
         req_mocker.post(
@@ -99,4 +99,4 @@ def test_morph_execute_bad_json_response(mock_get_jwt, mock_sign_msg, caplog):
     mock_get_jwt.assert_called()
     mock_sign_msg.assert_called_with(encode_defunct(text=f"axie_id={m.axie}&owner={m.account}"),
                                      private_key=m.private_key)
-    assert f"Something went wrong morphing axie {m.axie} in {m.account}" in caplog.text
+    assert f"Somethin went wrong morphing axie {m.axie} in {m.account}\n" in caplog.text

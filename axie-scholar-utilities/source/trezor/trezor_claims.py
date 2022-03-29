@@ -56,12 +56,12 @@ class TrezorAxieClaimsManager:
     def prepare_claims(self):
         claims_list = [
             TrezorClaim(
-                account=acc,
                 force=self.force,
+                account=acc,
                 client=get_default_client(ui=CustomUI(passphrase=self.trezor_config[acc]['passphrase'])),
                 bip_path=self.trezor_config[acc]['bip_path'],
                 acc_name=self.acc_names[acc]) for acc in self.trezor_config]
         logging.info("Claiming starting...")
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(asyncio.gather(*[claim.execute() for claim in claims_list]))
+        for claim in claims_list:
+            claim.execute()
         logging.info("Claiming completed!")
