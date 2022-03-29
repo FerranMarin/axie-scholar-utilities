@@ -1,7 +1,8 @@
 """ Axie Scholar Utilities CLI.
 This tool will help you perform various actions.
 They are: payout, claim, generate_secrets, mass_update_secrets, generate_payments, generate_QR,
-transfer_axies, axie_morphing, axie_breeding, generate_breedings
+transfer_axies, axie_morphing, axie_breeding, generate_breedings, scatter_ron and a few managed ones which mean
+they have an integration with axie.management
 
 Usage:
     axie_scholar_cli.py payout <payments_file> <secrets_file> [-y]
@@ -240,7 +241,7 @@ def check_file(file):
 
 def run_cli():
     """ Wrapper function for testing purposes"""
-    args = docopt(__doc__, version='Axie Scholar Payments CLI v2.0.3')
+    args = docopt(__doc__, version='Axie Scholar Payments CLI v3.0.0')
     if args['payout']:
         logging.info("I shall help you pay!")
         payments_file_path = args['<payments_file>']
