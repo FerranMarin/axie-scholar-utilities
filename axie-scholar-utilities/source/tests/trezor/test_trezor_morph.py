@@ -107,4 +107,4 @@ def test_morph_execute_bad_json_response(mock_get_jwt, mock_sign_msg, mock_parse
     mock_parse.assert_called()
     mock_get_jwt.assert_called()
     mock_sign_msg.assert_called()
-    assert f"Somethin went wrong morphing axie {m.axie} in {m.account}" in caplog.text
+    assert f"Something went wrong morphing axie {m.axie} in {m.account}" in caplog.text

@@ -239,7 +239,7 @@ class AxiePaymentsManager:
             scholar_amount = acc_balance * (acc["ScholarPercent"]/100)
             scholar_amount += acc.get("ScholarPayout", 0)
             scholar_amount = round(scholar_amount)
-            acc_payments[acc["TrainerPayoutAddress"]] = scholar_amount
+            acc_payments[acc["ScholarPayoutAddress"]] = scholar_amount
             self.summary.increase_payout(amount=scholar_amount, address=acc["ScholarPayoutAddress"], payout_type='scholar')
             total_payments += scholar_amount
             if acc.get("TrainerPayoutAddress"):

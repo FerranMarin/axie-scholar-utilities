@@ -99,4 +99,4 @@ def test_morph_execute_bad_json_response(mock_get_jwt, mock_sign_msg, caplog):
     mock_get_jwt.assert_called()
     mock_sign_msg.assert_called_with(encode_defunct(text=f"axie_id={m.axie}&owner={m.account}"),
                                      private_key=m.private_key)
-    assert f"Somethin went wrong morphing axie {m.axie} in {m.account}\n" in caplog.text
+    assert f"Something went wrong morphing axie {m.axie} in {m.account}\n" in caplog.text

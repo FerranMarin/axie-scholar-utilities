@@ -13,7 +13,7 @@ jsonschema = "^3.2.0"
 qrcode = "^7.3.1"
 Pillow = "^9.0.1"
 trezor = "^0.13.0"
-axie-utils = "^2.0.1"
+axie-utils = "^2.0.4"
 
 [tool.poetry.dev-dependencies]
 mock = "^4.0.3"

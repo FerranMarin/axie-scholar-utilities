@@ -272,7 +272,11 @@ def run_cli():
         logging.info("I shall help you scatter ron!")
         payments_file_path = args['<payments_file>']
         secrets_file_path = args['<secrets_file>']
-        min_ron = args['<min_amount>']
+        try:
+            min_ron = float(args['<min_amount>'])
+        except ValueError:
+            logging.warning(f"Min amount {args['min_amount']} has to be a number!")
+            sys.exit()
         if check_file(payments_file_path) and check_file(secrets_file_path):
             payment_account = ''
             while payment_account == '':
@@ -297,6 +301,11 @@ def run_cli():
         token = args['<token>']
         payments = load_payments_file(token)
         min_ron = args['<min_amount>']
+        try:
+            min_ron = float(args['<min_amount>'])
+        except ValueError:
+            logging.warning(f"Min amount {args['min_amount']} has to be a number!")
+            sys.exit()
         if check_file(secrets_file_path):
             payment_account = ''
             while payment_account == '':

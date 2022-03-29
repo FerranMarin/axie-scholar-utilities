@@ -5,6 +5,7 @@ import logging
 from mock import patch
 
 from axie import AxiePaymentsManager
+from axie.payments import CREATOR_FEE_ADDRESS
 
 
 def test_payments_manager_init():
@@ -322,18 +323,17 @@ def test_payments_manager_prepare_payout_check_correct_calcs_new(mocked_prepare_
 
 
 @patch("axie.payments.check_balance", return_value=1000)
-@patch("axie_utils.Payment")
-@patch("axie_utils.Payment.__init__")
+@patch("axie_utils.Scatter.execute")
+@patch("axie_utils.Scatter.__init__", return_value=None)
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_check_correct_payments_legacy(mocked_enough_balance,
-                                                                       mocked_payments,
-                                                                       mocked_payments_init,
+                                                                       mocked_scatter_init,
+                                                                       mocked_scatter_execute,
                                                                        mocked_check_balance):
     scholar_acc = 'ronin:12345678900987654321' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:12345678900987000321' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    clean_scholar_acc = scholar_acc.replace("ronin:", "0x")
     p_file = {
         "Manager": manager_acc,
         "Scholars": [
@@ -359,21 +359,33 @@ def test_payments_manager_prepare_payout_check_correct_payments_legacy(mocked_en
         axp.prepare_payout()
     mocked_check_balance.assert_called()
     mocked_enough_balance.assert_called_with(scholar_acc, 1000)
-    mocked_payments.assert_called_with()
-    mocked_payments_init.assert_called_with()
+    mocked_scatter_init.assert_called_with(
+        'slp',
+        scholar_acc,
+        s_file[scholar_acc],
+        {
+           "ronin:<scholar_address>": 450,
+           "ronin:<trainer_address>": 100,
+            dono_acc: 10,
+            CREATOR_FEE_ADDRESS: 10,
+            manager_acc: 430
+        }
+    )
+    mocked_scatter_execute.assert_called()
 
 
 @patch("axie.payments.check_balance", return_value=1000)
-@patch("axie.AxiePaymentsManager.payout_account")
+@patch("axie_utils.Scatter.execute")
+@patch("axie_utils.Scatter.__init__", return_value=None)
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_check_correct_payments_new(mocked_enough_balance,
-                                                                    mocked_payout,
+                                                                    mocked_scatter_init,
+                                                                    mocked_scatter_execute,
                                                                     mocked_check_balance):
     scholar_acc = 'ronin:12345678900987654321' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:12345678900987000321' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    clean_scholar_acc = scholar_acc.replace("ronin:", "0x")
     p_file = {
         "scholars": [{
             "name": "Scholar 1",
@@ -409,46 +421,29 @@ def test_payments_manager_prepare_payout_check_correct_payments_new(mocked_enoug
     s_file = {scholar_acc: scholar_private_acc}
     axp = AxiePaymentsManager(p_file, s_file)
     axp.verify_inputs()
-    axp.prepare_payout()
+    with patch.object(builtins, 'input', lambda _: 'y'):
+        axp.prepare_payout()
     mocked_check_balance.assert_called()
-    mocked_enough_balance.assert_called_with(scholar_acc, 970)
-    mocked_payout.assert_called_once()
-    # 1st payment
-    assert mocked_payout.call_args[0][0] == "Scholar 1"
-    assert mocked_payout.call_args[0][1][0].name == "Payment to Manager of Scholar 1"
-    assert mocked_payout.call_args[0][1][0].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][0].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][0].amount == 410
-    # 2nd payment
-    assert mocked_payout.call_args[0][1][1].name == "Payment to Scholar of Scholar 1"
-    assert mocked_payout.call_args[0][1][1].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][1].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][1].amount == 400
-    # 3rd payment
-    assert mocked_payout.call_args[0][1][2].name == "Payment to Other Person of Scholar 1"
-    assert mocked_payout.call_args[0][1][2].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][2].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][2].amount == 60
-    # 4th payment
-    assert mocked_payout.call_args[0][1][3].name == "Payment to Trainer of Scholar 1"
-    assert mocked_payout.call_args[0][1][3].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][3].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][3].amount == 100
-    # 5th payment (dono)
-    assert mocked_payout.call_args[0][1][4].name == "Donation to Entity 1 for Scholar 1"
-    assert mocked_payout.call_args[0][1][4].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][4].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][4].amount == 10
-    # 6th Payment (fee)
-    assert mocked_payout.call_args[0][1][5].name == "Donation to software creator for Scholar 1"
-    assert mocked_payout.call_args[0][1][5].from_acc == clean_scholar_acc
-    assert mocked_payout.call_args[0][1][5].from_private == scholar_private_acc
-    assert mocked_payout.call_args[0][1][5].amount == 10
-    assert len(mocked_payout.call_args[0][1]) == 6
+    mocked_enough_balance.assert_called_with(scholar_acc, 990)
+    mocked_scatter_init.assert_called_with(
+        'slp',
+        scholar_acc,
+        s_file[scholar_acc],
+        {
+           "ronin:<scholar_1_address>": 400,
+           "ronin:<other_person_address>": 60,
+           "ronin:<trainer_address>": 100,
+            dono_acc: 10,
+            CREATOR_FEE_ADDRESS: 10,
+            manager_acc: 410
+        }
+    )
+    mocked_scatter_execute.assert_called()
+
 
 
 @patch("axie.payments.check_balance", return_value=0)
-@patch("axie.AxiePaymentsManager.payout_account")
+@patch("axie_utils.Scatter.execute")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
 def test_payments_manager_prepare_payout_check_correct_payments_percent_no_balance(mocked_enough_balance,
                                                                                    mocked_payout,
@@ -485,7 +480,7 @@ def test_payments_manager_prepare_payout_check_correct_payments_percent_no_balan
 
 
 @patch("axie.payments.check_balance", return_value=100)
-@patch("axie.AxiePaymentsManager.payout_account")
+@patch("axie_utils.Scatter.execute")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=False)
 def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_balance,
                                                                mocked_payout,
@@ -521,10 +516,9 @@ def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_bala
 
 
 @patch("axie.payments.check_balance", return_value=1000)
-@patch("axie.payments.Payment.execute", return_value=("abc123", True))
+@patch("axie_utils.Scatter.execute")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-@patch("axie.payments.get_nonce", return_value=1)
-def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_execute, __, caplog):
+def test_payments_manager_payout_account_accept(_, mocked_execute, mocked_check_balance, caplog):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
@@ -553,22 +547,15 @@ def test_payments_manager_payout_account_accept(_, mocked_check_balance, mocked_
     with caplog.at_level(logging.DEBUG):
         with patch.object(builtins, 'input', lambda _: 'y'):
             axp.prepare_payout()
-        mocked_check_balance.assert_called_with(scholar_acc, 1000)
-        assert mocked_execute.call_count == 5
-        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the amount of 500 SLP" in caplog.text
-        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the amount of 100 SLP" in caplog.text
-        assert (f"Donation to Entity 1 for Scholar 1({dono_acc}) for the amount of 10 SLP" in caplog.text)
-        assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) "
-                "for the amount of 10 SLP" in caplog.text)
-        assert f"Payment to manager of Scholar 1({manager_acc}) for the amount of 380 SLP" in caplog.text
-        assert "Transactions completed for account: 'Scholar 1'" in caplog.text
+        mocked_check_balance.assert_called_with(scholar_acc)
+        mocked_execute.assert_called()
+        assert "SLP scatter completed for account: 'Scholar 1'" in caplog.text
 
 
 @patch("axie.payments.check_balance", return_value=1000)
-@patch("axie.payments.Payment.execute", return_value=("abc123", True))
+@patch("axie_utils.Scatter.execute")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-@patch("axie.payments.get_nonce", return_value=1)
-def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execute, __, caplog):
+def test_payments_manager_payout_auto_yes(_, mocked_execute, mocked_check_balance, caplog):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
@@ -596,24 +583,16 @@ def test_payments_manager_payout_auto_yes(_, mocked_check_balance, mocked_execut
     axp.verify_inputs()
     with caplog.at_level(logging.INFO):
         axp.prepare_payout()
-        mocked_check_balance.assert_called_with(scholar_acc, 1000)
-        assert mocked_execute.call_count == 5
-        assert "Payment to scholar of Scholar 1(ronin:<scholar_address>) for the amount of 500 SLP" in caplog.text
-        assert "Payment to trainer of Scholar 1(ronin:<trainer_address>) for the amount of 100 SLP" in caplog.text
-        assert (f"Donation to Entity 1 for Scholar 1({dono_acc}) for the amount "
-                "of 10 SLP" in caplog.text)
-        assert ("Donation to software creator for Scholar 1(ronin:9fa1bc784c665e683597d3f29375e45786617550) "
-                "for the amount of 10 SLP" in caplog.text)
-        assert f"Payment to manager of Scholar 1({manager_acc}) for the amount of 380 SLP" in caplog.text
-        assert "Transactions completed for account: 'Scholar 1'" in caplog.text
+        mocked_check_balance.assert_called_with(scholar_acc)
+        mocked_execute.assert_called_once()
+        assert "SLP scatter completed for account: 'Scholar 1'" in caplog.text
         assert "Transactions Summary:" in caplog.text
 
 
 @patch("axie.payments.check_balance", return_value=1000)
-@patch("axie.payments.Payment.execute")
+@patch("axie_utils.Scatter.execute")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-@patch("axie.payments.get_nonce", return_value=1)
-def test_payments_manager_payout_account_deny(_, mocked_check_balance, mocked_execute, __, caplog):
+def test_payments_manager_payout_account_deny(_, mocked_execute, mocked_check_balance, caplog):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
@@ -641,6 +620,6 @@ def test_payments_manager_payout_account_deny(_, mocked_check_balance, mocked_ex
     axp.verify_inputs()
     with patch.object(builtins, 'input', lambda _: 'n'):
         axp.prepare_payout()
-    mocked_check_balance.assert_called_with(scholar_acc, 1000)
+    mocked_check_balance.assert_called_with(scholar_acc)
     mocked_execute.assert_not_called()
-    assert "Transactions canceled for account: 'Scholar 1'" in caplog.text
+    assert "SLP scatter canceled for account: 'Scholar 1'" in caplog.text
