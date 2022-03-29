@@ -982,8 +982,8 @@ def test_axie_morphing_file_check_fail(caplog):
 
 
 @patch("trezor.TrezorAxieMorphingManager.__init__", return_value=None)
-@patch("axie.Axies.__init__", return_value=None)
-@patch("axie.Axies.find_axies_to_morph", return_value=[1, 2, 3])
+@patch("axie_utils.Axies.__init__", return_value=None)
+@patch("axie_utils.Axies.find_axies_to_morph", return_value=[1, 2, 3])
 @patch("trezor.TrezorAxieMorphingManager.execute")
 @patch("trezor.TrezorAxieMorphingManager.verify_inputs")
 def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir): # noqa
@@ -1000,8 +1000,8 @@ def test_axie_morphing(mock_veritfy_inputs, mock_morphing_execute, mock_find_axi
 
 
 @patch("trezor.TrezorAxieMorphingManager.__init__", return_value=None)
-@patch("axie.Axies.__init__", return_value=None)
-@patch("axie.Axies.find_axies_to_morph", return_value=[])
+@patch("axie_utils.Axies.__init__", return_value=None)
+@patch("axie_utils.Axies.find_axies_to_morph", return_value=[])
 @patch("trezor.TrezorAxieMorphingManager.execute")
 @patch("trezor.TrezorAxieMorphingManager.verify_inputs")
 def test_axie_morphing_none(mock_veritfy_inputs, mock_morphing_execute, mock_find_axies, mock_axies_init, mock_morphingmanager, tmpdir): # noqa
