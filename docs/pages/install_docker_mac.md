@@ -54,7 +54,10 @@ If you go this route, I recomend also setting up these alias in your terminal to
     axie-utils-axie-breeding() {docker run -it -v ${PWD}/${1}:/opt/app/files/breedings.json -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities axie_breeding files/breedings.json files/secrets.json}
     # Alias to morph axies
     axie-utils-axie-morphing() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities axie_morphing files/secrets.json ${2}}
-
+    # Alias to scatter ron
+    axie-utils-scatter-ron() {docker run -it -v ${PWD}/${1}:/opt/app/files/payments.json  -v ${PWD}/${2}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities scatter_ron files/payments.json files/secrets.json ${3}}
+    # Alias to managed scatter ron
+    axie-utils-managed-scatter-ron() {docker run -it -v ${PWD}/${1}:/opt/app/files/secrets.json -v ${PWD}/files/logs:/opt/app/logs epith/axie-scholar-utilities managed_scatter_ron files/secrets.json ${2} ${3}}
 
 If you do not want to re-introduce these 'alias' everytime, you can add the previous lines in zshrc. The easiest way to do so is to run the following in the console:
 

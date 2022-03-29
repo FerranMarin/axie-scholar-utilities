@@ -80,8 +80,16 @@ If you go this route, I recomend also setting up these alias in your terminal to
         docker run -it -v $pwd\breedings.json:/opt/app/files/breedings.json -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities axie_breeding files/breedings.json files/secrets.json
     }
     # Alias to morph axies
-    function axie-utils-axie-morphing() {
+    function axie-utils-axie-morphing {
         docker run -it -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities axie_morphing files/secrets.json $args
+    }
+    # Alias to scatter ron
+    function axie-utils-scatter-ron {
+        docker run -it -v $pwd\payments.json:/opt/app/files/payments.json  -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities scatter_ron files/payments.json files/secrets.json $args
+    }
+    # Alias to managed scatter ron
+    function axie-utils-managed-scatter-ron {
+        docker run -it -v $pwd\secrets.json:/opt/app/files/secrets.json -v $pwd\logs:/opt/app/logs epith/axie-scholar-utilities managed_scatter_ron files/secrets.json $args
     }
 
 Be aware, that this aliases will require the EXACT file names to work.

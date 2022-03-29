@@ -105,7 +105,7 @@ If you do not provide a transfers.json it will be generated for you in the same 
 
 ## Generate QR
 
-For this command we need to have a generated payments file and secrets file. Then the command will be as follows:
+For this command we need to have a generated payments file and a trezor_config file. Then the command will be as follows:
 
     poetry run python trezor_axie_scholar_cli.py generate_QR payments.json trezor_config.json
 
@@ -157,3 +157,17 @@ This command will automatically find your axies to morph and morph them. It need
     poetry run python trezor_axie_scholar_cli.py axie_morphing trezor_config.json ronin:abc1,ronin:abc2
 
 Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACE!)
+
+## RON Scattering
+
+This command will scatter RON to your scholars. You need to set the min RON you want those accounts to hold, the tool will check which ones need some RON and top them off. Then execute the Scatter conctract to distribute the funds.
+
+    poetry run python trezor_axie_scholar_cli.py scatter_ron payments.json trezor_config.json <min_amount>
+
+or
+
+    poetry run python trezor_axie_scholar_cli.py managed_scatter_ron trezor_config.json TOKEN <min_amount>
+
+
+Replace MIN_RON with a number (can be decimal) of the minumum RON you want the scholars accounts in payments.json to have!
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).

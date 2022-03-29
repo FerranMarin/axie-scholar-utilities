@@ -14,6 +14,11 @@ As of now it has the following commands:
 - Axie Morphing
 - Axie Breeding
 - QR Code Generation
+- Scatter RON to your scholar accounts
+
+**Disclaimer!**
+
+From v.3 onwards all transactions will cost RON and will no longer use your free tx. Be aware of that!
 
 **WITH TREZOR SUPORT!**
 
