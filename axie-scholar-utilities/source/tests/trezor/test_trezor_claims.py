@@ -1,18 +1,8 @@
 import sys
-import json
-import builtins
-from glob import glob
-from datetime import datetime, timedelta
 
-import pytest
-from mock import patch, mock_open, call
-import requests_mock
-from hexbytes import HexBytes
+from mock import patch
 
 from trezor import TrezorAxieClaimsManager
-from trezor.trezor_claims import TrezorClaim
-from axie.utils import SLP_CONTRACT, RONIN_PROVIDER_FREE, USER_AGENT
-from tests.test_utils import async_cleanup_log_file, LOG_FILE_PATH, MockedSignedMsg
 
 
 @patch("trezor.TrezorAxieClaimsManager.load_trezor_config_and_acc_name", return_value=("foo", "bar"))

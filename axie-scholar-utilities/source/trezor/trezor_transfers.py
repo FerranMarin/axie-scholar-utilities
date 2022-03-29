@@ -75,7 +75,7 @@ class TrezorAxieTransferManager:
                         logging.info(f"Axie ({axie['AxieId']}) not in account ({acc['AccountAddress']}), skipping.")
                 else:
                     logging.info(f"Receiver address {axie['ReceiverAddress']} not in secrets.json, skipping transfer.")
-        self.execute_transfers(transfers)
+            self.execute_transfers(transfers)
 
     def execute_transfers(self, transfers):
         logging.info("Starting to transfer axies")
