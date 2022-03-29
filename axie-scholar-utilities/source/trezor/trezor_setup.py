@@ -5,8 +5,7 @@ from trezorlib.client import get_default_client
 from trezorlib.tools import parse_path
 from trezorlib import ethereum
 
-from axie.utils import load_json
-from trezor.trezor_utils import CustomUI
+from axie_utils import CustomUI
 
 
 class TrezorAccountsSetup:

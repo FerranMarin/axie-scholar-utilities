@@ -2,11 +2,8 @@ import sys
 import json
 
 from mock import patch, call
-import requests_mock
 
 from trezor import TrezorAxieMorphingManager
-from trezor.trezor_morphing import TrezorMorph
-from tests.test_utils import MockedSignedMsg
 
 
 @patch("trezor.trezor_morphing.load_json", return_value={"foo": "bar"})
@@ -60,51 +57,3 @@ def test_morph_manager_execute(mock_morph_init, mock_morph_execute, mock_client,
         call(axie=3, account=scholar_acc, client='client', bip_path="m/44'/60'/0'/0/0")
     ])
     assert mock_morph_execute.call_count == 3
-
-
-@patch("trezor.trezor_utils.parse_path", return_value="m/44'/60'/0'/0/0")
-def test_morph_init(mock_parse):
-    m = TrezorMorph(axie=1, account="ronin:abcd1", client='client', bip_path="m/44'/60'/0'/0/0")
-    mock_parse.assert_called()
-    assert m.axie == 1
-    assert m.account == "0xabcd1"
-    assert m.client == "client"
-    assert m.bip_path == "m/44'/60'/0'/0/0"
-
-
-@patch("trezor.trezor_utils.parse_path", return_value="m/44'/60'/0'/0/0")
-@patch("trezor.trezor_morphing.ethereum.sign_message", return_value=MockedSignedMsg())
-@patch("trezor.trezor_morphing.TrezorMorph.get_jwt", return_value="token")
-def test_morph_execute(mock_get_jwt, mock_sign_msg, mock_parse, caplog):
-    with requests_mock.Mocker() as req_mocker:
-        req_mocker.post(
-            'https://graphql-gateway.axieinfinity.com/graphql',
-            json={
-                "data": {"morphAxie": True}
-            }
-        )
-        m = TrezorMorph(axie=1, account="ronin:abcd1", client='client', bip_path="m/44'/60'/0'/0/0")
-        m.execute()
-    mock_parse.assert_called()
-    mock_get_jwt.assert_called()
-    mock_sign_msg.assert_called()
-    assert f"Axie {m.axie} in {m.account} correctly morphed!" in caplog.text
-
-
-@patch("trezor.trezor_utils.parse_path", return_value="m/44'/60'/0'/0/0")
-@patch("trezor.trezor_morphing.ethereum.sign_message", return_value=MockedSignedMsg())
-@patch("trezor.trezor_morphing.TrezorMorph.get_jwt", return_value="token")
-def test_morph_execute_bad_json_response(mock_get_jwt, mock_sign_msg, mock_parse, caplog):
-    with requests_mock.Mocker() as req_mocker:
-        req_mocker.post(
-            'https://graphql-gateway.axieinfinity.com/graphql',
-            json={
-                "foo": "bar"
-            }
-        )
-        m = TrezorMorph(axie=1, account="ronin:abcd1", client='client', bip_path="m/44'/60'/0'/0/0")
-        m.execute()
-    mock_parse.assert_called()
-    mock_get_jwt.assert_called()
-    mock_sign_msg.assert_called()
-    assert f"Somethin went wrong morphing axie {m.axie} in {m.account}" in caplog.text

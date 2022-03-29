@@ -162,3 +162,17 @@ This command will automatically find your axies to morph and morph them. It need
     poetry run python axie_scholar_cli.py axie_morphing secrets.json ronin:abc1,ronin:abc2
 
 Be careful when writing the accounts, if multiple they need to be separeted only by a comma (NO SPACE!)
+
+## RON Scattering
+
+This command will scatter RON to your scholars. You need to set the min RON you want those accounts to hold, the tool will check which ones need some RON and top them off. Then execute the Scatter conctract to distribute the funds.
+
+    poetry run python axie_scholar_cli.py scatter_ron payments.json secrets.json <min_amount>
+
+or
+
+    poetry run python axie_scholar_cli.py managed_scatter_ron secrets.json TOKEN <min_amount>
+
+
+Replace MIN_RON with a number (can be decimal) of the minumum RON you want the scholars accounts in payments.json to have!
+Change the TOKEN for the one you receive from axie.management. Find it following this [link](https://tracker.axie.management/profile).

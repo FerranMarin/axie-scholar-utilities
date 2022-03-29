@@ -59,3 +59,8 @@ As per the library we are using, this is what it says:
     Current trezorlib version supports Trezor One version 1.8.0 and up, and Trezor T version 2.1.0 and up.
 
 For more info, please visit their [PyPi page](https://pypi.org/project/trezor/)
+
+## Can I use my free tx instead? Does the tool use RON?
+
+From v.3 onwards tool uses RON for all transactions, before it was using free tx. Feel free to try use an older version if you wish to use the tool and your free transactions.
+I cannot guarantee that versions older than the latest work tho!

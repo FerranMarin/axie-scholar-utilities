@@ -1,13 +1,10 @@
 import sys
 import json
-import builtins
 
-from mock import patch, mock_open, call
+from mock import patch, call
 
 from axie import AxieBreedManager
-from axie.breeding import Breed, AXIE_CONTRACT
 from axie.payments import PaymentsSummary, CREATOR_FEE_ADDRESS
-from axie.utils import RONIN_PROVIDER_FREE, USER_AGENT
 
 
 @patch("axie.breeding.load_json", return_value={"foo": "bar"})
@@ -162,10 +159,10 @@ def test_breed_manager_calculate_breeding_cost(tmpdir):
 
 
 @patch("axie.breeding.check_balance", return_value=1000)
-@patch("axie.breeding.Breed.execute")
-@patch("axie.breeding.Breed.__init__", return_value=None)
-@patch("axie.payments.Payment.execute")
-@patch("axie.payments.Payment.__init__", return_value=None)
+@patch("axie_utils.Breed.execute")
+@patch("axie_utils.Breed.__init__", return_value=None)
+@patch("axie_utils.Payment.execute")
+@patch("axie_utils.Payment.__init__", return_value=None)
 def test_breed_manager_execute(mock_payments_init,
                                mock_payments_execute,
                                mock_breed_init,
@@ -206,10 +203,10 @@ def test_breed_manager_execute(mock_payments_init,
     assert mock_payments_execute.call_count == 1
 
 
-@patch("axie.payments.Payment.execute")
-@patch("axie.breeding.Breed.execute")
-@patch("axie.payments.Payment.__init__", return_value=None)
-@patch("axie.breeding.Breed.__init__", return_value=None)
+@patch("axie_utils.Payment.execute")
+@patch("axie_utils.Breed.execute")
+@patch("axie_utils.Payment.__init__", return_value=None)
+@patch("axie_utils.Breed.__init__", return_value=None)
 @patch("axie.breeding.check_balance", return_value=0)
 def test_breed_manager_execute_not_enough_slp(mock_check_balance, _, __, ___, ____, tmpdir, caplog):
     acc = 'ronin:<accountfoo_address>' + "".join([str(x) for x in range(10)]*4)
@@ -233,52 +230,3 @@ def test_breed_manager_execute_not_enough_slp(mock_check_balance, _, __, ___, __
     mocked_sys.assert_called_once()
     mock_check_balance.assert_called_once()
     assert "Not enough SLP funds to pay for breeding and the fee" in caplog.text
-
-
-def test_breed_init():
-    acc = 'ronin:<accountfoo_address>' + "".join([str(x) for x in range(10)]*4)
-    private_acc = '0x<accountfoo_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    b = Breed(sire_axie=123, matron_axie=456, address=acc, private_key=private_acc)
-    assert b.sire_axie == 123
-    assert b.matron_axie == 456
-    assert b.private_key == private_acc
-    assert b.address == acc.replace("ronin:", "0x")
-
-
-@patch("web3.Web3.toHex", return_value="transaction_hash")
-@patch("web3.Web3.keccak", return_value='result_of_keccak')
-@patch("web3.eth.Eth.get_transaction_receipt", return_value={'status': 1})
-@patch("web3.eth.Eth.send_raw_transaction", return_value="raw_tx")
-@patch("web3.eth.Eth.account.sign_transaction")
-@patch("axie.breeding.get_nonce", return_value=1)
-@patch("web3.eth.Eth.contract")
-@patch("web3.Web3.toChecksumAddress", return_value="checksum")
-@patch("web3.Web3.HTTPProvider", return_value="provider")
-def test_breed_execute(mocked_provider,
-                       mocked_checksum,
-                       mocked_contract,
-                       mock_get_nonce,
-                       mocked_sign_transaction,
-                       mock_raw_send,
-                       mock_receipt,
-                       mock_keccak,
-                       mock_to_hex):
-    acc = 'ronin:<accountfoo_address>' + "".join([str(x) for x in range(10)]*4)
-    private_acc = '0x<accountfoo_private_address>012345' + "".join([str(x) for x in range(10)]*3)
-    with patch.object(builtins,
-                      "open",
-                      mock_open(read_data='{"foo": "bar"}')):
-        b = Breed(sire_axie=123, matron_axie=456, address=acc, private_key=private_acc)
-        b.execute()
-    mock_get_nonce.assert_called_once()
-    mocked_provider.assert_called_with(
-        RONIN_PROVIDER_FREE,
-        request_kwargs={"headers": {"content-type": "application/json", "user-agent": USER_AGENT}}
-    )
-    mocked_checksum.assert_called_with(AXIE_CONTRACT)
-    mocked_contract.assert_called_with(address="checksum", abi={"foo": "bar"})
-    mocked_sign_transaction.assert_called_once()
-    mock_raw_send.assert_called_once()
-    mock_keccak.assert_called_once()
-    mock_to_hex.assert_called_with("result_of_keccak")
-    mock_receipt.assert_called_with("transaction_hash")

@@ -5,7 +5,7 @@ from datetime import datetime
 
 import qrcode
 
-from axie.utils import AxieGraphQL
+from axie_utils import AxieGraphQL
 
 
 class QRCode(AxieGraphQL):

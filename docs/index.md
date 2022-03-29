@@ -13,6 +13,7 @@ This tool allows managers to carry out different activities such as:
 <li>Transferring Axies</li>
 <li>Breeding Axies</li>
 <li>Morphing Axies</li>
+<li>Scatter RON<li>
 <br>
 The tool is a software that has to be installed in your computer and so far, it can only be executed from the command line. Depending on your operating sistem and installation method , it may requires the use of supportive platform Docker. If you have already experience with python, you will be able to customize some of the commands. However, if you are not a techy person, do not worry!, every detail of how to install it and use it will be explained in the guidelines. 
 
@@ -57,6 +58,7 @@ Depending on how you've installed the tool, to run the commands you will need to
 - **Axie Morphing**: This command will morph all axies in one or multiple accounts. It will find and morph them automatically.
 - **Axie Breeding**: This command will breed the axies defined in axie breedings file. It will charge a fee at the end depending on the ammount of axies breed.
 - **Generate Breedings**: This command helps you generate the breedings file from a csv file.
+- **Scatter RON**: This command scatters RON to your scholars.
 
 To read the instructions on how to run these commands:
 

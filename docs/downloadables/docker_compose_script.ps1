@@ -66,7 +66,14 @@ function axie-utils-axie-breeding {
 function axie-utils-axie-morphing($ronin_list) {
     docker-compose run scholar-utilities axie_morphing files/secrets.json $ronin_list
 }
-
+# Alias to scatter ron
+function axie-utils-scatter-ron {
+    docker-compose run scholar-utilities scatter_ron files/payments.json files/secrets.json $min_ron
+}
+# Alias to managed scatter ron
+function axie-utils-managed-scatter-ron {
+    docker-compose run scholar-utilities managed_scatter_ron files/secrets.json $token $min_ron
+}
 
 
 function validate_ronin_addresses($ronin_list, $i = 0) {
@@ -112,14 +119,16 @@ while ($running -ne 0) {
     Write-Host "10. Generate Breedings File"
     Write-Host "11. Execute Breed Axies"
     Write-Host "12. Execute Morph Axies by Ronin Addresses"
+    Write-Host "13. Execute Scatter RON"
     Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     Write-Host "   Managed commands (if you have axie.management Token)"
     Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    Write-Host "13. Managed Generate Secrets"
-    Write-Host "14. Managed Execute Claims"
-    Write-Host "15. Managed Execute Payments"
-    Write-Host "16. Managed Execute Auto-PaymentsPayments"
-    Write-Host "17. Managed Generate QR Code"
+    Write-Host "14. Managed Generate Secrets"
+    Write-Host "15. Managed Execute Claims"
+    Write-Host "16. Managed Execute Payments"
+    Write-Host "17. Managed Execute Auto-PaymentsPayments"
+    Write-Host "18. Managed Generate QR Code"
+    Write-Host "19. Managed Scatter RON"
     Write-Host "0. Exit"
     Write-Host "====================================="
     $choice = Read-Host "Choose an option: "
@@ -177,28 +186,39 @@ while ($running -ne 0) {
             pause
         }
         13 {
-            $token = Read-Host "Introduce Axie.management Token:"
-            axie-utils-managed-gen-secrets $token
+            $min_ron = Read-Host "Introduce RON you want each scholar to hold:"
+            axie-utils-scatter-ron $token $min_ron
             pause
         }
         14 {
             $token = Read-Host "Introduce Axie.management Token:"
-            axie-utils-managed-claim $token
+            axie-utils-managed-gen-secrets $token
             pause
         }
         15 {
             $token = Read-Host "Introduce Axie.management Token:"
-            axie-utils-managed-payout
+            axie-utils-managed-claim $token
             pause
         }
         16 {
             $token = Read-Host "Introduce Axie.management Token:"
-            axie-utils-managed-auto-payout
+            axie-utils-managed-payout
             pause
         }
         17 {
             $token = Read-Host "Introduce Axie.management Token:"
+            axie-utils-managed-auto-payout
+            pause
+        }
+        18 {
+            $token = Read-Host "Introduce Axie.management Token:"
             axie-utils-managed-gen-QR
+            pause
+        }
+        19 {
+            $token = Read-Host "Introduce Axie.management Token:"
+            $min_ron = Read-Host "Introduce RON you want each scholar to hold:"
+            axie-utils-managed-scatter-ron $token $min_ron
             pause
         }
     }
