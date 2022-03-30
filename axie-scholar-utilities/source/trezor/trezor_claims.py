@@ -1,5 +1,4 @@
 import sys
-import asyncio
 import logging
 from datetime import datetime
 from trezorlib.client import get_default_client

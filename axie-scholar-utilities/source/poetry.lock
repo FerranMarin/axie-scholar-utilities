@@ -61,7 +61,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "axie-utils"
-version = "2.0.4"
+version = "2.0.5"
 description = "Library that provides the functionality you need to build your own axie Infinity python tools"
 category = "main"
 optional = false
@@ -585,20 +585,6 @@ tomli = ">=1.0.0"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
 
 [[package]]
-name = "pytest-asyncio"
-version = "0.18.3"
-description = "Pytest support for asyncio"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-pytest = ">=6.1.0"
-
-[package.extras]
-testing = ["coverage (==6.2)", "hypothesis (>=5.7.1)", "flaky (>=3.5.0)", "mypy (==0.931)", "pytest-trio (>=0.7.0)"]
-
-[[package]]
 name = "pytest-mock"
 version = "3.7.0"
 description = "Thin-wrapper around the mock package for easier use with pytest"
@@ -666,22 +652,6 @@ urllib3 = ">=1.21.1,<1.27"
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
-
-[[package]]
-name = "requests-mock"
-version = "1.9.3"
-description = "Mock out responses from the requests package"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-requests = ">=2.3,<3"
-six = "*"
-
-[package.extras]
-fixture = ["fixtures"]
-test = ["fixtures", "mock", "purl", "pytest", "sphinx", "testrepository (>=0.0.18)", "testtools"]
 
 [[package]]
 name = "rlp"
@@ -833,7 +803,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "b85529d87eb37720b010462b220a91cd3f1423adfd462624eda6d0d572253c45"
+content-hash = "571f516f74651158bf9fae038d986e02d470b83cb2c3ee7ef355c7b567583cd9"
 
 [metadata.files]
 aiohttp = [
@@ -927,8 +897,8 @@ attrs = [
     {file = "attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
 ]
 axie-utils = [
-    {file = "axie-utils-2.0.4.tar.gz", hash = "sha256:510b4891ec42e6989202c0752c088eab79a774cab284c0697a9518d5d0ac4208"},
-    {file = "axie_utils-2.0.4-py3-none-any.whl", hash = "sha256:bfd04d1b9dfb768966528812c7c8cd61f9fff744db05adfff97091d2cb5a4d0d"},
+    {file = "axie-utils-2.0.5.tar.gz", hash = "sha256:2918c54f5f2e1c757ced36a143df6c19824cdbaf81aeec274db9f60698368fdd"},
+    {file = "axie_utils-2.0.5-py3-none-any.whl", hash = "sha256:b0f44b481a2400901fca71d5435651d8977b3ca717dfdd84c89be802e89e108c"},
 ]
 base58 = [
     {file = "base58-2.1.1-py3-none-any.whl", hash = "sha256:11a36f4d3ce51dfc1043f3218591ac4eb1ceb172919cebe05b52a5bcc8d245c2"},
@@ -1348,11 +1318,6 @@ pytest = [
     {file = "pytest-7.1.1-py3-none-any.whl", hash = "sha256:92f723789a8fdd7180b6b06483874feca4c48a5c76968e03bb3e7f806a1869ea"},
     {file = "pytest-7.1.1.tar.gz", hash = "sha256:841132caef6b1ad17a9afde46dc4f6cfa59a05f9555aae5151f73bdf2820ca63"},
 ]
-pytest-asyncio = [
-    {file = "pytest-asyncio-0.18.3.tar.gz", hash = "sha256:7659bdb0a9eb9c6e3ef992eef11a2b3e69697800ad02fb06374a210d85b29f91"},
-    {file = "pytest_asyncio-0.18.3-1-py3-none-any.whl", hash = "sha256:16cf40bdf2b4fb7fc8e4b82bd05ce3fbcd454cbf7b92afc445fe299dabb88213"},
-    {file = "pytest_asyncio-0.18.3-py3-none-any.whl", hash = "sha256:8fafa6c52161addfd41ee7ab35f11836c5a16ec208f93ee388f752bea3493a84"},
-]
 pytest-mock = [
     {file = "pytest-mock-3.7.0.tar.gz", hash = "sha256:5112bd92cc9f186ee96e1a92efc84969ea494939c3aead39c50f421c4cc69534"},
     {file = "pytest_mock-3.7.0-py3-none-any.whl", hash = "sha256:6cff27cec936bf81dc5ee87f07132b807bcda51106b5ec4b90a04331cba76231"},
@@ -1381,10 +1346,6 @@ qrcode = [
 requests = [
     {file = "requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d"},
     {file = "requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61"},
-]
-requests-mock = [
-    {file = "requests-mock-1.9.3.tar.gz", hash = "sha256:8d72abe54546c1fc9696fa1516672f1031d72a55a1d66c85184f972a24ba0eba"},
-    {file = "requests_mock-1.9.3-py2.py3-none-any.whl", hash = "sha256:0a2d38a117c08bb78939ec163522976ad59a6b7fdd82b709e23bb98004a44970"},
 ]
 rlp = [
     {file = "rlp-2.0.1-py2.py3-none-any.whl", hash = "sha256:52a57c9f53f03c88b189283734b397314288250cc4a3c4113e9e36e2ac6bdd16"},
