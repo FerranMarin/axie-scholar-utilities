@@ -29,6 +29,7 @@ class TrezorScatterRonManager:
                     scatter_dict[scholar['ronin']] = missing_ron
                 else:
                     logging.info(f'Account {scholar["ronin"]} already has more than the min ron desired')
+        return scatter_dict
     
     def execute(self):
         s = TrezorScatter('ron', self.from_acc, self.client, self.bip_path, self.scatter_accounts_amounts)

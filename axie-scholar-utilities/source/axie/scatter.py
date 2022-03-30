@@ -5,8 +5,8 @@ from axie_utils import check_balance, Scatter
 class ScatterRonManager:
     def __init__(self, from_acc, payments, secrets, min_ron):
         self.min_ron = min_ron
-        self.from_acc = from_acc,
-        self.from_private = secrets['from_acc']
+        self.from_acc = from_acc
+        self.from_private = secrets[self.from_acc]
         self.scatter_accounts_amounts = self.load_scatter(payments)
 
     def load_scatter(self, payments):
@@ -27,6 +27,7 @@ class ScatterRonManager:
                     scatter_dict[scholar['ronin']] = missing_ron
                 else:
                     logging.info(f'Account {scholar["ronin"]} already has more than the min ron desired')
+        return scatter_dict
     
     def execute(self):
         s = Scatter('ron', self.from_acc, self.from_private, self.scatter_accounts_amounts)
