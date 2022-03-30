@@ -13,7 +13,7 @@ This tool allows managers to carry out different activities such as:
 <li>Transferring Axies</li>
 <li>Breeding Axies</li>
 <li>Morphing Axies</li>
-<li>Scatter RON<li>
+<li>Scatter RON</li>
 <br>
 The tool is a software that has to be installed in your computer and so far, it can only be executed from the command line. Depending on your operating sistem and installation method , it may requires the use of supportive platform Docker. If you have already experience with python, you will be able to customize some of the commands. However, if you are not a techy person, do not worry!, every detail of how to install it and use it will be explained in the guidelines. 
 
