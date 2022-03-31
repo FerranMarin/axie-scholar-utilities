@@ -210,7 +210,7 @@ def run_cli():
         logging.info("I shall help you scatter ron!")
         payments_file_path = args['<payments_file>']
         config_file_path = args['<config_file>']
-        min_ron = args['<min_amount>']
+        min_ron = float(args['<min_amount>'])
         if check_file(payments_file_path) and check_file(config_file_path):
             payment_account = ''
             while payment_account == '':
@@ -234,7 +234,7 @@ def run_cli():
         config_file_path = args['<config_file>']
         token = args['<token>']
         payments = load_payments_file(token)
-        min_ron = args['<min_amount>']
+        min_ron = float(args['<min_amount>'])
         if check_file(config_file_path):
             payment_account = ''
             while payment_account == '':
