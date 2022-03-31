@@ -4,7 +4,7 @@ from axie_utils import check_balance, Scatter
 
 class ScatterRonManager:
     def __init__(self, from_acc, payments, secrets, min_ron):
-        self.min_ron = min_ron
+        self.min_ron = float(min_ron)
         self.from_acc = from_acc
         self.from_private = secrets[self.from_acc]
         self.scatter_accounts_amounts = self.load_scatter(payments)
