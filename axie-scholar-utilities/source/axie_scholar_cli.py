@@ -301,7 +301,11 @@ def run_cli():
         secrets_file_path = args['<secrets_file>']
         token = args['<token>']
         payments = load_payments_file(token)
-        min_ron = args['<min_amount>']
+        try:
+            min_ron = float(args['<min_amount>'])
+        except ValueError:
+            logging.warning(f"Min amount {args['min_amount']} has to be a number!")
+            sys.exit()
         try:
             min_ron = float(args['<min_amount>'])
         except ValueError:
