@@ -5,7 +5,7 @@ from axie_utils import check_balance, TrezorScatter, CustomUI
 
 class TrezorScatterRonManager:
     def __init__(self, from_acc, payments, config_file, min_ron):
-        self.min_ron = min_ron
+        self.min_ron = float(min_ron)
         self.from_acc = from_acc
         self.bip_path = config_file[self.from_acc]['bip_path']
         self.client = get_default_client(ui=CustomUI(passphrase=config_file[self.from_acc]['passphrase']))
