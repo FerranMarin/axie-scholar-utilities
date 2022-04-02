@@ -55,7 +55,7 @@ class TrezorAxieTransferManager:
         transfers = []
         logging.info("Preparing transfers")
         for acc in self.transfers_file:
-            a = Axies(acc['AccountAddress'].lower()).get_axies()
+            a = Axies(acc['AccountAddress'].lower())
             for axie in acc['Transfers']:
                 if not self.secure or (self.secure and axie['ReceiverAddress'].lower() in self.trezor_config):
                     # Check axie in account

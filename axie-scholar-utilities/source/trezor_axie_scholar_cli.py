@@ -71,17 +71,16 @@ def generate_transfers_file(csv_file_path, transfer_file_path=None):
             f.write("{}")
 
     transfers_dict = {}
-    with open(csv_file_path, encoding='utf-8') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            acc = row['AccountAddress']
-            axie = row['AxieId']
-            receiver = row['ReceiverAddress']
-            ax_dict = {"AxieId": int(axie), "ReceiverAddress": receiver}
-            if acc not in transfers_dict:
-                transfers_dict[acc] = {"Transfers": [ax_dict]}
-            else:
-                transfers_dict[acc]['Transfers'].append(ax_dict)
+    reader = csv.DictReader(open(csv_file_path, encoding='utf-8'))
+    for row in reader:
+        acc = row['AccountAddress']
+        axie = row['AxieId']
+        receiver = row['ReceiverAddress']
+        ax_dict = {"AxieId": int(axie), "ReceiverAddress": receiver}
+        if acc not in transfers_dict:
+            transfers_dict[acc] = {"Transfers": [ax_dict]}
+        else:
+            transfers_dict[acc]['Transfers'].append(ax_dict)
 
     transfers_list = []
     for d in transfers_dict:
@@ -101,14 +100,13 @@ def generate_breedings_file(csv_file_path, breeding_file_path=None):
         with open(breeding_file_path, 'w', encoding='utf-8') as f:
             f.write("{}")
 
-    with open(csv_file_path, encoding='utf-8') as csv_file:
-        reader = csv.DictReader(csv_file)
-        breed_list = []
-        for row in reader:
-            clean_row = {k: v for k, v in row.items() if v is not None and v != ''}
-            integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
-            clean_row.update(integer_row)
-            breed_list.append(clean_row)
+    reader = csv.DictReader(open(csv_file_path, encoding='utf-8'))
+    breed_list = []
+    for row in reader:
+        clean_row = {k: v for k, v in row.items() if v is not None and v != ''}
+        integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
+        clean_row.update(integer_row)
+        breed_list.append(clean_row)
 
     with open(breeding_file_path, 'w', encoding='utf-8') as f:
         json.dump(breed_list, f, ensure_ascii=False, indent=4)
@@ -136,14 +134,13 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
         else:
             logging.info(f'Ronin provided ({msg}) looks wrong, try again.')
 
-    with open(csv_file_path, encoding='utf-8') as csv_file:
-        reader = csv.DictReader(csv_file)
-        scholars_list = []
-        for row in reader:
-            clean_row = {k: v for k, v in row.items() if v is not None and v != ''}
-            integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
-            clean_row.update(integer_row)
-            scholars_list.append(clean_row)
+    reader = csv.DictReader(open(csv_file_path, encoding='utf-8'))
+    scholars_list = []
+    for row in reader:
+        clean_row = {k: v for k, v in row.items() if v is not None and v != ''}
+        integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
+        clean_row.update(integer_row)
+        scholars_list.append(clean_row)
 
     payments_dict = {"Manager": manager_acc, "Scholars": scholars_list}
 

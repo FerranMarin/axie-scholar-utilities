@@ -16,7 +16,7 @@ def test_transfer_manager_init(mocked_load_json):
     assert atm.secure is True
 
 
-@patch("axie.transfers.Axies.get_axies", return_value=[123, 123123, 234])
+@patch("axie.transfers.Axies.check_axie_owner", return_value=True)
 @patch("axie.transfers.load_json")
 @patch("axie.transfers.AxieTransferManager.execute_transfers")
 def test_transfer_manager_prepare_transfers(mocked_execute_transfers, mocked_load_json, mock_axies):
@@ -33,7 +33,7 @@ def test_transfer_manager_prepare_transfers(mocked_execute_transfers, mocked_loa
     ]}]
     atm.secrets_file = {"ronin:1": "0xsecret1"}
     atm.prepare_transfers()
-    mock_axies.assert_called_once()
+    assert mock_axies.call_count == 3
     assert mocked_execute_transfers.call_count == 1
     transactions_list = mocked_execute_transfers.call_args_list[0][0][0]
     assert len(transactions_list) == 3
@@ -54,7 +54,7 @@ def test_transfer_manager_prepare_transfers(mocked_execute_transfers, mocked_loa
     assert transactions_list[2].axie_id == 234
 
 
-@patch("axie.transfers.Axies.get_axies", return_value=[123])
+@patch("axie.transfers.Axies.check_axie_owner", side_effect=[True, False, False])
 @patch("axie.transfers.load_json")
 @patch("axie.transfers.AxieTransferManager.execute_transfers")
 def test_transfer_manager_prepare_transfers_only_available(mocked_execute_transfers, mocked_load_json, mock_axies):
@@ -71,7 +71,7 @@ def test_transfer_manager_prepare_transfers_only_available(mocked_execute_transf
     ]}]
     atm.secrets_file = {"ronin:1": "0xsecret1"}
     atm.prepare_transfers()
-    mock_axies.assert_called_once()
+    assert mock_axies.call_count == 3
     assert mocked_execute_transfers.call_count == 1
     transactions_list = mocked_execute_transfers.call_args_list[0][0][0]
     assert len(transactions_list) == 1
@@ -82,10 +82,10 @@ def test_transfer_manager_prepare_transfers_only_available(mocked_execute_transf
     assert transactions_list[0].axie_id == 123
 
 
-@patch("axie.transfers.Axies.get_axies", return_value=[123, 123123, 234])
+@patch("axie.transfers.Axies.check_axie_owner", return_value=True)
 @patch("axie.transfers.load_json")
 @patch("axie.transfers.AxieTransferManager.execute_transfers")
-def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers, mocked_load_json, _):
+def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers, mocked_load_json, mock_axies):
     transfers_file = "sample_transfers_file.json"
     secrets_file = "sample_secrets_file.json"
     atm = AxieTransferManager(transfers_file, secrets_file, True)
@@ -100,6 +100,7 @@ def test_transfer_manager_prepare_transfers_secure(mocked_execute_transfers, moc
     atm.secrets_file = {"ronin:1": "0xsecret1", "ronin:3": "0xsecret3"}
     atm.prepare_transfers()
     assert mocked_execute_transfers.call_count == 1
+    assert mock_axies.call_count == 1
     transactions_list = mocked_execute_transfers.call_args_list[0][0][0]
     assert len(transactions_list) == 1
     assert transactions_list[0].from_acc == "0x1"

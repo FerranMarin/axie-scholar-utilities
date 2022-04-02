@@ -87,7 +87,7 @@ def test_claims_manager_verify_inputs_wrong_public_ronin(caplog):
 
 
 @patch("trezor.trezor_claims.get_default_client", return_value="client")
-@patch("trezor.trezor_claims.TrezorClaim.execute")
+@patch("trezor.trezor_claims.TrezorClaim.async_execute")
 def test_claims_manager_prepare_claims(mocked_claim_execute, mock_client):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     p_file = {

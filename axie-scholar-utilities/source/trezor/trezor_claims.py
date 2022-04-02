@@ -1,4 +1,5 @@
 import sys
+import asyncio
 import logging
 from datetime import datetime
 from trezorlib.client import get_default_client
@@ -61,6 +62,6 @@ class TrezorAxieClaimsManager:
                 bip_path=self.trezor_config[acc]['bip_path'],
                 acc_name=self.acc_names[acc]) for acc in self.trezor_config]
         logging.info("Claiming starting...")
-        for claim in claims_list:
-            claim.execute()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(asyncio.gather(*[claim.async_execute() for claim in claims_list]))
         logging.info("Claiming completed!")

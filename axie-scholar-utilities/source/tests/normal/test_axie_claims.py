@@ -135,7 +135,7 @@ def test_claims_manager_verify_input_wrong_private_short(caplog):
     assert f"Private key for account {scholar_acc} is not valid, please review it!" in caplog.text
 
 
-@patch("axie_utils.Claim.execute")
+@patch("axie_utils.Claim.async_execute")
 def test_claims_manager_prepare_claims(mocked_claim_execute):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*4)
     scholar_private_acc = '0x<account_s1_private_address>012345' + "".join([str(x) for x in range(10)]*3)
