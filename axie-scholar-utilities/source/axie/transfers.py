@@ -57,11 +57,11 @@ class AxieTransferManager:
         transfers = []
         logging.info("Preparing transfers")
         for acc in self.transfers_file:
-            axies_in_acc = Axies(acc['AccountAddress']).get_axies()
+            a = Axies(acc['AccountAddress'])
             for axie in acc['Transfers']:
                 if not self.secure or (self.secure and axie['ReceiverAddress'] in self.secrets_file):
                     # Check axie in account
-                    if axie['AxieId'] in axies_in_acc:
+                    if a.check_axie_owner(axie['AxieId']):
                         t = Transfer(
                             to_acc=axie['ReceiverAddress'],
                             from_private=self.secrets_file[acc['AccountAddress']],
