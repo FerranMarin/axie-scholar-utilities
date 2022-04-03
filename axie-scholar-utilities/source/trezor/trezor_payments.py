@@ -5,7 +5,6 @@ from datetime import datetime
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from trezorlib.client import get_default_client
-from trezorlib.tools import parse_path
 
 from axie.payments import PaymentsSummary
 from axie.schemas import payments_schema, legacy_payments_schema
@@ -176,7 +175,7 @@ class TrezorAxiePaymentsManager:
         for acc in self.scholar_accounts:
             client = get_default_client(
                 ui=CustomUI(passphrase=self.trezor_config[acc['ronin'].lower()]['passphrase']))
-            bip_path = parse_path(self.trezor_config[acc['ronin'].lower()]['bip_path'])
+            bip_path = self.trezor_config[acc['ronin'].lower()]['bip_path']
             acc_balance = check_balance(acc['ronin'])
             total_payments = 0
             acc_payments = {}
@@ -234,7 +233,7 @@ class TrezorAxiePaymentsManager:
         for acc in self.scholar_accounts:
             client = get_default_client(
                 ui=CustomUI(passphrase=self.trezor_config[acc['AccountAddress'].lower()]['passphrase']))
-            bip_path = parse_path(self.trezor_config[acc['AccountAddress'].lower()]['bip_path'])
+            bip_path = self.trezor_config[acc['AccountAddress'].lower()]['bip_path']
             acc_balance = check_balance(acc['AccountAddress'].lower())
             total_payments = 0
             acc_payments = {}

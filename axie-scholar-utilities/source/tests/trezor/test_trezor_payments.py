@@ -226,7 +226,6 @@ def test_payments_manager_prepare_payout(mocked_prepare_payout):
     mocked_prepare_payout.assert_called_once()
 
 
-@patch("trezor.trezor_payments.parse_path", return_value="m/44'/60'/0'/0/0")
 @patch("trezor.trezor_payments.get_default_client", return_value="client")
 @patch("trezor.trezor_payments.check_balance", return_value=1000)
 @patch("axie_utils.TrezorScatter.execute")
@@ -236,8 +235,7 @@ def test_payments_manager_prepare_payout_check_correct_payments(mocked_enough_ba
                                                                 mocked_scatter_init,
                                                                 mocked_scatter_execute,
                                                                 mocked_check_balance,
-                                                                mocked_client,
-                                                                mocked_parse):
+                                                                mocked_client):
     scholar_acc = 'ronin:12345678900987654321' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:12345678900987000321' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
@@ -264,7 +262,6 @@ def test_payments_manager_prepare_payout_check_correct_payments(mocked_enough_ba
     axp.verify_inputs()
     axp.prepare_payout()
     mocked_client.assert_called()
-    mocked_parse.assert_called()
     mocked_check_balance.assert_called()
     mocked_enough_balance.assert_called_with(scholar_acc, 1000)
     mocked_scatter_init.assert_called_with(
