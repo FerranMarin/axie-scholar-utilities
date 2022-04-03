@@ -515,10 +515,12 @@ def test_payments_manager_prepare_no_payout_not_enough_balance(mocked_check_bala
     mocked_payout.assert_not_called()
 
 
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress")
 @patch("axie.payments.check_balance", return_value=1000)
 @patch("axie_utils.Scatter.execute")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-def test_payments_manager_payout_account_accept(_, mocked_execute, mocked_check_balance, caplog):
+def test_payments_manager_payout_account_accept(_, mocked_execute, mocked_check_balance, __, ___, caplog):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
@@ -552,10 +554,12 @@ def test_payments_manager_payout_account_accept(_, mocked_execute, mocked_check_
         assert "SLP scatter completed for account: 'Scholar 1'" in caplog.text
 
 
+@patch("web3.eth.Eth.contract")
+@patch("web3.Web3.toChecksumAddress")
 @patch("axie.payments.check_balance", return_value=1000)
 @patch("axie_utils.Scatter.execute")
 @patch("axie.AxiePaymentsManager.check_acc_has_enough_balance", return_value=True)
-def test_payments_manager_payout_auto_yes(_, mocked_execute, mocked_check_balance, caplog):
+def test_payments_manager_payout_auto_yes(_, mocked_execute, mocked_check_balance, __, ___, caplog):
     scholar_acc = 'ronin:<account_s1_address>' + "".join([str(x) for x in range(10)]*2)
     manager_acc = 'ronin:<manager_address>000' + "".join([str(x) for x in range(10)]*2)
     dono_acc = 'ronin:<donations_address>0' + "".join([str(x) for x in range(10)]*2)
