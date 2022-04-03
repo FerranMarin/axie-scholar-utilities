@@ -11,7 +11,7 @@ docopt = "^0.6.2"
 jsonschema = "^3.2.0"
 qrcode = "^7.3.1"
 Pillow = "^9.0.1"
-axie-utils = "^2.0.10"
+axie-utils = "^2.0.11"
 
 [tool.poetry.dev-dependencies]
 mock = "^4.0.3"
