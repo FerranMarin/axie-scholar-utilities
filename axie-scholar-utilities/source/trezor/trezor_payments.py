@@ -54,7 +54,7 @@ class TrezorAxiePaymentsManager:
 
         # Check we have private keys for all accounts
         for acc in self.payments_file["Scholars"]:
-            if acc["AccountAddress"] not in self.trezor_config:
+            if acc["AccountAddress"].lower() not in self.trezor_config:
                 logging.critical(f"Account '{acc['Name']}' is not present in trezor_config file, please add it.")
                 validation_success = False       
         if not validation_success:
@@ -79,7 +79,7 @@ class TrezorAxiePaymentsManager:
 
         # Check we have private keys for all accounts
         for acc in self.payments_file["scholars"]:
-            if acc["ronin"] not in self.trezor_config:
+            if acc["ronin"].lower() not in self.trezor_config:
                 logging.critical(f"Account '{acc['name']}' is not present in trezor_config file, please add it.")
                 validation_success = False
             # Check all splits have a "manager" persona
