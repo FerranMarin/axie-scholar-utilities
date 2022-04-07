@@ -61,7 +61,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "axie-utils"
-version = "2.0.12"
+version = "2.0.13"
 description = "Library that provides the functionality you need to build your own axie Infinity python tools"
 category = "main"
 optional = false
@@ -823,7 +823,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "ececa4353d839a4a9acafc668088971804065f13ef99af10f4879eb4e94d5e8a"
+content-hash = "2006e042941b4b8ab65ca6b478e2b67e4fa59a08335bf5fdc0b3569e756d23f6"
 
 [metadata.files]
 aiohttp = [
@@ -917,8 +917,8 @@ attrs = [
     {file = "attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
 ]
 axie-utils = [
-    {file = "axie-utils-2.0.12.tar.gz", hash = "sha256:81e1f10a9e4286800f6a4a2a03a706848493e7c23a7d9c98a4dc0562ed90d549"},
-    {file = "axie_utils-2.0.12-py3-none-any.whl", hash = "sha256:a3ddc44dde913c8deb8f39566b86ef73b521d68f4452c49a941e2427e32de248"},
+    {file = "axie-utils-2.0.13.tar.gz", hash = "sha256:4614f3d4b1a16caf48150b96a471bc201dc52c41965ecf5da9529c54f9856518"},
+    {file = "axie_utils-2.0.13-py3-none-any.whl", hash = "sha256:0bfd2b435074592746bf3393e13381b3bc75b8c3002c1b431717f21c7ae1c6ad"},
 ]
 base58 = [
     {file = "base58-2.1.1-py3-none-any.whl", hash = "sha256:11a36f4d3ce51dfc1043f3218591ac4eb1ceb172919cebe05b52a5bcc8d245c2"},
