@@ -154,7 +154,7 @@ def generate_payments_file(csv_file_path, payments_file_path=None):
     scholars_list = []
     for row in reader:
         clean_row = {k: v for k, v in row.items() if v is not None and v != ''}
-        integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit()}
+        integer_row = {k: int(v) for k, v in clean_row.items() if v.isdigit() and k != "Name"}
         clean_row.update(integer_row)
         scholars_list.append(clean_row)
 
