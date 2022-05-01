@@ -279,7 +279,7 @@ class AxiePaymentsManager:
             if self.check_acc_has_enough_balance(acc['AccountAddress'], total_payments) and acc_balance > 0:
                 accept = "y" if self.auto else None
                 while accept not in ["y", "n", "Y", "N"]:
-                    accept = input(f"Do you want to proceed with payments for {acc['name']} ({acc_payments})? (y/n): ")
+                    accept = input(f"Do you want to proceed with payments for {acc['Name']} ({acc_payments})? (y/n): ")
                 if accept.lower() == "y":
                     s = Scatter('slp', acc['AccountAddress'], self.secrets_file[acc['AccountAddress']], acc_payments)
                     s.execute()
@@ -350,4 +350,8 @@ class PaymentsSummary(Singleton):
             msg += f'Paid {len(self.other["accounts"])} other accounts, {self.other["slp"]} SLP.\n'
         if self.donations["slp"] > 0:
             msg += f'Donated to {len(self.donations["accounts"])} organisations, {self.donations["slp"]} SLP.\n'
+
+        # TODO: Find a fix for this!
+        msg += "---------------------- \n"
+        msg += "This summary assumes all trasactions went fine, please do NOT trust it!\n"
         return msg
