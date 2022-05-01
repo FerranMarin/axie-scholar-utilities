@@ -221,7 +221,7 @@ class TrezorAxiePaymentsManager:
             if self.check_acc_has_enough_balance(acc['ronin'], total_payments) and acc_balance > 0:
                 accept = "y" if self.auto else None
                 while accept not in ["y", "n", "Y", "N"]:
-                    accept = input("Do you want to proceed with these transactions?(y/n): ")
+                    accept = input(f"Do you want to proceed with payments for {acc['name']} ({acc_payments})? (y/n): ")
                 if accept.lower() == "y":
                     s = TrezorScatter('slp', acc['ronin'], client, bip_path, acc_payments)
                     s.execute()
@@ -281,7 +281,7 @@ class TrezorAxiePaymentsManager:
             if self.check_acc_has_enough_balance(acc['AccountAddress'], total_payments) and acc_balance > 0:
                 accept = "y" if self.auto else None
                 while accept not in ["y", "n", "Y", "N"]:
-                    accept = input("Do you want to proceed with these transactions?(y/n): ")
+                    accept = input(f"Do you want to proceed with payments for {acc['name']} ({acc_payments})? (y/n): ")
                 if accept.lower() == "y":
                     s = TrezorScatter('slp', acc['AccountAddress'], client, bip_path, acc_payments)
                     s.execute()

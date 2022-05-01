@@ -29,8 +29,8 @@ class AxieMorphingManager:
             sys.exit()
 
     def execute(self):
-        logging.info(f"About to start morphing axies for account {self.account}")
+        logging.info(f"Important: About to start morphing axies for account {self.account}")
         for axie in self.axie_list:
             m = Morph(axie=axie, account=self.account, private_key=self.secrets[self.account])
             m.execute()
-        logging.info(f"Done morphing axies for account {self.account}")
+        logging.info(f"Important: Done morphing axies for account {self.account}")

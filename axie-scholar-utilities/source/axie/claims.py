@@ -61,7 +61,7 @@ class AxieClaimsManager:
                 account=acc,
                 private_key=self.secrets_file[acc],
                 acc_name=self.acc_names[acc]) for acc in self.secrets_file]
-        logging.info("Claiming starting...")
+        logging.info("Important: Claiming starting...")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.gather(*[claim.async_execute() for claim in claims_list]))
-        logging.info("Claiming completed!")
+        logging.info("Important: Claiming completed!")

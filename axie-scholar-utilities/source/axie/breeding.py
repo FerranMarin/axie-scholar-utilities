@@ -68,10 +68,10 @@ class AxieBreedManager:
 
     def execute(self):
         if check_balance(self.payment_account) < self.calculate_cost():
-            logging.critical("Not enough SLP funds to pay for breeding and the fee")
+            logging.critical("Important: Not enough SLP funds to pay for breeding and the fee")
             sys.exit()
 
-        logging.info("About to start breeding axies")
+        logging.info("Important: About to start breeding axies")
         for bf in self.breeding_file:
             b = Breed(
                 sire_axie=bf['Sire'],
@@ -80,7 +80,7 @@ class AxieBreedManager:
                 private_key=self.secrets[bf['AccountAddress']]
             )
             b.execute()
-        logging.info("Done breeding axies")
+        logging.info("Important: Done breeding axies")
         fee = self.calculate_fee_cost()
         logging.info(f"Time to pay the fee for breeding. For this session it is: {fee} SLP")
         p = Payment(
