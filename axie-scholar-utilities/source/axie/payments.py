@@ -90,7 +90,8 @@ class AxiePaymentsManager:
                 validation_success = False
         
         if not validation_success:
-            logging.critical("Please make sure your payments.json file looks like the payments one in the wiki or the sample files.\n"
+            logging.critical("Please make sure your payments.json file looks like the payments one in "
+                             "the wiki or the sample files.\n"
                              "Find it here: https://ferranmarin.github.io/axie-scholar-utilities/ \n"
                              "Make sure you have configured all secrets too!")
             sys.exit()
@@ -182,8 +183,9 @@ class AxiePaymentsManager:
             total_payments = 0
             acc_payments = {}
             deductable_fees = 1
-            for dono in self.donations:
-                deductable_fees += dono['percentage']
+            if self.donations:
+                for dono in self.donations:
+                    deductable_fees += dono['percentage']
             # Split payments
             for sacc in acc['splits']:
                 if sacc['persona'].lower() == 'manager':

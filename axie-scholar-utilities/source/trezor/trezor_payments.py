@@ -143,7 +143,8 @@ class TrezorAxiePaymentsManager:
             logging.critical(f"Unexpected error! Unrecognized payments mode")
        
         if not validation_success:
-            logging.critical("There is a problem with your trezor_config.json, delete it and re-generate the file starting with an empty file.")
+            logging.critical("There is a problem with your trezor_config.json, delete it and re-generate "
+                             "the file starting with an empty file.")
             sys.exit()
         
         if self.type == "legacy":
@@ -181,8 +182,9 @@ class TrezorAxiePaymentsManager:
             total_payments = 0
             acc_payments = {}
             deductable_fees = 1
-            for dono in self.donations:
-                deductable_fees += dono['percentage']
+            if self.donations:
+                for dono in self.donations:
+                    deductable_fees += dono['percentage']
             # Split payments
             for sacc in acc['splits']:
                 if sacc['persona'].lower() == 'manager':
@@ -261,7 +263,8 @@ class TrezorAxiePaymentsManager:
                     dono_amount = round(acc_balance * (dono["Percent"]/100))
                     if dono_amount > 1:
                         acc_payments[dono['AccountAddress']] = dono_amount
-                        self.summary.increase_payout(amount=dono_amount, address=dono['AccountAddress'], payout_type='donation')
+                        self.summary.increase_payout(amount=dono_amount, address=dono['AccountAddress'],
+                                                     payout_type='donation')
                         manager_payout -= dono_amount
                         total_payments += dono_amount
             # Fee Payments
