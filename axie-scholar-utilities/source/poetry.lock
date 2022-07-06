@@ -590,7 +590,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 
 [[package]]
 name = "pytest-mock"
-version = "3.7.0"
+version = "3.8.2"
 description = "Thin-wrapper around the mock package for easier use with pytest"
 category = "dev"
 optional = false
@@ -692,6 +692,14 @@ rust-backend = ["rusty-rlp (>=0.1.15,<0.2)"]
 test = ["hypothesis (==5.19.0)", "pytest (==5.4.3)", "tox (>=2.9.1,<3)"]
 
 [[package]]
+name = "simple-rlp"
+version = "0.1.2"
+description = "RLP (Recursive Length Prefix) - Encode and decode data structures"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -717,26 +725,27 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "trezor"
-version = "0.13.0"
+version = "0.13.2"
 description = "Python library for communicating with Trezor Hardware Wallet"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-click = ">=7,<9"
-construct = ">=2.9"
+click = ">=7,<8.2"
+construct = ">=2.9,<2.10.55 || >2.10.55"
 ecdsa = ">=0.9"
 hidapi = {version = ">=0.7.99.post20", optional = true, markers = "extra == \"hidapi\""}
 libusb1 = ">=1.6.4"
 mnemonic = ">=0.20"
 requests = ">=2.4.0"
+simple-rlp = {version = ">=0.1.2", markers = "python_version >= \"3.7\""}
 typing-extensions = ">=3.10"
 
 [package.extras]
-ethereum = ["rlp (>=1.1.0)", "web3 (>=4.8)"]
+ethereum = ["web3 (>=4.8)", "rlp (>=1.1.0)"]
 extra = ["pillow"]
-full = ["hidapi (>=0.7.99.post20)", "rlp (>=1.1.0)", "web3 (>=4.8)", "pyqt5", "pillow", "stellar-sdk (>=4.0.0,<6.0.0)"]
+full = ["hidapi (>=0.7.99.post20)", "web3 (>=4.8)", "pyqt5", "pillow", "stellar-sdk (>=4.0.0,<6.0.0)", "rlp (>=1.1.0)"]
 hidapi = ["hidapi (>=0.7.99.post20)"]
 qt-widgets = ["pyqt5"]
 stellar = ["stellar-sdk (>=4.0.0,<6.0.0)"]
@@ -823,7 +832,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "17e1226f3ff8f21825d29baae72e1fc6bd5d02c67328d472547f3a8ebfcbf0cb"
+content-hash = "47c5a76e05430f8dd599bbd305076e3a94f1356e2faa31f10748304cec275806"
 
 [metadata.files]
 aiohttp = [
@@ -1411,8 +1420,8 @@ pytest = [
     {file = "pytest-7.1.2.tar.gz", hash = "sha256:a06a0425453864a270bc45e71f783330a7428defb4230fb5e6a731fde06ecd45"},
 ]
 pytest-mock = [
-    {file = "pytest-mock-3.7.0.tar.gz", hash = "sha256:5112bd92cc9f186ee96e1a92efc84969ea494939c3aead39c50f421c4cc69534"},
-    {file = "pytest_mock-3.7.0-py3-none-any.whl", hash = "sha256:6cff27cec936bf81dc5ee87f07132b807bcda51106b5ec4b90a04331cba76231"},
+    {file = "pytest-mock-3.8.2.tar.gz", hash = "sha256:77f03f4554392558700295e05aed0b1096a20d4a60a4f3ddcde58b0c31c8fca2"},
+    {file = "pytest_mock-3.8.2-py3-none-any.whl", hash = "sha256:8a9e226d6c0ef09fcf20c94eb3405c388af438a90f3e39687f84166da82d5948"},
 ]
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
@@ -1449,6 +1458,9 @@ rlp = [
     {file = "rlp-2.0.1-py2.py3-none-any.whl", hash = "sha256:52a57c9f53f03c88b189283734b397314288250cc4a3c4113e9e36e2ac6bdd16"},
     {file = "rlp-2.0.1.tar.gz", hash = "sha256:665e8312750b3fc5f7002e656d05b9dcb6e93b6063df40d95c49ad90c19d1f0e"},
 ]
+simple-rlp = [
+    {file = "simple-rlp-0.1.2.tar.gz", hash = "sha256:5c4a9c58f1b742f7fa8af0fe4ea6ff9fb02294ae041912f771570dfaf339d2b9"},
+]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
@@ -1462,8 +1474,8 @@ toolz = [
     {file = "toolz-0.11.2.tar.gz", hash = "sha256:6b312d5e15138552f1bda8a4e66c30e236c831b612b2bf0005f8a1df10a4bc33"},
 ]
 trezor = [
-    {file = "trezor-0.13.0-py3-none-any.whl", hash = "sha256:8c79aab2ea30440a4c6a1380c0373a848f11730bcde43b3de5280a927a8e82cc"},
-    {file = "trezor-0.13.0.tar.gz", hash = "sha256:4571aa09dbfe88b31eb2f16c7c359b4809621b75a04b7b5bc9dbffe17046c99a"},
+    {file = "trezor-0.13.2-py3-none-any.whl", hash = "sha256:32410690e756c0a37bf59eb087298366afa9cb8930cb450a766320e8d972d455"},
+    {file = "trezor-0.13.2.tar.gz", hash = "sha256:cdb696fd01dad6a0cb23b61ea3a4867bb51cecda5cb2a77366fb6a53bff58ac4"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.2.0-py3-none-any.whl", hash = "sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708"},
