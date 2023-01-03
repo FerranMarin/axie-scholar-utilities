@@ -10,7 +10,7 @@ python = "^3.8"
 docopt = "^0.6.2"
 jsonschema = "^3.2.0"
 qrcode = "^7.3.1"
-Pillow = "^9.0.1"
+Pillow = "^9.4.0"
 axie-utils = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
