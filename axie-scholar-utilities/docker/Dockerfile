@@ -1,4 +1,4 @@
-FROM python:3.10-alpine as python-base
+FROM python:3.12.3-alpine as python-base
 # External Deps we need
 RUN apk add --update --no-cache gcc libc-dev jpeg-dev zlib-dev linux-headers libusb libusb-dev eudev-dev eudev
 
