@@ -47,24 +47,10 @@ You can breed using multiple accounts and pay the fee with another one. More ins
 
 # Roadmap
 
-- Release a desktop app (even more convenient)
-- Integrate with Discord (via a self-hosted bot, it will be 100% yours!)
-- ...
-- Feel free to suggest what's next on Discord! :)
-
-
-Feel free to open issues requesting features. I will consider all of them and maybe add them in the future!
+- Project archived as I will no longer actively mantain it and have not done so for a few months already!
 
 # Donations
 
 If you want to donate to thank me, feel free to do so at this ronin address:
 
     ronin:9fa1bc784c665e683597d3f29375e45786617550
-
-If you prefer you can:
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G36LZ2A)
-    
-# Discord
-
-Feel free to join this project's <a href="https://discord.gg/bmKvmhenvu">Discord</a>
